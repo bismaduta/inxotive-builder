@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal — INXOTIVE</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --surface2: #1a2332;
+  --primary: #4f46e5; --primary-light: rgba(79,70,229,0.15);
+  --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+  --text: #e2e8f0; --text-secondary: #94a3b8; --text-muted: #64748b;
+  --border: #334155; --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text);
+  min-height: 100vh; }
+a { color: var(--primary); text-decoration: none; }
+
+/* ── Layout ── */
+.app { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+.header { display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.logo { width: 34px; height: 34px; border-radius: 8px; background: var(--primary);
+  display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; }
+.brand-name { font-size: 18px; font-weight: 700; }
+.brand-name span { color: #818cf8; }
+.header-right { font-size: 13px; color: var(--text-secondary); }
+
+/* ── Status Bar ── */
+.status-bar { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.status-item { flex: 1; min-width: 120px; background: var(--surface);
+  border-radius: var(--radius); padding: 14px 18px; border: 1px solid var(--border); }
+.status-value { font-size: 22px; font-weight: 700; }
+.status-label { font-size: 11px; color: var(--text-muted); margin-top: 4px;
+  text-transform: uppercase; letter-spacing: .5px; }
+
+/* ── Card ── */
+.card { background: var(--surface); border-radius: var(--radius);
+  padding: 20px; border: 1px solid var(--border); margin-bottom: 16px; }
+.card-header { display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; }
+.card-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.card-title i { color: var(--primary); }
+
+/* ── Site Hero ── */
+.site-hero { background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-radius: var(--radius); padding: 28px; border: 1px solid var(--border);
+  margin-bottom: 24px; }
+.site-hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+.site-hero .url { font-size: 14px; color: var(--primary); margin-bottom: 12px; }
+.site-hero .badge-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.badge { display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.badge-live { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+.badge-built { background: rgba(59,130,246,0.15); color: #93c5fd; }
+.badge-draft { background: rgba(100,116,139,0.15); color: #94a3b8; }
+.badge-warn { background: rgba(245,158,11,0.15); color: #fcd34d; }
+
+/* ── Editor Tabs ── */
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 8px 16px; border-radius: 8px 8px 0 0; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--text-muted);
+  border: 1px solid transparent; border-bottom: none; transition: all .15s; }
+.tab:hover { color: var(--text); background: var(--surface2); }
+.tab.active { color: #fff; background: var(--surface); border-color: var(--border); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ── Form ── */
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary);
+  margin-bottom: 5px; display: block; }
+.form-input, .form-textarea, .form-select { width: 100%; padding: 10px 14px;
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text); font-size: 14px;
+  font-family: inherit; outline: none; transition: border .2s; }
+.form-input:focus, .form-textarea:focus { border-color: var(--primary); }
+.form-textarea { min-height: 90px; resize: vertical; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:640px) { .form-grid { grid-template-columns: 1fr; } }
+
+/* ── Buttons ── */
+.btn { padding: 10px 20px; border-radius: var(--radius-sm); font-size: 14px;
+  font-weight: 500; cursor: pointer; border: none; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 8px; transition: all .15s; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { opacity: .85; }
+.btn-secondary { background: var(--surface2); color: var(--text);
+  border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); }
+.btn-success { background: #059669; color: #fff; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Upload Zone ── */
+.upload-zone { border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 30px; text-align: center; cursor: pointer; transition: all .2s; }
+.upload-zone:hover, .upload-zone.dragover { border-color: var(--primary);
+  background: var(--primary-light); }
+.upload-zone i { font-size: 32px; color: var(--text-muted); margin-bottom: 8px; }
+.upload-zone p { font-size: 13px; color: var(--text-secondary); }
+
+.asset-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(100px,1fr));
+  gap: 10px; margin-top: 12px; }
+.asset-item { background: var(--surface2); border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--border); }
+.asset-item .thumb { height: 70px; background: var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.asset-item .info { padding: 6px 8px; }
+.asset-item .name { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.asset-item .size { font-size: 10px; color: var(--text-muted); }
+
+/* ── Toast ── */
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+.toast { background: var(--surface); border-radius: var(--radius-sm);
+  padding: 12px 18px; box-shadow: var(--shadow); border-left: 4px solid var(--primary);
+  font-size: 13px; margin-top: 8px; animation: slideIn .3s ease; }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+@keyframes slideIn { from { transform:translateX(100%); opacity:0; }
+  to { transform:translateX(0); opacity:1; } }
+
+/* ── Loading ── */
+.loading { text-align: center; padding: 60px; color: var(--text-muted); }
+.loading i { font-size: 36px; margin-bottom: 12px; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+
+/* ── Empty ── */
+.empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+
+/* ── Row editor ── */
+.row-editor { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.row-editor input { flex: 1; }
+.service-grid { display: grid; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">I</div>
+      <div class="brand-name"><span>INXOTIVE</span> Client Portal</div>
+    </div>
+    <div class="header-right">
+      <span id="client-name-display">—</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading-screen" class="loading">
+    <i class="fas fa-spinner spin"></i>
+    <p>Memuat portal Anda...</p>
+  </div>
+
+  <!-- Portal Content (hidden initially) -->
+  <div id="portal-content" style="display:none">
+
+    <!-- Status Bar -->
+    <div class="status-bar" id="status-bar"></div>
+
+    <!-- Site Hero -->
+    <div class="site-hero" id="site-hero"></div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tab-nav">
+      <div class="tab active" data-tab="edit">✏️ Edit Konten</div>
+      <div class="tab" data-tab="photos">🖼️ Foto</div>
+      <div class="tab" data-tab="request">📩 Request</div>
+    </div>
+
+    <!-- Tab: Edit Konten -->
+    <div class="tab-content active" id="tab-edit">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-info-circle"></i> Informasi Bisnis</span>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Nama Bisnis</label>
+            <input class="form-input" id="edit-name" placeholder="Nama bisnis">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tagline</label>
+            <input class="form-input" id="edit-tagline" placeholder="Tagline bisnis">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">WhatsApp <span style="color:var(--text-muted);font-weight:400">(62xxx)</span></label>
+            <input class="form-input" id="edit-wa" placeholder="6281234567890">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" id="edit-email" type="email" placeholder="email@domain.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alamat</label>
+          <input class="form-input" id="edit-address" placeholder="Alamat lengkap">
+        </div>
+        <button class="btn btn-primary" onclick="saveInfo()"><i class="fas fa-save"></i> Simpan</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-clock"></i> Jam Operasional</span>
+        </div>
+        <div id="hours-editor"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addHour()" style="margin-top:8px"><i class="fas fa-plus"></i> Tambah Jam</button>
+        <button class="btn btn-primary btn-sm" onclick="saveHours()" style="margin-top:8px;margin-left:8px"><i class="fas fa-save"></i> Simpan Jam</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-concierge-bell"></i> Layanan</span>
+        </div>
+        <div id="services-editor"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addService()" style="margin-top:8px"><i class="fas fa-plus"></i> Tambah Layanan</button>
+        <button class="btn btn-primary btn-sm" onclick="saveServices()" style="margin-top:8px;margin-left:8px"><i class="fas fa-save"></i> Simpan Layanan</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-book"></i> Tentang</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Judul</label>
+          <input class="form-input" id="edit-about-title" placeholder="Judul section tentang">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Deskripsi</label>
+          <textarea class="form-textarea" id="edit-about-desc" placeholder="Cerita tentang bisnis Anda..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveAbout()"><i class="fas fa-save"></i> Simpan</button>
+      </div>
+    </div>
+
+    <!-- Tab: Foto -->
+    <div class="tab-content" id="tab-photos">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-cloud-upload-alt"></i> Upload Foto</span>
+        </div>
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Klik atau drag & drop foto di sini</p>
+          <p style="font-size:11px;color:var(--text-muted);margin-top:4px">JPG, PNG, WebP — maks 10MB per file</p>
+          <input type="file" id="file-input" style="display:none" accept="image/*" onchange="handleUpload(this.files)">
+        </div>
+        <div id="portal-assets"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Request -->
+    <div class="tab-content" id="tab-request">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-paper-plane"></i> Kirim Request ke INXOTIVE</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jenis Request</label>
+          <select class="form-select" id="request-type">
+            <option value="revisi">✏️ Revisi konten</option>
+            <option value="fitur">➕ Tambah fitur/halaman</option>
+            <option value="error">🐛 Laporan error</option>
+            <option value="lainnya">📝 Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Detail Request</label>
+          <textarea class="form-textarea" id="request-message" rows="5"
+            placeholder="Jelaskan apa yang ingin diubah atau ditambahkan..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="sendRequest()"><i class="fas fa-paper-plane"></i> Kirim Request</button>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:8px">
+          <i class="fas fa-info-circle"></i> Request akan langsung diteruskan ke tim INXOTIVE via WhatsApp/Email.
+        </p>
+      </div>
+      <div class="card" id="request-history-card" style="display:none">
+        <div class="card-header">
+          <span class="card-title"><i class="fas fa-history"></i> Riwayat Request</span>
+        </div>
+        <div id="request-history"></div>
+      </div>
+    </div>
+
+  </div><!-- /portal-content -->
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:20px 0;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:24px">
+    <span>INXOTIVE OFFICE — Web Agency</span>
+    <span style="margin:0 8px">·</span>
+    <span>Ada pertanyaan? <a href="https://wa.me/6281234567890" target="_blank">Hubungi kami</a></span>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ═════════════════════════════════════
+// Client Portal Script
+// ═════════════════════════════════════
+
+// Client data injected by server
+const CLIENT_DATA = <!-- CLIENT_DATA --> || { client: {}, sites: [] };
+const API_BASE = window.location.origin;
+
+let STATE = {
+  token: '',
+  client: CLIENT_DATA.client || {},
+  sites: CLIENT_DATA.sites || [],
+  currentSiteId: '',
+  siteConfig: null,
+};
+
+// ── Init ──
+function init() {
+  // Extract token from URL path
+  const pathParts = window.location.pathname.split('/');
+  const tokenIndex = pathParts.indexOf('portal');
+  if (tokenIndex >= 0 && tokenIndex + 1 < pathParts.length) {
+    STATE.token = pathParts[tokenIndex + 1];
+  }
+
+  if (!STATE.token || !STATE.client.name) {
+    document.getElementById('loading-screen').innerHTML =
+      '<i class="fas fa-lock" style="color:#ef4444"></i><p style="color:#ef4444">Link akses tidak valid. Hubungi tim INXOTIVE.</p>';
+    return;
+  }
+
+  document.getElementById('client-name-display').textContent = STATE.client.name || 'Klien';
+  loadPortal();
+}
+
+// ── Load Portal ──
+async function loadPortal() {
+  if (!STATE.sites.length) {
+    document.getElementById('loading-screen').innerHTML =
+      '<i class="fas fa-globe" style="color:var(--text-muted)"></i><p>Belum ada website untuk akun ini.</p>';
+    return;
+  }
+
+  STATE.currentSiteId = STATE.sites[0].id;
+
+  // Status bar
+  const liveCount = STATE.sites.filter(s => s.status === 'deployed').length;
+  const totalCount = STATE.sites.length;
+  document.getElementById('status-bar').innerHTML = `
+    <div class="status-item"><div class="status-value">${totalCount}</div><div class="status-label">Website</div></div>
+    <div class="status-item"><div class="status-value" style="color:#6ee7b7">${liveCount}</div><div class="status-label">Live</div></div>
+    <div class="status-item"><div class="status-value" style="color:#93c5fd">${STATE.client.name}</div><div class="status-label">Client</div></div>
+  `;
+
+  // Site hero
+  const site = STATE.sites[0];
+  const statusClass = site.status === 'deployed' ? 'badge-live' : site.status === 'built' ? 'badge-built' : 'badge-draft';
+  const statusText = site.status === 'deployed' ? '✅ Live' : site.status === 'built' ? '🔧 Built' : '📄 Draft';
+  document.getElementById('site-hero').innerHTML = `
+    <h1>${site.name || 'Website'}</h1>
+    <div class="url">${site.domain || site.last_deploy_url || 'Belum di-deploy'}</div>
+    <div class="badge-row">
+      <span class="badge ${statusClass}">${statusText}</span>
+      <span class="badge badge-warn">${site.template || '-'}</span>
+      ${site.last_deploy ? `<span class="badge badge-live"><i class="fas fa-external-link-alt"></i> <a href="${site.last_deploy}" target="_blank" style="color:#6ee7b7">Buka Site</a></span>` : ''}
+    </div>
+  `;
+
+  // Load site config
+  await loadSiteConfig();
+
+  // Show portal
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('portal-content').style.display = 'block';
+
+  // Load assets
+  loadAssets();
+}
+
+async function loadSiteConfig() {
+  if (!STATE.currentSiteId) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/sites/${STATE.currentSiteId}`);
+    const data = await res.json();
+    STATE.siteConfig = data;
+    fillForm(data);
+  } catch(e) {
+    toast('Gagal memuat konfigurasi site', 'error');
+  }
+}
+
+// ── Fill Form ──
+function fillForm(data) {
+  const cfg = data.config || {};
+
+  // Info
+  setVal('edit-name', data.name || '');
+  setVal('edit-tagline', cfg?.brand?.tagline || '');
+  setVal('edit-wa', cfg?.contact?.whatsapp || '');
+  setVal('edit-email', cfg?.contact?.email || '');
+  setVal('edit-address', cfg?.contact?.address || '');
+
+  // About
+  setVal('edit-about-title', cfg?.about?.title || '');
+  setVal('edit-about-desc', cfg?.about?.desc || '');
+
+  // Hours
+  renderHours(cfg?.hours || []);
+
+  // Services
+  renderServices(cfg?.services || []);
+}
+
+function setVal(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.value = v || '';
+}
+function getVal(id) { return document.getElementById(id)?.value || ''; }
+
+// ── Hours Editor ──
+function renderHours(hours) {
+  const c = document.getElementById('hours-editor');
+  c.innerHTML = hours.map((h, i) => `
+    <div class="row-editor">
+      <input class="form-input hour-day" value="${h.day || ''}" placeholder="Hari">
+      <input class="form-input hour-time" value="${h.time || ''}" placeholder="Jam">
+      <button class="btn btn-sm" style="background:#dc2626;color:#fff" onclick="this.closest('.row-editor').remove()"><i class="fas fa-times"></i></button>
+    </div>`).join('');
+}
+function addHour() {
+  const c = document.getElementById('hours-editor');
+  c.insertAdjacentHTML('beforeend',
+    `<div class="row-editor"><input class="form-input hour-day" placeholder="Hari">
+    <input class="form-input hour-time" placeholder="Jam">
+    <button class="btn btn-sm" style="background:#dc2626;color:#fff" onclick="this.closest('.row-editor').remove()"><i class="fas fa-times"></i></button></div>`);
+}
+
+function collectHours() {
+  const hours = [];
+  document.querySelectorAll('#hours-editor .row-editor').forEach(row => {
+    const d = row.querySelector('.hour-day')?.value;
+    const t = row.querySelector('.hour-time')?.value;
+    if (d && t) hours.push({ day: d, time: t });
+  });
+  return hours;
+}
+
+// ── Services Editor ──
+function renderServices(services) {
+  const c = document.getElementById('services-editor');
+  c.innerHTML = services.map(s => `
+    <div class="row-editor">
+      <input class="form-input svc-icon" value="${s.icon || ''}" style="width:50px" placeholder="🥟">
+      <input class="form-input svc-title" value="${s.title || ''}" placeholder="Nama layanan">
+      <input class="form-input svc-desc" value="${s.desc || ''}" placeholder="Deskripsi">
+      <button class="btn btn-sm" style="background:#dc2626;color:#fff" onclick="this.closest('.row-editor').remove()"><i class="fas fa-times"></i></button>
+    </div>`).join('');
+}
+function addService() {
+  const c = document.getElementById('services-editor');
+  c.insertAdjacentHTML('beforeend',
+    `<div class="row-editor"><input class="form-input svc-icon" style="width:50px" placeholder="🥟">
+    <input class="form-input svc-title" placeholder="Nama layanan">
+    <input class="form-input svc-desc" placeholder="Deskripsi">
+    <button class="btn btn-sm" style="background:#dc2626;color:#fff" onclick="this.closest('.row-editor').remove()"><i class="fas fa-times"></i></button></div>`);
+}
+
+// ── SAVE: Info ──
+async function saveInfo() {
+  const data = {
+    brand: { name: getVal('edit-name'), tagline: getVal('edit-tagline') },
+    contact: { whatsapp: getVal('edit-wa'), email: getVal('edit-email'), address: getVal('edit-address') },
+  };
+  const res = await api(`/api/sites/${STATE.currentSiteId}/config`, 'PUT', data);
+  if (res?.updated) toast('Informasi tersimpan! Tim INXOTIVE akan mereview perubahan.', 'success');
+  else toast('Gagal menyimpan', 'error');
+}
+
+// ── SAVE: Hours ──
+async function saveHours() {
+  const hours = collectHours();
+  const res = await api(`/api/sites/${STATE.currentSiteId}/config`, 'PUT', { hours });
+  if (res?.updated) toast('Jam operasional tersimpan!', 'success');
+  else toast('Gagal menyimpan', 'error');
+}
+
+// ── SAVE: Services ──
+async function saveServices() {
+  const services = [];
+  document.querySelectorAll('#services-editor .row-editor').forEach(row => {
+    const icon = row.querySelector('.svc-icon')?.value;
+    const title = row.querySelector('.svc-title')?.value;
+    const desc = row.querySelector('.svc-desc')?.value;
+    if (title) services.push({ icon: icon || '✨', title, desc: desc || '' });
+  });
+  const res = await api(`/api/sites/${STATE.currentSiteId}/config`, 'PUT', { services });
+  if (res?.updated) toast('Layanan tersimpan!', 'success');
+  else toast('Gagal menyimpan', 'error');
+}
+
+// ── SAVE: About ──
+async function saveAbout() {
+  const data = { about: { title: getVal('edit-about-title'), desc: getVal('edit-about-desc') } };
+  const res = await api(`/api/sites/${STATE.currentSiteId}/config`, 'PUT', data);
+  if (res?.updated) toast('Tentang tersimpan!', 'success');
+  else toast('Gagal menyimpan', 'error');
+}
+
+// ── Assets ──
+async function loadAssets() {
+  const data = await api(`/api/assets?site_id=${STATE.currentSiteId}`);
+  if (!data) return;
+  const assets = data.assets || [];
+  const c = document.getElementById('portal-assets');
+  if (!assets.length) {
+    c.innerHTML = '<div class="empty-state"><p style="margin-top:12px">Belum ada foto yang diupload</p></div>';
+    return;
+  }
+  c.innerHTML = `<div style="margin-top:12px"><p style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">Foto yang sudah diupload (${assets.length})</p>
+    <div class="asset-grid">${assets.map(a => `
+      <div class="asset-item">
+        <div class="thumb">🖼️</div>
+        <div class="info">
+          <div class="name">${a.filename}</div>
+          <div class="size">${a.size ? Math.round(a.size/1024) + 'KB' : ''}</div>
+          <button class="btn btn-sm" style="background:#dc2626;color:#fff;width:100%;margin-top:4px;font-size:10px" onclick="deleteAsset('${a.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`).join('')}</div></div>`;
+}
+
+async function handleUpload(files) {
+  if (!files.length) return;
+  toast('Mengupload...', 'info');
+  const fd = new FormData();
+  fd.append('file', files[0]);
+  fd.append('site_id', STATE.currentSiteId);
+  fd.append('client_id', STATE.client.id || '');
+  try {
+    const res = await fetch(`${API_BASE}/api/assets/upload`, { method: 'POST', body: fd });
+    const d = await res.json();
+    if (d.id) { toast('Foto terupload!', 'success'); loadAssets(); }
+    else toast('Upload gagal', 'error');
+  } catch(e) { toast('Upload error', 'error'); }
+}
+
+async function deleteAsset(aid) {
+  if (!confirm('Hapus foto ini?')) return;
+  await api(`/api/assets/${aid}`, 'DELETE');
+  toast('Foto dihapus', 'info');
+  loadAssets();
+}
+
+// ── Request ──
+async function sendRequest() {
+  const type = document.getElementById('request-type').value;
+  const msg = document.getElementById('request-message').value.trim();
+  if (!msg) return toast('Tuliskan detail request Anda', 'error');
+
+  toast('Mengirim request...', 'info');
+  const res = await api('/api/portal/request', 'POST', {
+    token: STATE.token,
+    type,
+    message: msg,
+  });
+  if (res?.success) {
+    toast('Request terkirim! Tim INXOTIVE akan merespon segera.', 'success');
+    document.getElementById('request-message').value = '';
+  } else {
+    toast('Gagal mengirim request', 'error');
+  }
+}
+
+// ── Tabs ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+  });
+});
+
+// ── Upload Zone Drag & Drop ──
+const zone = document.getElementById('upload-zone');
+if (zone) {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover');
+    handleUpload(e.dataTransfer.files); });
+}
+
+// ── Helpers ──
+async function api(url, method = 'GET', body = null) {
+  try {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`${API_BASE}${url}`, opts);
+    return await res.json();
+  } catch(e) { toast('Network error', 'error'); return null; }
+}
+
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ── Init ──
+init();
+</script>
+</body>
+</html>

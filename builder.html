@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INXOTIVE Web Builder</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ===== INXOTIVE BUILDER v1 ===== */
+:root {
+  --sidebar-bg: #0b0f1a; --sidebar-hover: #1a1f35;
+  --sidebar-active: #4f46e5; --sidebar-text: #8b8fa3;
+  --bg: #f5f5f9; --surface: #fff; --surface2: #f8fafc;
+  --primary: #4f46e5; --primary-light: #e0e7ff;
+  --success: #10b981; --danger: #ef4444; --warning: #f59e0b; --info: #3b82f6;
+  --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+  --border: #e8ecf1;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,0.08);
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+.dark { --sidebar-bg: #0b0f1a; --sidebar-hover: #1a1f35;
+  --bg: #0f172a; --surface: #1e293b; --surface2: #1a2332;
+  --border: #334155; --text: #e2e8f0; --text-secondary: #94a3b8;
+  --text-muted: #64748b; }
+* { box-sizing: border-box; }
+html,body { height: 100%; margin: 0; padding: 0;
+  font-family: var(--font); background: var(--bg);
+  color: var(--text); overflow: hidden; }
+.app { display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: 240px; min-width: 240px; background: var(--sidebar-bg);
+  display: flex; flex-direction: column; z-index: 100; }
+.sidebar-header { padding: 18px 16px; display: flex; align-items: center;
+  gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.sidebar-logo { font-size: 16px; font-weight: 700; color: #e0e7ff; }
+.sidebar-logo span { color: #6366f1; }
+.sidebar-nav { padding: 10px; display: flex; flex-direction: column;
+  gap: 2px; flex: 1; overflow-y: auto; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  border-radius: 8px; cursor: pointer; color: var(--sidebar-text);
+  font-size: 13px; font-weight: 500; border: none; background: none;
+  width: 100%; text-align: left; transition: all .15s; }
+.nav-item i { width: 18px; font-size: 14px; text-align: center; }
+.nav-item:hover { background: var(--sidebar-hover); color: #c7d2fe; }
+.nav-item.active { background: var(--sidebar-active); color: #fff; }
+.sidebar-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 8px 10px; }
+.sidebar-footer { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+.brand-badge { font-size: 11px; color: var(--text-muted); }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+.topbar { display: flex; align-items: center; gap: 16px;
+  padding: 12px 24px; background: var(--surface);
+  border-bottom: 1px solid var(--border); min-height: 54px; }
+.topbar-content { display: flex; align-items: center; gap: 16px; flex: 1; }
+.page-section { display: none; flex-direction: column; height: 100%;
+  overflow-y: auto; padding: 20px 24px; gap: 16px;
+  animation: pageIn .3s ease; }
+.page-section.active { display: flex; }
+@keyframes pageIn { from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); } }
+.page-header { margin-bottom: 4px; }
+.page-header h2 { font-size: 20px; font-weight: 700; margin: 0; }
+.page-header p { font-size: 13px; color: var(--text-secondary); margin: 2px 0 0; }
+.page-actions { display: flex; gap: 8px; margin-left: auto; }
+
+/* ── Cards & Grid ── */
+.card { background: var(--surface); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-title { font-size: 15px; font-weight: 600; }
+.site-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 16px; }
+
+.site-card { background: var(--surface); border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow); border: 1px solid var(--border);
+  cursor: pointer; transition: all .2s; }
+.site-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.site-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.site-name { font-size: 15px; font-weight: 600; }
+.site-template { font-size: 11px; color: var(--text-muted); margin: 2px 0 8px; }
+.site-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-secondary); }
+.site-actions { display: flex; gap: 6px; margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border); }
+
+/* ── Status Badges ── */
+.badge { display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+.badge-draft { background: rgba(100,116,139,0.12); color: #64748b; }
+.badge-built { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.badge-deployed { background: rgba(16,185,129,0.12); color: #10b981; }
+.badge-deploy-failed { background: rgba(239,68,68,0.12); color: #ef4444; }
+.badge-live { background: rgba(16,185,129,0.12); color: #059669; }
+.badge-building { background: rgba(245,158,11,0.12); color: #d97706; }
+.badge.contacted { background: rgba(99,102,241,0.12); color: #6366f1; }
+.badge.prospect { background: rgba(148,163,184,0.12); color: #64748b; }
+.badge.meeting { background: rgba(245,158,11,0.12); color: #d97706; }
+.badge.won { background: rgba(16,185,129,0.12); color: #059669; }
+.badge.lost { background: rgba(239,68,68,0.12); color: #dc2626; }
+
+/* ── Buttons ── */
+.btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  cursor: pointer; border: none; font-family: inherit; display: inline-flex;
+  align-items: center; gap: 6px; transition: all .15s; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { opacity: .9; }
+.btn-secondary { background: var(--surface2); color: var(--text);
+  border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--border); }
+.btn-success { background: #059669; color: #fff; }
+.btn-danger { background: #dc2626; color: #fff; }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-lg { padding: 10px 20px; font-size: 14px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Forms ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary);
+  margin-bottom: 4px; display: block; }
+.form-input, .form-textarea, .form-select { width: 100%; padding: 8px 12px;
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text); font-size: 13px;
+  font-family: inherit; outline: none; transition: border .15s; }
+.form-input:focus, .form-textarea:focus { border-color: var(--primary); }
+.form-textarea { min-height: 80px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.theme-option { display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+  cursor: pointer; font-size: 12px; transition: all .15s; }
+.theme-option:hover { border-color: var(--primary); }
+.theme-option.active { border-color: var(--primary); background: var(--primary-light); }
+.theme-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+/* ── Editor Layout ── */
+.editor-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px;
+  height: calc(100vh - 100px); overflow: hidden; }
+.editor-form { overflow-y: auto; padding-right: 8px; }
+.editor-preview { background: var(--surface); border-radius: var(--radius);
+  border: 1px solid var(--border); overflow: hidden; display: flex;
+  flex-direction: column; }
+.editor-preview-toolbar { display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; background: var(--surface2); border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--text-secondary); }
+.editor-preview-frame { flex: 1; iframe { width: 100%; height: 100%; border: none; } }
+
+/* ── Tables ── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+th { font-size: 11px; font-weight: 600; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .5px; }
+tr:hover td { background: var(--surface2); }
+
+/* ── Modal ── */
+.modal-overlay { display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.active { display: flex; }
+.modal { background: var(--surface); border-radius: var(--radius);
+  padding: 24px; max-width: 560px; width: 90%; max-height: 80vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-close { background: none; border: none; font-size: 20px;
+  cursor: pointer; color: var(--text-muted); }
+
+/* ── Toast ── */
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+.toast { background: var(--surface); border-radius: var(--radius-sm);
+  padding: 12px 18px; box-shadow: var(--shadow-lg); border-left: 4px solid var(--primary);
+  font-size: 13px; margin-top: 8px; animation: slideIn .3s ease; }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.info { border-left-color: var(--info); }
+@keyframes slideIn { from { transform:translateX(100%); opacity:0; }
+  to { transform:translateX(0); opacity:1; } }
+
+/* ── Stats Grid ── */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px; }
+.stat-card { background: var(--surface); border-radius: var(--radius);
+  padding: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.stat-value { font-size: 28px; font-weight: 700; }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── Loading / Empty / Error ── */
+.loading-state, .empty-state, .error-state { text-align: center;
+  padding: 60px 20px; color: var(--text-muted); }
+.empty-state i { font-size: 40px; margin-bottom: 12px; opacity: .4; }
+.empty-state p { font-size: 14px; }
+
+/* ── Responsive ── */
+@media(max-width:1024px) {
+  .editor-layout { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .sidebar { width: 60px; min-width: 60px; }
+  .sidebar span { display: none; }
+  .sidebar-header span { display: none; }
+  .sidebar-footer span { display: none; }
+  .nav-item { justify-content: center; padding: 12px; }
+  .nav-item i { width: auto; font-size: 18px; }
+}
+@media(max-width:768px) {
+  .site-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+}
+
+/* ── Upload Zone ── */
+.upload-zone { border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 40px; text-align: center; cursor: pointer; transition: all .2s; }
+.upload-zone:hover, .upload-zone.dragover { border-color: var(--primary);
+  background: var(--primary-light); }
+.upload-zone i { font-size: 36px; color: var(--text-muted); margin-bottom: 8px; }
+.upload-zone p { font-size: 13px; color: var(--text-secondary); }
+
+/* ── Color swatch ── */
+.color-swatch { display: inline-flex; align-items: center; gap: 6px; }
+.swatch-dot { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--border); }
+.section-divider { border-top: 1px solid var(--border); margin: 12px 0 16px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div style="width:28px;height:28px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0">B</div>
+      <span class="sidebar-logo"><span>INXOTIVE</span> Builder</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-page="sites"><i class="fas fa-globe"></i><span>Sites</span></button>
+      <button class="nav-item" data-page="editor"><i class="fas fa-pencil-alt"></i><span>Editor</span></button>
+      <button class="nav-item" data-page="clients"><i class="fas fa-users"></i><span>Clients</span></button>
+      <button class="nav-item" data-page="deploy"><i class="fas fa-rocket"></i><span>Deploy</span></button>
+      <button class="nav-item" data-page="assets"><i class="fas fa-images"></i><span>Assets</span></button>
+      <div class="sidebar-divider"></div>
+      <button class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></button>
+      <a href="/client-portal" class="nav-item" style="text-decoration:none" target="_blank"><i class="fas fa-external-link-alt"></i><span>Client Portal</span></a>
+      <a href="/hub" class="nav-item" style="text-decoration:none"><i class="fas fa-home"></i><span>Back to Hub</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="color:#fff;font-size:13px;font-weight:600">Bisma</div>
+      <div class="brand-badge">INXOTIVE OFFICE</div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-content">
+        <span id="page-title" style="font-size:15px;font-weight:600">Sites</span>
+        <span id="page-subtitle" style="font-size:12px;color:var(--text-muted)">Web Agency Builder Dashboard</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="refreshAll()"><i class="fas fa-sync-alt"></i> Refresh</button>
+    </div>
+
+    <!-- ═══ Page: Sites Dashboard ═══ -->
+    <div class="page-section active" id="page-sites">
+      <div class="page-header"><h2>Sites</h2><p>All client websites — status & quick actions</p></div>
+      <div class="stats-row" id="sites-stats"></div>
+      <div style="display:flex;gap:8px;margin:8px 0">
+        <button class="btn btn-primary" onclick="openNewSiteModal()"><i class="fas fa-plus"></i> New Site</button>
+        <button class="btn btn-secondary" onclick="filterSites('')">All</button>
+        <button class="btn btn-secondary" onclick="filterSites('built')">Built</button>
+        <button class="btn btn-secondary" onclick="filterSites('deployed')">Live</button>
+        <button class="btn btn-secondary" onclick="filterSites('draft')">Draft</button>
+      </div>
+      <div class="site-grid" id="sites-grid"></div>
+    </div>
+
+    <!-- ═══ Page: Editor ═══ -->
+    <div class="page-section" id="page-editor">
+      <div class="page-header" style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-secondary btn-sm" onclick="switchPage('sites')"><i class="fas fa-arrow-left"></i></button>
+        <div>
+          <h2>Site Editor</h2>
+          <p id="editor-site-name">Select a site to edit</p>
+        </div>
+        <div class="page-actions">
+          <span id="editor-status" style="font-size:12px;transition:all .3s"></span>
+          <button class="btn btn-primary" onclick="saveEditor()"><i class="fas fa-save"></i> Save</button>
+          <button class="btn btn-secondary" onclick="refreshPreview()"><i class="fas fa-sync-alt"></i> Refresh</button>
+          <button class="btn btn-secondary" onclick="previewSite()"><i class="fas fa-external-link-alt"></i> New Tab</button>
+          <button class="btn btn-success" onclick="buildAndDeploy()"><i class="fas fa-rocket"></i> Build & Deploy</button>
+        </div>
+      </div>
+      <div class="editor-layout" id="editor-layout">
+        <div class="editor-form" id="editor-form">
+                    <div class="form-group">
+            <label class="form-label">Template</label>
+            <select class="form-select" id="ed-template" onchange="onThemeChanged()">
+              <option value="landing">Landing Page</option>
+              <option value="klinik">Klinik</option>
+              <option value="apotek">Apotek</option>
+              <option value="lab">Laboratorium</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Theme <span style="color:var(--text-muted);font-weight:400">- click to select</span></label>
+            <div id="ed-themes" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+          </div>
+          <div class="form-group" id="ed-colors-group" style="display:none">
+            <label class="form-label">Override Warna <span style="color:var(--text-muted);font-weight:400">- kosongkan untuk default</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div><label style="font-size:11px;color:var(--text-muted)">Primary</label><input class="form-input" id="ed-color-primary" type="color" style="height:36px;padding:2px"></div>
+              <div><label style="font-size:11px;color:var(--text-muted)">Secondary</label><input class="form-input" id="ed-color-secondary" type="color" style="height:36px;padding:2px"></div>
+              <div><label style="font-size:11px;color:var(--text-muted)">Accent</label><input class="form-input" id="ed-color-accent" type="color" style="height:36px;padding:2px"></div>
+              <div><label style="font-size:11px;color:var(--text-muted)">Bg</label><input class="form-input" id="ed-color-bg" type="color" style="height:36px;padding:2px"></div>
+            </div>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nama Bisnis</label>
+              <input class="form-input" id="ed-name" placeholder="Nama bisnis">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Badge</label>
+              <input class="form-input" id="ed-badge" placeholder="BADGE TEXT">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tagline</label>
+            <input class="form-input" id="ed-tagline" placeholder="Tagline bisnis">
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="ed-wa" placeholder="62812..."></div>
+            <div class="form-group"><label class="form-label">Telp</label><input class="form-input" id="ed-phone" placeholder="021-xxxx"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="ed-email" placeholder="email@domain.com"></div>
+            <div class="form-group"><label class="form-label">Maps Embed URL</label><input class="form-input" id="ed-maps" placeholder="https://maps.google.com/..."></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alamat</label>
+            <input class="form-input" id="ed-address" placeholder="Alamat lengkap">
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">Jam Operasional</label>
+            <div id="ed-hours"></div>
+            <button class="btn btn-secondary btn-sm" onclick="addHour()" style="margin-top:6px"><i class="fas fa-plus"></i> Tambah</button>
+            <button class="btn btn-primary btn-sm" onclick="saveHours()" style="margin-top:6px;margin-left:6px"><i class="fas fa-save"></i> Simpan Jam</button>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">Layanan</label>
+            <div id="ed-services"></div>
+            <button class="btn btn-secondary btn-sm" onclick="addService()" style="margin-top:6px"><i class="fas fa-plus"></i> Tambah</button>
+            <button class="btn btn-primary btn-sm" onclick="saveServices()" style="margin-top:6px;margin-left:6px"><i class="fas fa-save"></i> Simpan Layanan</button>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">Statistik <span style="color:var(--text-muted);font-weight:400">- angka prestasi</span></label>
+            <div id="ed-stats"></div>
+            <button class="btn btn-secondary btn-sm" onclick="addStat()" style="margin-top:6px"><i class="fas fa-plus"></i> Tambah</button>
+            <button class="btn btn-primary btn-sm" onclick="saveStats()" style="margin-top:6px;margin-left:6px"><i class="fas fa-save"></i> Simpan</button>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">Testimoni</label>
+            <div id="ed-testimonials"></div>
+            <button class="btn btn-secondary btn-sm" onclick="addTestimonial()" style="margin-top:6px"><i class="fas fa-plus"></i> Tambah</button>
+            <button class="btn btn-primary btn-sm" onclick="saveTestimonials()" style="margin-top:6px;margin-left:6px"><i class="fas fa-save"></i> Simpan</button>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">Tim</label>
+            <div id="ed-team"></div>
+            <button class="btn btn-secondary btn-sm" onclick="addTeamMember()" style="margin-top:6px"><i class="fas fa-plus"></i> Tambah</button>
+            <button class="btn btn-primary btn-sm" onclick="saveTeam()" style="margin-top:6px;margin-left:6px"><i class="fas fa-save"></i> Simpan</button>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group">
+            <label class="form-label">Fitur</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="ed-feat-booking"> Booking Online</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="ed-feat-ai"> AI Chat</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="ed-feat-search"> Search</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="ed-feat-cms"> CMS</label>
+            </div>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">Tentang</label>
+            <input class="form-input" id="ed-about-title" placeholder="Judul section tentang" style="margin-bottom:6px">
+            <textarea class="form-textarea" id="ed-about-desc" placeholder="Cerita bisnis..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Highlights <span style="color:var(--text-muted);font-weight:400">- poin keunggulan</span></label>
+            <div id="ed-highlights"></div>
+            <button class="btn btn-secondary btn-sm" onclick="addHighlight()" style="margin-top:6px"><i class="fas fa-plus"></i> Tambah</button>
+            <button class="btn btn-primary btn-sm" onclick="saveHighlights()" style="margin-top:6px;margin-left:6px"><i class="fas fa-save"></i> Simpan</button>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">Social Media</label>
+            <div class="form-row">
+              <div class="form-group"><label style="font-size:11px;color:var(--text-muted)">Instagram</label><input class="form-input" id="ed-social-ig" placeholder="https://instagram.com/..."></div>
+              <div class="form-group"><label style="font-size:11px;color:var(--text-muted)">Facebook</label><input class="form-input" id="ed-social-fb" placeholder="https://facebook.com/..."></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label style="font-size:11px;color:var(--text-muted)">Youtube</label><input class="form-input" id="ed-social-yt" placeholder="https://youtube.com/..."></div>
+              <div class="form-group"><label style="font-size:11px;color:var(--text-muted)">Twitter</label><input class="form-input" id="ed-social-tw" placeholder="https://twitter.com/..."></div>
+            </div>
+          </div>
+          <div class="section-divider"></div>
+          <div class="form-group"><label class="form-label">SEO Title</label><input class="form-input" id="ed-seo-title" placeholder="Title untuk Google"></div>
+          <div class="form-group"><label class="form-label">SEO Description</label><textarea class="form-textarea" id="ed-seo-desc" placeholder="Deskripsi untuk Google"></textarea></div>
+        </div>
+        <div class="editor-preview">
+          <div class="editor-preview-toolbar">
+            <i class="fas fa-eye"></i> Live Preview
+            <select class="form-select" style="margin-left:auto;width:auto;padding:4px 8px;font-size:11px" id="prev-device" onchange="resizePreview()">
+              <option value="desktop">Desktop</option>
+              <option value="tablet">Tablet</option>
+              <option value="mobile">Mobile</option>
+            </select>
+          </div>
+          <div style="flex:1;overflow:hidden;position:relative" id="preview-container">
+            <iframe id="preview-iframe" style="width:100%;height:100%;border:none;background:#fff"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Page: Clients ═══ -->
+    <div class="page-section" id="page-clients">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div><h2>Clients</h2><p>Leads, prospects, and active clients</p></div>
+        <button class="btn btn-primary btn-sm" onclick="openNewClientModal()"><i class="fas fa-user-plus"></i> New Client</button>
+      </div>
+      <div class="stats-row" id="client-stats"></div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="clients-table">
+            <thead><tr><th>Name</th><th>Business</th><th>Stage</th><th>Contact</th><th>Sites</th><th>Created</th><th></th></tr></thead>
+            <tbody id="clients-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Page: Deploy ═══ -->
+    <div class="page-section" id="page-deploy">
+      <div class="page-header"><h2>Deploy Center</h2><p>Build & deploy sites to Vercel</p></div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Sites Ready to Deploy</span></div>
+        <div id="deploy-sites"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Recent Deployments</span></div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Site</th><th>Status</th><th>URL</th><th>Time</th></tr></thead>
+            <tbody id="deployments-tbody"><tr><td colspan="4" style="text-align:center;color:var(--text-muted)">No deployments yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Page: Assets ═══ -->
+    <div class="page-section" id="page-assets">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+        <div><h2>Asset Library</h2><p>Upload & manage site assets</p></div>
+      </div>
+      <div class="stats-row" id="asset-stats"></div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="flex:1">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Upload</span></div>
+            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>Drop files here or click to upload</p>
+              <p style="font-size:11px;color:var(--text-muted)">JPG, PNG, WebP, SVG — max 10MB</p>
+              <input type="file" id="file-input" style="display:none" multiple accept="image/*" onchange="handleUpload(this.files)">
+            </div>
+          </div>
+        </div>
+        <div style="flex:2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Assets</span>
+              <select class="form-select" style="width:auto;padding:4px 8px;font-size:12px" id="asset-site-filter" onchange="loadAssets()"></select>
+            </div>
+            <div id="assets-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;min-height:60px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Page: Settings ═══ -->
+    <div class="page-section" id="page-settings">
+      <div class="page-header"><h2>Builder Settings</h2><p>Configure builder preferences</p></div>
+      <div class="card" style="max-width:600px">
+        <div class="form-group">
+          <label class="form-label">Theme</label>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button class="btn btn-secondary btn-sm" onclick="setTheme('light')"><i class="fas fa-sun"></i> Light</button>
+            <button class="btn btn-secondary btn-sm" onclick="setTheme('dark')"><i class="fas fa-moon"></i> Dark</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Default Template</label>
+          <select class="form-select" id="settings-default-tpl" style="max-width:300px">
+            <option value="landing">Landing Page</option>
+            <option value="klinik">Klinik</option>
+            <option value="apotek">Apotek</option>
+            <option value="lab">Laboratorium</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Info</label>
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.8">
+            <div>Builder Version: 1.0.0</div>
+            <div>API: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px">localhost:8888/api/</code></div>
+            <div>Storage: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px">~/.agency_data.json</code></div>
+            <div>Templates: 4 (<span id="settings-theme-count">6</span> themes each)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: New Site -->
+<div class="modal-overlay" id="modal-new-site">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">New Site</span><button class="modal-close" onclick="closeModal('modal-new-site')">&times;</button></div>
+    <div class="form-group"><label class="form-label">Site Name</label><input class="form-input" id="ns-name"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Template</label>
+        <select class="form-select" id="ns-template"><option value="landing">Landing Page</option><option value="klinik">Klinik</option><option value="apotek">Apotek</option><option value="lab">Laboratorium</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Theme</label>
+        <select class="form-select" id="ns-theme"></select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Client</label>
+      <select class="form-select" id="ns-client"><option value="">— No Client —</option></select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-new-site')">Cancel</button>
+      <button class="btn btn-primary" onclick="createNewSite()">Create Site</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: New Client -->
+<div class="modal-overlay" id="modal-new-client">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">New Client</span><button class="modal-close" onclick="closeModal('modal-new-client')">&times;</button></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="nc-name"></div>
+      <div class="form-group"><label class="form-label">Company</label><input class="form-input" id="nc-company"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" id="nc-wa" placeholder="62812..."></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="nc-email"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Industry</label>
+      <select class="form-select" id="nc-industry"><option>Klinik</option><option>Apotek</option><option>Lab</option><option>Restoran</option><option>Jasa</option><option>Lainnya</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Stage</label>
+      <select class="form-select" id="nc-status"><option value="prospect">Prospect</option><option value="contacted">Contacted</option><option value="interested">Interested</option><option value="meeting">Meeting</option><option value="proposal">Proposal Sent</option></select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeModal('modal-new-client')">Cancel</button>
+      <button class="btn btn-primary" onclick="createNewClient()">Add Client</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════
+let STATE = {
+  sites: [],
+  clients: [],
+  assets: [],
+  currentSiteId: null,
+  filter: '',
+  theme: localStorage.getItem('builder-theme') || 'light',
+  _building: false,
+};
+
+// ═══════════════════════════════════════════
+// Navigation
+// ═══════════════════════════════════════════
+const PAGE_TITLES = {
+  sites: 'Sites', editor: 'Site Editor', clients: 'Clients',
+  deploy: 'Deploy Center', assets: 'Asset Library', settings: 'Settings',
+};
+
+document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+  el.addEventListener('click', () => {
+    const page = el.dataset.page;
+    switchPage(page);
+  });
+});
+
+function switchPage(page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+  const nav = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (nav) nav.classList.add('active');
+  const sec = document.getElementById(`page-${page}`);
+  if (sec) sec.classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_TITLES[page] || page;
+  // Load data per page
+  if (page === 'sites') loadSites();
+  if (page === 'clients') loadClients();
+  if (page === 'deploy') loadDeploy();
+  if (page === 'assets') loadAssets();
+  if (page === 'settings') loadSettings();
+}
+
+// ═══════════════════════════════════════════
+// API Helpers
+// ═══════════════════════════════════════════
+async function api(url, opts = {}) {
+  try {
+    const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
+    return await res.json();
+  } catch(e) { toast(e.message, 'error'); return null; }
+}
+
+function toast(msg, type = 'info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// ═══════════════════════════════════════════
+// Theme
+// ═══════════════════════════════════════════
+function setTheme(t) {
+  STATE.theme = t;
+  localStorage.setItem('builder-theme', t);
+  document.body.classList.toggle('dark', t === 'dark');
+}
+
+// ═══════════════════════════════════════════
+// Sites
+// ═══════════════════════════════════════════
+async function loadSites() {
+  const data = await api('/api/sites');
+  if (!data) return;
+  STATE.sites = data.sites || [];
+  const sites = STATE.filter ? data.sites.filter(s => s.status === STATE.filter) : data.sites;
+
+  // Stats
+  const total = data.sites.length;
+  const live = data.sites.filter(s => s.status === 'deployed').length;
+  const built = data.sites.filter(s => s.status === 'built').length;
+  const draft = data.sites.filter(s => s.status === 'draft').length;
+  document.getElementById('sites-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Sites</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#10b981">${live}</div><div class="stat-label">Live</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#3b82f6">${built}</div><div class="stat-label">Built</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#64748b">${draft}</div><div class="stat-label">Draft</div></div>`;
+
+  if (!sites.length) {
+    document.getElementById('sites-grid').innerHTML =
+      '<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-globe"></i><p>No sites yet. Create your first site!</p><button class="btn btn-primary" onclick="openNewSiteModal()" style="margin-top:12px">+ New Site</button></div>';
+    return;
+  }
+
+  document.getElementById('sites-grid').innerHTML = sites.map(s => {
+    const statusClass = `badge-${s.status === 'deployed' ? 'live' : s.status}`;
+    const statusLabel = s.status === 'deployed' ? '✅ Live' : s.status === 'deploy-failed' ? '❌ Failed' :
+      s.status === 'built' ? '🔧 Built' : s.status === 'building' ? '🔄 Building' : '📄 Draft';
+    return `<div class="site-card" onclick="openEditor('${s.id}')">
+      <div class="site-card-header">
+        <div><div class="site-name">${s.name}</div>
+        <div class="site-template">${s.template} · ${s.theme}</div></div>
+        <span class="badge ${statusClass}">${statusLabel}</span>
+      </div>
+      <div class="site-meta">
+        <span>${s.client_name || 'No client'}</span>
+        ${s.last_deploy ? `<span><i class="fas fa-external-link-alt"></i> ${s.last_deploy.replace('https://','')}</span>` : ''}
+      </div>
+      <div class="site-actions">
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openEditor('${s.id}')"><i class="fas fa-pen"></i> Edit</button>
+        <button class="btn btn-sm ${s.status==='built'?'btn-success':'btn-secondary'}" onclick="event.stopPropagation();deploySite('${s.id}')"><i class="fas fa-rocket"></i> Deploy</button>
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openDomainModal('${s.id}')"><i class="fas fa-link"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();confirmDelete('site','${s.id}')" style="margin-left:auto"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterSites(f) { STATE.filter = f; loadSites(); }
+
+// ── New Site Modal ──
+function openNewSiteModal() {
+  // Load clients for dropdown
+  api('/api/clients').then(d => {
+    const sel = document.getElementById('ns-client');
+    sel.innerHTML = '<option value="">— No Client —</option>' + (d?.clients||[]).map(c =>
+      `<option value="${c.id}">${c.name}</option>`).join('');
+  });
+  // Load themes for selected template
+  updateThemeDropdown('landing');
+  document.getElementById('modal-new-site').classList.add('active');
+}
+
+document.getElementById('ns-template').addEventListener('change', e => updateThemeDropdown(e.target.value));
+
+function updateThemeDropdown(tplId) {
+  api(`/api/templates/${tplId}`).then(d => {
+    if (d && d.themes) {
+      document.getElementById('ns-theme').innerHTML = d.themes.map(t =>
+        `<option value="${t}" ${t===d.default_theme?'selected':''}>${t}</option>`).join('');
+    }
+  });
+}
+
+async function createNewSite() {
+  const name = document.getElementById('ns-name').value.trim();
+  if (!name) return toast('Site name required', 'error');
+  const res = await api('/api/sites', {
+    method: 'POST',
+    body: JSON.stringify({
+      name,
+      template: document.getElementById('ns-template').value,
+      client_id: document.getElementById('ns-client').value,
+      config: { theme: document.getElementById('ns-theme').value }
+    })
+  });
+  if (res && res.id) {
+    toast('Site created!', 'success');
+    closeModal('modal-new-site');
+    document.getElementById('ns-name').value = '';
+    loadSites();
+  }
+}
+
+// ── Domain Modal ──
+function openDomainModal(siteId) {
+  const domain = prompt('Enter custom domain (e.g., weifu-dimsum.com):');
+  if (domain) setSiteDomain(siteId, domain);
+}
+
+async function setSiteDomain(siteId, domain) {
+  const res = await api(`/api/sites/${siteId}/domain`, { method: 'POST', body: JSON.stringify({ domain }) });
+  if (res?.success) toast('Domain assigned!', 'success');
+  else toast(res?.error || 'Failed to assign domain', 'error');
+  loadSites();
+}
+
+// ═══════════════════════════════════════════
+// Editor
+// ═══════════════════════════════════════════
+async function openEditor(siteId) {
+  STATE.currentSiteId = siteId;  // MUST set BEFORE switchPage + refreshPreview
+  if (window._saveTimer) clearTimeout(window._saveTimer);
+  STATE._building = false;
+  switchPage('editor');
+  // Load preview immediately
+  refreshPreview();
+  const data = await api(`/api/sites/${siteId}`);
+  if (!data || data.error) return toast('Failed to load site', 'error');
+  document.getElementById('editor-site-name').textContent = `Editing: ${data.name}`;
+
+  // Template
+  document.getElementById('ed-template').value = data.template || 'landing';
+
+  // Theme — load themes from API
+  const tpl = await api(`/api/templates/${data.template || 'landing'}`);
+  const themes = tpl?.themes || ['clinical-trust','warm-family','precision-lab','heritage-care','fresh-apotek','premium-resto'];
+  const currentTheme = data.theme || 'clinical-trust';
+  const themeColors = { 'clinical-trust':'#0F766E','warm-family':'#C2552B','precision-lab':'#0A0A0A','heritage-care':'#1E3A5F','fresh-apotek':'#16A34A','premium-resto':'#C84B31' };
+  document.getElementById('ed-themes').innerHTML = themes.map(t =>
+    `<span class="theme-option ${t===currentTheme?'active':''}" onclick="selectTheme('${t}')">
+      <span class="theme-dot" style="background:${themeColors[t]||'#666'}"></span> ${t}
+    </span>`).join('');
+
+  // Fill form
+  const cfg = data.config || {};
+  setVal('ed-name', data.name || '');
+  setVal('ed-tagline', cfg?.brand?.tagline || '');
+  setVal('ed-badge', cfg?.brand?.badge || '');
+  setVal('ed-wa', cfg?.contact?.whatsapp || '');
+  setVal('ed-phone', cfg?.contact?.phone || '');
+  setVal('ed-email', cfg?.contact?.email || '');
+  setVal('ed-address', cfg?.contact?.address || '');
+  setVal('ed-maps', cfg?.contact?.mapsEmbedUrl || '');
+  setVal('ed-seo-title', cfg?.seo?.title || '');
+  setVal('ed-seo-desc', cfg?.seo?.description || '');
+  setVal('ed-about-title', cfg?.about?.title || '');
+  setVal('ed-about-desc', cfg?.about?.desc || '');
+
+  // Social
+  const soc = cfg?.social || {};
+  setVal('ed-social-ig', soc?.instagram || '');
+  setVal('ed-social-fb', soc?.facebook || '');
+  setVal('ed-social-yt', soc?.youtube || '');
+  setVal('ed-social-tw', soc?.twitter || '');
+
+  // Features
+  document.getElementById('ed-feat-booking').checked = cfg?.features?.booking || false;
+  document.getElementById('ed-feat-ai').checked = cfg?.features?.aiChat || false;
+  document.getElementById('ed-feat-search').checked = cfg?.features?.search || false;
+  document.getElementById('ed-feat-cms').checked = cfg?.features?.cms || false;
+
+  // Colors override
+  const colors = cfg?.brand?.colors || {};
+  if (colors.primary) { setVal('ed-color-primary', colors.primary); showColorPicker(); }
+  if (colors.secondary) setVal('ed-color-secondary', colors.secondary);
+  if (colors.accent) setVal('ed-color-accent', colors.accent);
+  if (colors.bg) setVal('ed-color-bg', colors.bg);
+
+  // Dynamic arrays
+  renderHours(cfg?.hours || []);
+  renderServices(cfg?.services || []);
+  renderStats(cfg?.stats || []);
+  renderTestimonials(cfg?.testimonials || []);
+  renderTeam(cfg?.team || []);
+  renderHighlights(cfg?.about?.highlights || []);
+}
+
+// Refresh preview iframe — preserve scroll position across reloads
+function refreshPreview() {
+  const sid = STATE.currentSiteId;
+  if (!sid) return;
+  const pf = document.getElementById('preview-iframe');
+  if (!pf) return;
+
+  // Save current scroll position before reload
+  let savedScroll = 0;
+  try {
+    if (pf.contentWindow) savedScroll = pf.contentWindow.scrollY || 0;
+  } catch(e) {}
+
+  // Reload preview
+  pf.src = '/api/preview/' + sid + '?_=' + Date.now();
+
+  // Restore scroll after load
+  pf.onload = function() {
+    pf.onload = null;
+    try { pf.contentWindow.scrollTo(0, savedScroll); } catch(e) {}
+  };
+}
+
+// Helper: async version of String.replace
+async function replaceAsync(str, regex, asyncFn) {
+  const promises = [];
+  str.replace(regex, (match, ...args) => {
+    promises.push(asyncFn(match, ...args));
+    return match;
+  });
+  const replacements = await Promise.all(promises);
+  return str.replace(regex, () => replacements.shift());
+}
+
+// Auto-save system using event delegation on the editor form
+function setupAutoSave() {
+  const form = document.getElementById('editor-form');
+  if (!form) return;
+  // Remove old listener if any, add new one
+  if (form._autoSaveHandler) form.removeEventListener('input', form._autoSaveHandler);
+  form._autoSaveHandler = function(e) {
+    // Only trigger on actual input/select elements
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+      onFieldChange();
+    }
+  };
+  form.addEventListener('input', form._autoSaveHandler);
+  form.addEventListener('change', form._autoSaveHandler);
+}
+
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val || '';
+}
+
+// Auto-save debounce: called on any form input
+let _saveTimer = null;
+function onFieldChange() {
+  updateStatus('unsaved');
+  if (_saveTimer) clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(() => {
+    autoSaveEditor();
+  }, 1800);
+}
+
+// Status indicator
+function updateStatus(status) {
+  const el = document.getElementById('editor-status');
+  if (!el) return;
+  if (status === 'unsaved') {
+    el.innerHTML = '⚡ <span style="color:#f59e0b">Unsaved...</span>';
+  } else if (status === 'saving') {
+    el.innerHTML = '💾 <span style="color:#3b82f6">Saving & building...</span>';
+  } else if (status === 'saved') {
+    el.innerHTML = '✅ <span style="color:#10b981">Saved & preview updated</span>';
+    setTimeout(() => { if (el) el.innerHTML = ''; }, 3000);
+  } else if (status === 'error') {
+    el.innerHTML = '❌ <span style="color:#ef4444">Save failed</span>';
+    setTimeout(() => { if (el) el.innerHTML = ''; }, 4000);
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+// Auto-save: saves config + builds + refreshes preview
+async function autoSaveEditor() {
+  if (!STATE.currentSiteId || STATE._building) return;
+  STATE._building = true;
+  updateStatus('saving');
+  const data = collectEditorData();
+  const res = await api('/api/preview/' + STATE.currentSiteId + '/save', { method: 'POST', body: JSON.stringify(data) });
+  STATE._building = false;
+  if (res && res.preview_url) {
+    updateStatus('saved');
+    refreshPreview();
+  } else {
+    updateStatus('error');
+    if (res?.error) console.warn('Auto-save error:', res.error);
+  }
+}
+
+function selectTheme(t) {
+  document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+  document.querySelectorAll('.theme-option').forEach(o => {
+    if (o.textContent.trim().startsWith(t)) o.classList.add('active');
+  });
+}
+
+function onThemeChanged() {
+  // Reload themes for new template
+  const tplId = document.getElementById('ed-template').value;
+  api(`/api/templates/${tplId}`).then(d => {
+    if (d && d.themes) {
+      const themeColors = { 'clinical-trust':'#0F766E','warm-family':'#C2552B','precision-lab':'#0A0A0A','heritage-care':'#1E3A5F','fresh-apotek':'#16A34A','premium-resto':'#C84B31' };
+      document.getElementById('ed-themes').innerHTML = d.themes.map(t =>
+        `<span class="theme-option ${t===d.default_theme?'active':''}" onclick="selectTheme('${t}')">
+          <span class="theme-dot" style="background:${themeColors[t]||'#666'}"></span> ${t}
+        </span>`).join('');
+    }
+  });
+}
+
+function getVal(id) { return document.getElementById(id)?.value || ''; }
+
+function collectEditorData() {
+  const themeEl = document.querySelector('.theme-option.active');
+  const theme = themeEl ? themeEl.textContent.trim().split(' ')[0] : 'clinical-trust';
+  const colors = {};
+  ['primary','secondary','accent','bg'].forEach(k => {
+    const v = getVal('ed-color-'+k);
+    if (v && v !== '#000000') colors[k] = v;
+  });
+
+  // Collect dynamic hours
+  const hours = [];
+  document.querySelectorAll('#ed-hours .hour-row').forEach(r => {
+    const d = r.querySelector('.hour-day')?.value;
+    const t = r.querySelector('.hour-time')?.value;
+    if (d && t) hours.push({day: d, time: t});
+  });
+
+  // Collect dynamic services
+  const services = [];
+  document.querySelectorAll('#ed-services .service-row').forEach(r => {
+    const icon = r.querySelector('.svc-icon')?.value;
+    const title = r.querySelector('.svc-title')?.value;
+    const desc = r.querySelector('.svc-desc')?.value;
+    if (title) services.push({icon: icon || '✨', title, desc: desc || ''});
+  });
+
+  // Collect dynamic stats
+  const stats = [];
+  document.querySelectorAll('#ed-stats .stat-row').forEach(r => {
+    const value = r.querySelector('.svc-value')?.value;
+    const label = r.querySelector('.svc-label')?.value;
+    if (value || label) stats.push({value: value||'', label: label||''});
+  });
+
+  // Collect dynamic testimonials
+  const testimonials = [];
+  document.querySelectorAll('#ed-testimonials .testimonial-row').forEach(r => {
+    const name = r.querySelector('.t-name')?.value || '';
+    const text = r.querySelector('.t-text')?.value || '';
+    const rating = parseInt(r.querySelector('.t-rating')?.value) || 5;
+    if (text) testimonials.push({name, text, rating});
+  });
+
+  // Collect dynamic team
+  const team = [];
+  document.querySelectorAll('#ed-team .team-row').forEach(r => {
+    const name = r.querySelector('.tm-name')?.value || '';
+    const spec = r.querySelector('.tm-spec')?.value || '';
+    if (name) team.push({name, specialty: spec});
+  });
+
+  // Collect dynamic highlights
+  const highlights = [];
+  document.querySelectorAll('#ed-highlights .hl-row').forEach(r => {
+    const title = r.querySelector('.hl-title')?.value || '';
+    const desc = r.querySelector('.hl-desc')?.value || '';
+    if (title || desc) highlights.push({title, desc});
+  });
+
+  return {
+    theme,
+    brand: {
+      name: getVal('ed-name'), tagline: getVal('ed-tagline'), badge: getVal('ed-badge'),
+      colors: Object.keys(colors).length ? colors : undefined,
+    },
+    contact: {
+      whatsapp: getVal('ed-wa'), phone: getVal('ed-phone'), email: getVal('ed-email'),
+      address: getVal('ed-address'), mapsEmbedUrl: getVal('ed-maps'),
+    },
+    hours,
+    services,
+    stats: stats.length ? stats : undefined,
+    testimonials,
+    team,
+    features: {
+      booking: document.getElementById('ed-feat-booking').checked,
+      aiChat: document.getElementById('ed-feat-ai').checked,
+      search: document.getElementById('ed-feat-search').checked,
+      cms: document.getElementById('ed-feat-cms').checked,
+    },
+    social: {
+      instagram: getVal('ed-social-ig'), facebook: getVal('ed-social-fb'),
+      youtube: getVal('ed-social-yt'), twitter: getVal('ed-social-tw'),
+    },
+    about: { title: getVal('ed-about-title'), desc: getVal('ed-about-desc'), highlights },
+    seo: { title: getVal('ed-seo-title'), description: getVal('ed-seo-desc') },
+  };
+}
+
+async function saveEditor() {
+  if (!STATE.currentSiteId) return toast('No site selected', 'error');
+  const data = collectEditorData();
+  toast('Saving & building preview...', 'info');
+  const res = await api(`/api/preview/${STATE.currentSiteId}/save`, { method: 'POST', body: JSON.stringify(data) });
+  if (res?.preview_url) {
+    toast('Preview updated!', 'success');
+    // Refresh preview iframe
+    refreshPreview();
+  } else if (res?.updated) {
+    toast('Config saved! Build to preview.', 'success');
+  } else {
+    toast('Save failed: ' + (res?.error || 'unknown'), 'error');
+  }
+}
+
+function showColorPicker() { document.getElementById('ed-colors-group').style.display = 'block'; }
+
+async function saveSection(field, data) {
+  if (!STATE.currentSiteId) return toast('No site selected', 'error');
+  const payload = {};
+  payload[field] = data;
+  const res = await api(`/api/sites/${STATE.currentSiteId}/config`, { method: 'PUT', body: JSON.stringify(payload) });
+  if (res && res.updated) {
+    toast(field + ' saved! Building preview...', 'info');
+    // Auto-build and refresh preview
+    const buildRes = await api(`/api/sites/${STATE.currentSiteId}/build`, { method: 'POST' });
+    if (buildRes?.success) {
+      refreshPreview();
+      toast(field + ' saved, preview updated', 'success');
+    } else {
+      toast(field + ' saved! Build failed: ' + (buildRes?.error || ''), 'info');
+    }
+  } else {
+    toast('Save failed', 'error');
+  }
+}
+
+// Hours — collect & save
+async function saveHours() {
+  if (!STATE.currentSiteId) return toast('No site selected', 'error');
+  const hours = [];
+  document.querySelectorAll('.hour-row').forEach(r => {
+    const d = r.querySelector('.hour-day')?.value;
+    const t = r.querySelector('.hour-time')?.value;
+    if (d && t) hours.push({day: d, time: t});
+  });
+  await saveSection('hours', hours);
+}
+
+// Services — collect & save
+async function saveServices() {
+  if (!STATE.currentSiteId) return toast('No site selected', 'error');
+  const services = [];
+  document.querySelectorAll('.service-row').forEach(r => {
+    const icon = r.querySelector('.svc-icon')?.value;
+    const title = r.querySelector('.svc-title')?.value;
+    const desc = r.querySelector('.svc-desc')?.value;
+    if (title) services.push({icon: icon || '✨', title, desc: desc || ''});
+  });
+  await saveSection('services', services);
+}
+
+// Stats
+function renderStats(stats) {
+  const c = document.getElementById('ed-stats');
+  c.innerHTML = stats.map((s, i) => '<div class="stat-row" style="display:flex;gap:8px;margin-bottom:6px">' +
+    '<input class="form-input svc-value" value="'+(s.value||'')+'" style="flex:1" placeholder="15+">' +
+    '<input class="form-input svc-label" value="'+(s.label||'')+'" style="flex:2" placeholder="Tahun">' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>').join('');
+}
+function addStat() {
+  const c = document.getElementById('ed-stats');
+  c.insertAdjacentHTML('beforeend', '<div class="stat-row" style="display:flex;gap:8px;margin-bottom:6px">' +
+    '<input class="form-input svc-value" style="flex:1" placeholder="15+">' +
+    '<input class="form-input svc-label" style="flex:2" placeholder="Tahun">' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>');
+}
+async function saveStats() {
+  const stats = []; document.querySelectorAll('.stat-row').forEach(r => {
+    const value = r.querySelector('.svc-value')?.value, label = r.querySelector('.svc-label')?.value;
+    if (value || label) stats.push({value:value||'', label:label||''}); });
+  await saveSection('stats', stats);
+}
+
+// Testimonials
+function renderTestimonials(ts) {
+  const c = document.getElementById('ed-testimonials');
+  c.innerHTML = ts.map((t, i) => '<div class="testimonial-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">' +
+    '<input class="form-input t-name" value="'+(t.name||'')+'" style="flex:1" placeholder="Nama">' +
+    '<input class="form-input t-text" value="'+(t.text||'')+'" style="flex:2" placeholder="Testimoni">' +
+    '<input class="form-input t-rating" value="'+(t.rating||'')+'" style="width:60px" placeholder="5">' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>').join('');
+}
+function addTestimonial() {
+  const c = document.getElementById('ed-testimonials');
+  c.insertAdjacentHTML('beforeend', '<div class="testimonial-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">' +
+    '<input class="form-input t-name" style="flex:1" placeholder="Nama">' +
+    '<input class="form-input t-text" style="flex:2" placeholder="Testimoni">' +
+    '<input class="form-input t-rating" style="width:60px" placeholder="5">' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>');
+}
+async function saveTestimonials() {
+  const ts = []; document.querySelectorAll('.testimonial-row').forEach(r => {
+    const name = r.querySelector('.t-name')?.value, text = r.querySelector('.t-text')?.value, rating = parseInt(r.querySelector('.t-rating')?.value) || 5;
+    if (text) ts.push({name:name||'', text, rating}); });
+  await saveSection('testimonials', ts);
+}
+
+// Team
+function renderTeam(team) {
+  const c = document.getElementById('ed-team');
+  c.innerHTML = team.map((t, i) => '<div class="team-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">' +
+    '<input class="form-input tm-name" value="'+(t.name||'')+'" style="flex:1" placeholder="Nama">' +
+    '<input class="form-input tm-spec" value="'+(t.specialty||'')+'" style="flex:2" placeholder="Spesialisasi">' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>').join('');
+}
+function addTeamMember() {
+  const c = document.getElementById('ed-team');
+  c.insertAdjacentHTML('beforeend', '<div class="team-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">' +
+    '<input class="form-input tm-name" style="flex:1" placeholder="Nama">' +
+    '<input class="form-input tm-spec" style="flex:2" placeholder="Spesialisasi">' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>');
+}
+async function saveTeam() {
+  const team = []; document.querySelectorAll('.team-row').forEach(r => {
+    const name = r.querySelector('.tm-name')?.value, spec = r.querySelector('.tm-spec')?.value;
+    if (name) team.push({name, specialty:spec||''}); });
+  await saveSection('team', team);
+}
+
+// Highlights
+function renderHighlights(hs) {
+  const c = document.getElementById('ed-highlights');
+  c.innerHTML = hs.map((h, i) => '<div class="hl-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">' +
+    '<input class="form-input hl-title" value="'+(h.title||'')+'" style="flex:1" placeholder="Judul">' +
+    '<input class="form-input hl-desc" value="'+(h.desc||'')+'" style="flex:2" placeholder="Deskripsi">' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>').join('');
+}
+function addHighlight() {
+  const c = document.getElementById('ed-highlights');
+  c.insertAdjacentHTML('beforeend', '<div class="hl-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">' +
+    '<input class="form-input hl-title" style="flex:1" placeholder="Judul">' +
+    '<input class="form-input hl-desc" style="flex:2" placeholder="Deskripsi">' +
+    '<button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>');
+}
+async function saveHighlights() {
+  const highlights = []; document.querySelectorAll('.hl-row').forEach(r => {
+    const title = r.querySelector('.hl-title')?.value, desc = r.querySelector('.hl-desc')?.value;
+    if (title || desc) highlights.push({title:title||'', desc:desc||''}); });
+  await saveSection('about', { title: getVal('ed-about-title'), desc: getVal('ed-about-desc'), highlights });
+}
+
+async function buildAndDeploy() {
+  if (!STATE.currentSiteId) return toast('No site selected', 'error');
+  // Save + build first
+  const data = collectEditorData();
+  toast('Saving & building...', 'info');
+  const saveRes = await api(`/api/preview/${STATE.currentSiteId}/save`, { method: 'POST', body: JSON.stringify(data) });
+  if (saveRes?.preview_url) {
+    // Refresh preview
+    refreshPreview();
+    toast('Build OK! Deploying to Vercel...', 'success');
+    const depRes = await api(`/api/sites/${STATE.currentSiteId}/deploy`, { method: 'POST' });
+    if (depRes?.url) {
+      toast('Deployed! ' + depRes.url, 'success');
+      loadSites();
+    } else {
+      toast('Deploy done but no URL: ' + (depRes?.error || ''), 'info');
+    }
+  } else {
+    toast('Build failed: ' + (saveRes?.error || 'unknown'), 'error');
+  }
+}
+
+function previewSite() {
+  const sid = STATE.currentSiteId;
+  if (!sid) return toast('No site selected', 'error');
+  // Open preview in new tab
+  window.open(`/api/preview/${sid}`, '_blank');
+}
+
+function resizePreview() {
+  const device = document.getElementById('prev-device').value;
+  const frame = document.getElementById('preview-iframe');
+  const container = document.getElementById('preview-container');
+  if (device === 'mobile') { frame.style.width = '375px'; frame.style.margin = '0 auto'; frame.style.display = 'block'; }
+  else if (device === 'tablet') { frame.style.width = '768px'; frame.style.margin = '0 auto'; frame.style.display = 'block'; }
+  else { frame.style.width = '100%'; frame.style.margin = '0'; frame.style.display = ''; }
+}
+
+// ── Hours Editor ──
+function renderHours(hours) {
+  const c = document.getElementById('ed-hours');
+  c.innerHTML = hours.map((h, i) => `
+    <div class="hour-row" style="display:flex;gap:8px;margin-bottom:6px">
+      <input class="form-input hour-day" value="${h.day}" style="flex:1" placeholder="Senin–Jumat">
+      <input class="form-input hour-time" value="${h.time}" style="flex:1" placeholder="08.00–21.00">
+      <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    </div>`).join('');
+}
+
+function addHour() {
+  const c = document.getElementById('ed-hours');
+  c.insertAdjacentHTML('beforeend', `<div class="hour-row" style="display:flex;gap:8px;margin-bottom:6px">
+    <input class="form-input hour-day" style="flex:1" placeholder="Hari">
+    <input class="form-input hour-time" style="flex:1" placeholder="Jam">
+    <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+  </div>`);
+}
+
+// ── Services Editor ──
+function renderServices(services) {
+  const c = document.getElementById('ed-services');
+  c.innerHTML = services.map((s, i) => `
+    <div class="service-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+      <input class="form-input svc-icon" value="${s.icon}" style="width:50px" placeholder="🥟">
+      <input class="form-input svc-title" value="${s.title}" style="flex:1" placeholder="Layanan">
+      <input class="form-input svc-desc" value="${s.desc}" style="flex:2" placeholder="Deskripsi">
+      <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    </div>`).join('');
+}
+
+function addService() {
+  const c = document.getElementById('ed-services');
+  c.insertAdjacentHTML('beforeend', `<div class="service-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+    <input class="form-input svc-icon" style="width:50px" placeholder="🥟">
+    <input class="form-input svc-title" style="flex:1" placeholder="Layanan">
+    <input class="form-input svc-desc" style="flex:2" placeholder="Deskripsi">
+    <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+  </div>`);
+}
+
+// ═══════════════════════════════════════════
+// Clients
+// ═══════════════════════════════════════════
+async function loadClients() {
+  const data = await api('/api/clients');
+  if (!data) return;
+  STATE.clients = data.clients || [];
+
+  // Stats
+  const total = STATE.clients.length;
+  const contacted = STATE.clients.filter(c => c.status === 'contacted').length;
+  const prospect = STATE.clients.filter(c => c.status === 'prospect').length;
+  const won = STATE.clients.filter(c => c.status === 'won').length;
+  document.getElementById('client-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Clients</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#6366f1">${contacted}</div><div class="stat-label">Contacted</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#94a3b8">${prospect}</div><div class="stat-label">Prospects</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#10b981">${won}</div><div class="stat-label">Won</div></div>`;
+
+  if (!STATE.clients.length) {
+    document.getElementById('clients-tbody').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No clients yet</td></tr>';
+    return;
+  }
+
+  document.getElementById('clients-tbody').innerHTML = STATE.clients.map(c => `
+    <tr>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.company || '-'}</td>
+      <td><span class="badge ${c.status}">${c.status}</span></td>
+      <td style="font-size:12px">${c.contact?.wa || '-'}</td>
+      <td>${c.site_count || 0}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${c.created ? new Date(c.created).toLocaleDateString('id-ID') : '-'}</td>
+      <td style="display:flex;gap:4px"><button class="btn btn-secondary btn-sm" onclick="generatePortalLink('${c.id}')"><i class="fas fa-external-link-alt"></i></button><button class="btn btn-danger btn-sm" onclick="confirmDelete('client','${c.id}')"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('');
+}
+
+function openNewClientModal() { document.getElementById('modal-new-client').classList.add('active'); }
+
+async function createNewClient() {
+  const name = document.getElementById('nc-name').value.trim();
+  if (!name) return toast('Client name required', 'error');
+  const res = await api('/api/clients', {
+    method: 'POST',
+    body: JSON.stringify({
+      name, company: getVal('nc-company'), wa: getVal('nc-wa'),
+      email: getVal('nc-email'), industry: getVal('nc-industry'),
+      status: getVal('nc-status')
+    })
+  });
+  if (res && res.id) {
+    toast('Client added!', 'success');
+    closeModal('modal-new-client');
+    ['nc-name','nc-company','nc-wa','nc-email'].forEach(id => document.getElementById(id).value = '');
+    loadClients();
+    openNewSiteModal(); // Continue to create site
+  }
+}
+
+// ═══════════════════════════════════════════
+// Deploy
+// ═══════════════════════════════════════════
+async function loadDeploy() {
+  const data = await api('/api/sites');
+  if (!data) return;
+  const sites = (data.sites || []).filter(s => s.status === 'built' || s.status === 'deploy-failed');
+  const c = document.getElementById('deploy-sites');
+  if (!sites.length) {
+    c.innerHTML = '<div class="empty-state"><i class="fas fa-rocket"></i><p>No sites ready to deploy. Build a site first.</p></div>';
+  } else {
+    c.innerHTML = sites.map(s => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div><strong>${s.name}</strong> <span style="font-size:12px;color:var(--text-muted)">${s.template}</span></div>
+        <button class="btn btn-success btn-sm" onclick="deploySite('${s.id}')"><i class="fas fa-rocket"></i> Deploy Now</button>
+      </div>`).join('');
+  }
+
+  // Load deployments
+  const deployments = [];
+  data.sites.forEach(s => {
+    if (s.last_deploy) deployments.push({ site: s.name, status: s.last_deploy_status, url: s.last_deploy, time: s.updated });
+  });
+  if (deployments.length) {
+    document.getElementById('deployments-tbody').innerHTML = deployments.map(d =>
+      `<tr><td>${d.site}</td><td><span class="badge badge-${d.status==='ready'?'deployed':'building'}">${d.status}</span></td>
+      <td style="font-size:12px"><a href="${d.url}" target="_blank">${d.url.replace('https://','')}</a></td>
+      <td style="font-size:12px;color:var(--text-muted)">${d.time ? new Date(d.time).toLocaleString('id-ID') : '-'}</td></tr>`).join('');
+  }
+}
+
+async function deploySite(siteId) {
+  toast('Building & deploying...', 'info');
+  // Build first
+  const buildRes = await api(`/api/sites/${siteId}/build`, { method: 'POST' });
+  if (!buildRes?.success) return toast('Build failed: ' + (buildRes?.error || ''), 'error');
+  toast('Build OK, deploying...', 'info');
+  const depRes = await api(`/api/sites/${siteId}/deploy`, { method: 'POST' });
+  if (depRes?.url) {
+    toast(`✅ Deployed! ${depRes.url}`, 'success');
+    loadSites(); loadDeploy();
+  } else {
+    toast('Deploy failed: ' + (depRes?.error || 'Check Vercel token'), 'error');
+  }
+}
+
+// ── Portal Link Generator ──
+async function generatePortalLink(clientId) {
+  const res = await api('/api/portal/token', { method: 'POST', body: JSON.stringify({ client_id: clientId }) });
+  if (res && res.token) {
+    const url = `${window.location.origin}/portal/${res.token}`;
+    // Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(url);
+      toast('✅ Portal link copied!', 'success');
+    } catch {
+      // Fallback: prompt
+      prompt('Client Portal Link:', url);
+    }
+  } else {
+    toast('Failed to generate portal link', 'error');
+  }
+}
+
+// ═══════════════════════════════════════════
+// Assets
+// ═══════════════════════════════════════════
+async function loadAssets() {
+  // Load sites for filter
+  const sitesData = await api('/api/sites');
+  const sites = sitesData?.sites || [];
+  const filterSel = document.getElementById('asset-site-filter');
+  const currentFilter = filterSel.value;
+  filterSel.innerHTML = '<option value="">All Sites</option>' +
+    sites.map(s => `<option value="${s.id}" ${s.id===currentFilter?'selected':''}>${s.name}</option>`).join('');
+
+  const siteFilter = filterSel.value || '';
+  const data = await api(`/api/assets${siteFilter ? '?site_id='+siteFilter : ''}`);
+  if (!data) return;
+  STATE.assets = data.assets || [];
+
+  document.getElementById('asset-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${STATE.assets.length}</div><div class="stat-label">Total Assets</div></div>
+    <div class="stat-card"><div class="stat-value">${STATE.assets.filter(a => a.type==='image').length}</div><div class="stat-label">Images</div></div>`;
+
+  const grid = document.getElementById('assets-grid');
+  if (!STATE.assets.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>No assets uploaded</p></div>';
+    return;
+  }
+  grid.innerHTML = STATE.assets.map(a => `
+    <div style="background:var(--surface2);border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+      <div style="height:80px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:30px">🖼️</div>
+      <div style="padding:6px 8px">
+        <div style="font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.filename}</div>
+        <div style="font-size:10px;color:var(--text-muted)">${a.size ? Math.round(a.size/1024)+'KB' : ''}</div>
+        <button class="btn btn-danger btn-sm" style="width:100%;margin-top:4px" onclick="deleteAsset('${a.id}')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+async function handleUpload(files) {
+  if (!files.length) return;
+  const formData = new FormData();
+  formData.append('file', files[0]);
+  formData.append('site_id', document.getElementById('asset-site-filter').value || '');
+  formData.append('client_id', '');
+  try {
+    const res = await fetch('/api/assets/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.id) { toast('Uploaded!', 'success'); loadAssets(); }
+    else toast('Upload failed', 'error');
+  } catch(e) { toast('Upload error', 'error'); }
+}
+
+async function deleteAsset(aid) {
+  if (!confirm('Delete this asset?')) return;
+  await api(`/api/assets/${aid}`, { method: 'DELETE' });
+  toast('Deleted', 'info');
+  loadAssets();
+}
+
+// ═══════════════════════════════════════════
+// Settings
+// ═══════════════════════════════════════════
+function loadSettings() {
+  document.getElementById('settings-default-tpl').value =
+    localStorage.getItem('builder-default-tpl') || 'landing';
+  document.getElementById('settings-theme-count').textContent = '6';
+  document.getElementById('settings-default-tpl').onchange = function() {
+    localStorage.setItem('builder-default-tpl', this.value);
+    toast('Default template saved', 'success');
+  };
+}
+
+// ═══════════════════════════════════════════
+// Confirm Delete
+// ═══════════════════════════════════════════
+function confirmDelete(type, id) {
+  const label = type === 'site' ? 'site' : 'client';
+  if (!confirm(`Delete this ${label}? This cannot be undone.`)) return;
+  api(`/api/${type}s/${id}`, { method: 'DELETE' }).then(res => {
+    if (res?.ok) { toast(`${label} deleted`, 'info'); loadSites(); loadClients(); }
+    else toast('Delete failed', 'error');
+  });
+}
+
+// ═══════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════
+function refreshAll() {
+  loadSites();
+  const active = document.querySelector('.page-section.active');
+  if (active) {
+    const page = active.id.replace('page-', '');
+    if (page === 'clients') loadClients();
+    if (page === 'deploy') loadDeploy();
+    if (page === 'assets') loadAssets();
+  }
+  toast('Refreshed', 'info');
+}
+
+// Init
+setTheme(STATE.theme);
+// Drag & drop support
+const zone = document.getElementById('upload-zone');
+if (zone) {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    handleUpload(e.dataTransfer.files);
+  });
+}
+// Load first page
+loadSites();
+</script>
+</body>
+</html>
