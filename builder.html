@@ -234,7 +234,7 @@ tr:hover td { background: var(--surface2); }
       <div class="sidebar-divider"></div>
       <button class="nav-item" data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></button>
       <a href="/client-portal" class="nav-item" style="text-decoration:none" target="_blank"><i class="fas fa-external-link-alt"></i><span>Client Portal</span></a>
-      <a href="/hub" class="nav-item" style="text-decoration:none"><i class="fas fa-home"></i><span>Back to Hub</span></a>
+      <a href="http://localhost:8888/hub" class="nav-item" style="text-decoration:none"><i class="fas fa-home"></i><span>Back to Hub</span></a>
     </nav>
     <div class="sidebar-footer">
       <div style="color:#fff;font-size:13px;font-weight:600">Bisma</div>
@@ -274,6 +274,7 @@ tr:hover td { background: var(--surface2); }
           <h2>Site Editor</h2>
           <p id="editor-site-name">Select a site to edit</p>
         </div>
+        <div style="margin-left:12px" id="editor-site-selector"></div>
         <div class="page-actions">
           <span id="editor-status" style="font-size:12px;transition:all .3s"></span>
           <button class="btn btn-primary" onclick="saveEditor()"><i class="fas fa-save"></i> Save</button>
@@ -297,8 +298,12 @@ tr:hover td { background: var(--surface2); }
             <label class="form-label">Theme <span style="color:var(--text-muted);font-weight:400">- click to select</span></label>
             <div id="ed-themes" style="display:flex;flex-wrap:wrap;gap:6px"></div>
           </div>
-          <div class="form-group" id="ed-colors-group" style="display:none">
-            <label class="form-label">Override Warna <span style="color:var(--text-muted);font-weight:400">- kosongkan untuk default</span></label>
+          <div class="form-group">
+            <label class="form-label" style="cursor:pointer" onclick="toggleColorPicker()">
+              <i class="fas fa-palette"></i> Override Warna
+              <span style="color:var(--text-muted);font-weight:400">- <span id="color-toggle-text">tampilkan</span></span>
+            </label>
+            <div id="ed-colors-group" style="display:none">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
               <div><label style="font-size:11px;color:var(--text-muted)">Primary</label><input class="form-input" id="ed-color-primary" type="color" style="height:36px;padding:2px"></div>
               <div><label style="font-size:11px;color:var(--text-muted)">Secondary</label><input class="form-input" id="ed-color-secondary" type="color" style="height:36px;padding:2px"></div>
@@ -418,9 +423,12 @@ tr:hover td { background: var(--surface2); }
 
     <!-- ═══ Page: Clients ═══ -->
     <div class="page-section" id="page-clients">
-      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <div><h2>Clients</h2><p>Leads, prospects, and active clients</p></div>
-        <button class="btn btn-primary btn-sm" onclick="openNewClientModal()"><i class="fas fa-user-plus"></i> New Client</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="form-input" id="client-search" placeholder="Cari client..." style="width:200px;padding:6px 10px;font-size:12px" oninput="loadClients()">
+          <button class="btn btn-primary btn-sm" onclick="openNewClientModal()"><i class="fas fa-user-plus"></i> New Client</button>
+        </div>
       </div>
       <div class="stats-row" id="client-stats"></div>
       <div class="card">
@@ -504,7 +512,7 @@ tr:hover td { background: var(--surface2); }
           <label class="form-label">Info</label>
           <div style="font-size:13px;color:var(--text-secondary);line-height:1.8">
             <div>Builder Version: 1.0.0</div>
-            <div>API: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px">localhost:8888/api/</code></div>
+            <div>API: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px">localhost:7777/api/</code></div>
             <div>Storage: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px">~/.agency_data.json</code></div>
             <div>Templates: 4 (<span id="settings-theme-count">6</span> themes each)</div>
           </div>
@@ -667,8 +675,8 @@ async function loadSites() {
 
   document.getElementById('sites-grid').innerHTML = sites.map(s => {
     const statusClass = `badge-${s.status === 'deployed' ? 'live' : s.status}`;
-    const statusLabel = s.status === 'deployed' ? '✅ Live' : s.status === 'deploy-failed' ? '❌ Failed' :
-      s.status === 'built' ? '🔧 Built' : s.status === 'building' ? '🔄 Building' : '📄 Draft';
+    const statusLabels = {deployed:'Live', 'deploy-failed':'Failed', built:'Built', building:'Building', draft:'Draft'};
+    const statusLabel = statusLabels[s.status] || s.status;
     return `<div class="site-card" onclick="openEditor('${s.id}')">
       <div class="site-card-header">
         <div><div class="site-name">${s.name}</div>
@@ -753,6 +761,23 @@ async function setSiteDomain(siteId, domain) {
 // ═══════════════════════════════════════════
 async function openEditor(siteId) {
   STATE.currentSiteId = siteId;  // MUST set BEFORE switchPage + refreshPreview
+  if (!siteId) {
+    // Show site selector if no site specified
+    switchPage('editor');
+    document.getElementById('editor-site-name').textContent = 'Pilih site untuk diedit';
+    document.getElementById('editor-layout').style.display = 'none';
+    const selDiv = document.getElementById('editor-site-selector');
+    const sites = await api('/api/sites');
+    if (!sites?.sites?.length) {
+      selDiv.innerHTML = '<div class="empty-state"><p>Belum ada site. Buat site dulu.</p></div>';
+      return;
+    }
+    selDiv.innerHTML = '<div class="card" style="max-width:400px;margin:20px auto"><div class="card-header"><span class="card-title">Pilih Site</span></div>' +
+      sites.sites.map(s => `<div style="padding:10px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer" onclick="openEditor('${s.id}')">
+        <strong>${s.name}</strong><br><span style="font-size:12px;color:var(--text-muted)">${s.template} · ${s.status}</span></div>`).join('') + '</div>';
+    return;
+  }
+  document.getElementById('editor-layout').style.display = 'grid';
   if (window._saveTimer) clearTimeout(window._saveTimer);
   STATE._building = false;
   switchPage('editor');
@@ -1034,12 +1059,17 @@ function collectEditorData() {
 
 async function saveEditor() {
   if (!STATE.currentSiteId) return toast('No site selected', 'error');
+  if (STATE._building) return toast('Already saving, please wait...', 'info');
+  STATE._building = true;
+  const saveBtn = document.querySelector('#page-editor .btn-primary');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; }
   const data = collectEditorData();
   toast('Saving & building preview...', 'info');
   const res = await api(`/api/preview/${STATE.currentSiteId}/save`, { method: 'POST', body: JSON.stringify(data) });
+  STATE._building = false;
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save"></i> Save'; }
   if (res?.preview_url) {
     toast('Preview updated!', 'success');
-    // Refresh preview iframe
     refreshPreview();
   } else if (res?.updated) {
     toast('Config saved! Build to preview.', 'success');
@@ -1049,6 +1079,12 @@ async function saveEditor() {
 }
 
 function showColorPicker() { document.getElementById('ed-colors-group').style.display = 'block'; }
+function toggleColorPicker() {
+  const el = document.getElementById('ed-colors-group');
+  const txt = document.getElementById('color-toggle-text');
+  if (el.style.display === 'none') { el.style.display = 'block'; txt.textContent = 'sembunyikan'; }
+  else { el.style.display = 'none'; txt.textContent = 'tampilkan'; }
+}
 
 async function saveSection(field, data) {
   if (!STATE.currentSiteId) return toast('No site selected', 'error');
@@ -1210,7 +1246,7 @@ async function buildAndDeploy() {
 function previewSite() {
   const sid = STATE.currentSiteId;
   if (!sid) return toast('No site selected', 'error');
-  // Open preview in new tab
+  toast('Loading preview...', 'info');
   window.open(`/api/preview/${sid}`, '_blank');
 }
 
@@ -1271,9 +1307,20 @@ function addService() {
 async function loadClients() {
   const data = await api('/api/clients');
   if (!data) return;
-  STATE.clients = data.clients || [];
+  let clients = data.clients || [];
 
-  // Stats
+  // Search filter
+  const searchEl = document.getElementById('client-search');
+  const q = (searchEl?.value || '').toLowerCase().trim();
+  if (q) {
+    clients = clients.filter(c =>
+      (c.name || '').toLowerCase().includes(q) ||
+      (c.company || '').toLowerCase().includes(q) ||
+      (c.status || '').toLowerCase().includes(q) ||
+      (c.contact?.wa || '').includes(q)
+    );
+  }
+  STATE.clients = clients;
   const total = STATE.clients.length;
   const contacted = STATE.clients.filter(c => c.status === 'contacted').length;
   const prospect = STATE.clients.filter(c => c.status === 'prospect').length;
@@ -1320,7 +1367,12 @@ async function createNewClient() {
     closeModal('modal-new-client');
     ['nc-name','nc-company','nc-wa','nc-email'].forEach(id => document.getElementById(id).value = '');
     loadClients();
-    openNewSiteModal(); // Continue to create site
+    // Offer to create site for this client
+    if (confirm(`Buat site untuk ${name}?`)) {
+      document.getElementById('ns-name').value = name;
+      document.getElementById('ns-client').value = res.id;
+      openNewSiteModal();
+    }
   }
 }
 
@@ -1330,16 +1382,22 @@ async function createNewClient() {
 async function loadDeploy() {
   const data = await api('/api/sites');
   if (!data) return;
-  const sites = (data.sites || []).filter(s => s.status === 'built' || s.status === 'deploy-failed');
+  const sites = (data.sites || []).filter(s => s.status !== 'deployed');
   const c = document.getElementById('deploy-sites');
   if (!sites.length) {
-    c.innerHTML = '<div class="empty-state"><i class="fas fa-rocket"></i><p>No sites ready to deploy. Build a site first.</p></div>';
+    c.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle" style="color:#10b981"></i><p>Semua site sudah di-deploy!</p></div>';
   } else {
-    c.innerHTML = sites.map(s => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-        <div><strong>${s.name}</strong> <span style="font-size:12px;color:var(--text-muted)">${s.template}</span></div>
-        <button class="btn btn-success btn-sm" onclick="deploySite('${s.id}')"><i class="fas fa-rocket"></i> Deploy Now</button>
-      </div>`).join('');
+    c.innerHTML = sites.map(s => {
+      const actionBtn = s.status === 'built'
+        ? `<button class="btn btn-success btn-sm" onclick="deploySite('${s.id}')"><i class="fas fa-rocket"></i> Deploy Now</button>`
+        : s.status === 'deploy-failed'
+        ? `<button class="btn btn-warning btn-sm" onclick="deploySite('${s.id}')" style="background:#d97706;color:#fff"><i class="fas fa-redo"></i> Retry Deploy</button>`
+        : `<button class="btn btn-secondary btn-sm" onclick="buildAndDeployFromList('${s.id}')"><i class="fas fa-tools"></i> Build & Deploy</button>`;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div><strong>${s.name}</strong> <span class="badge badge-${s.status}">${s.status}</span> <span style="font-size:12px;color:var(--text-muted)">${s.template}</span></div>
+        ${actionBtn}
+      </div>`;
+    }).join('');
   }
 
   // Load deployments
@@ -1353,6 +1411,16 @@ async function loadDeploy() {
       <td style="font-size:12px"><a href="${d.url}" target="_blank">${d.url.replace('https://','')}</a></td>
       <td style="font-size:12px;color:var(--text-muted)">${d.time ? new Date(d.time).toLocaleString('id-ID') : '-'}</td></tr>`).join('');
   }
+}
+
+async function buildAndDeployFromList(siteId) {
+  toast('Building...', 'info');
+  const buildRes = await api(`/api/sites/${siteId}/build`, { method: 'POST' });
+  if (!buildRes?.success) return toast('Build failed: ' + (buildRes?.error || ''), 'error');
+  toast('Build OK, deploying...', 'info');
+  const depRes = await api(`/api/sites/${siteId}/deploy`, { method: 'POST' });
+  if (depRes?.url) { toast('✅ Deployed! ' + depRes.url, 'success'); loadSites(); loadDeploy(); }
+  else toast('Deploy failed: ' + (depRes?.error || '?'), 'error');
 }
 
 async function deploySite(siteId) {
@@ -1416,7 +1484,9 @@ async function loadAssets() {
   }
   grid.innerHTML = STATE.assets.map(a => `
     <div style="background:var(--surface2);border-radius:8px;overflow:hidden;border:1px solid var(--border)">
-      <div style="height:80px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:30px">🖼️</div>
+      ${a.type === 'image'
+        ? `<img src="/api/assets/file/${a.id}" style="width:100%;height:80px;object-fit:cover;display:block" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="height:80px;background:var(--border);display:none;align-items:center;justify-content:center;font-size:30px">🖼️</div>`
+        : `<div style="height:80px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:30px">📄</div>`}
       <div style="padding:6px 8px">
         <div style="font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.filename}</div>
         <div style="font-size:10px;color:var(--text-muted)">${a.size ? Math.round(a.size/1024)+'KB' : ''}</div>
@@ -1427,16 +1497,21 @@ async function loadAssets() {
 
 async function handleUpload(files) {
   if (!files.length) return;
-  const formData = new FormData();
-  formData.append('file', files[0]);
-  formData.append('site_id', document.getElementById('asset-site-filter').value || '');
-  formData.append('client_id', '');
-  try {
-    const res = await fetch('/api/assets/upload', { method: 'POST', body: formData });
-    const data = await res.json();
-    if (data.id) { toast('Uploaded!', 'success'); loadAssets(); }
-    else toast('Upload failed', 'error');
-  } catch(e) { toast('Upload error', 'error'); }
+  const siteId = document.getElementById('asset-site-filter').value || '';
+  let ok = 0, fail = 0;
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('site_id', siteId);
+    formData.append('client_id', '');
+    try {
+      const res = await fetch('/api/assets/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.id) ok++; else fail++;
+    } catch(e) { fail++; }
+  }
+  toast(`${ok} uploaded${fail ? `, ${fail} failed` : ''}`, fail ? 'info' : 'success');
+  if (ok) loadAssets();
 }
 
 async function deleteAsset(aid) {
@@ -1488,6 +1563,16 @@ function refreshAll() {
 
 // Init
 setTheme(STATE.theme);
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    const active = document.querySelector('.page-section.active');
+    if (active && active.id === 'page-editor') saveEditor();
+  }
+});
+
 // Drag & drop support
 const zone = document.getElementById('upload-zone');
 if (zone) {

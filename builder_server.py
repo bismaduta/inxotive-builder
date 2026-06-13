@@ -3,15 +3,12 @@ INXOTIVE Web Builder Server
 ============================
 Standalone FastAPI server on port 7777.
 Builder + Client Portal.
-
-Source: https://github.com/bismaduta/inxotive-builder
 """
 
 import sys, os
 from pathlib import Path
 
-# ── Self-contained paths ──
-THIS_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(Path.home() / "market-api"))
 
 # Load env secrets
 _env_secrets = Path.home() / ".env_secrets"
@@ -22,8 +19,8 @@ if _env_secrets.exists():
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 import json
 
 from builder import (
@@ -41,7 +38,7 @@ app = FastAPI(title="INXOTIVE Builder", version="1.0")
 
 @app.get("/", response_class=HTMLResponse)
 async def builder_root():
-    path = THIS_DIR / "builder.html"
+    path = Path.home() / "market-api" / "builder.html"
     if path.exists():
         return HTMLResponse(path.read_text())
     return HTMLResponse("<h1>Builder not found</h1>", status_code=404)
@@ -49,7 +46,7 @@ async def builder_root():
 
 @app.get("/client-portal", response_class=HTMLResponse)
 async def client_portal_page():
-    cp_path = THIS_DIR / "client-portal.html"
+    cp_path = Path.home() / "market-api" / "client-portal.html"
     if cp_path.exists():
         return HTMLResponse(cp_path.read_text())
     return HTMLResponse("<h1>Client Portal not found</h1>", status_code=404)
@@ -67,7 +64,7 @@ async def client_portal_token(token: str):
         <body><div><h1>🔒 Token Tidak Valid</h1><p>Link akses tidak ditemukan atau sudah kedaluwarsa.</p>
         <p><a href="/client-portal">Kembali ke Portal</a></p></div></body></html>""", status_code=404)
 
-    cp_path = THIS_DIR / "client-portal.html"
+    cp_path = Path.home() / "market-api" / "client-portal.html"
     if cp_path.exists():
         html = cp_path.read_text()
         # Inject client data
@@ -87,7 +84,7 @@ async def api_templates():
 async def api_template_detail(tid: str):
     t = get_template(tid)
     if t is None:
-        return {"error": "Template not found"}, 404
+        raise HTTPException(status_code=404, detail="Template not found")
     return t
 
 
@@ -102,14 +99,14 @@ async def api_clients():
 async def api_client_detail(cid: str):
     c = get_client(cid)
     if c is None:
-        return {"error": "Client not found"}, 404
+        raise HTTPException(status_code=404, detail="Client not found")
     return c
 
 
 @app.post("/api/clients")
 async def api_create_client(data: dict):
     if not data.get("name"):
-        return {"error": "Client name is required"}, 400
+        raise HTTPException(status_code=400, detail="Client name is required")
     return create_client(data)
 
 
@@ -117,7 +114,7 @@ async def api_create_client(data: dict):
 async def api_update_client(cid: str, data: dict):
     result = update_client(cid, data)
     if result is None:
-        return {"error": "Client not found"}, 404
+        raise HTTPException(status_code=404, detail="Client not found")
     return result
 
 
@@ -125,7 +122,7 @@ async def api_update_client(cid: str, data: dict):
 async def api_delete_client(cid: str):
     ok = delete_client(cid)
     if not ok:
-        return {"error": "Client not found"}, 404
+        raise HTTPException(status_code=404, detail="Client not found")
     return {"ok": True}
 
 
@@ -140,7 +137,7 @@ async def api_sites(status: str = ""):
 async def api_site_detail(sid: str):
     s = get_site(sid)
     if s is None:
-        return {"error": "Site not found"}, 404
+        raise HTTPException(status_code=404, detail="Site not found")
     return s
 
 
@@ -148,7 +145,7 @@ async def api_site_detail(sid: str):
 async def api_create_site(data: dict):
     result = create_site(data)
     if "error" in result:
-        return result, 400
+        raise HTTPException(status_code=400, detail=result.get("error", "Unknown error"))
     return result, 201
 
 
@@ -156,9 +153,9 @@ async def api_create_site(data: dict):
 async def api_update_site_config(sid: str, data: dict):
     result = update_site_config(sid, data)
     if result is None:
-        return {"error": "Site not found"}, 404
+        raise HTTPException(status_code=404, detail="Site not found")
     if "error" in result:
-        return result, 400
+        raise HTTPException(status_code=400, detail=result.get("error", "Unknown error"))
     return result
 
 
@@ -166,7 +163,7 @@ async def api_update_site_config(sid: str, data: dict):
 async def api_build_site(sid: str):
     result = build_site(sid)
     if "error" in result:
-        return result, 400
+        raise HTTPException(status_code=400, detail=result.get("error", "Unknown error"))
     return result
 
 
@@ -174,7 +171,7 @@ async def api_build_site(sid: str):
 async def api_deploy_site(sid: str):
     result = deploy_site(sid)
     if "error" in result:
-        return result, 400
+        raise HTTPException(status_code=400, detail=result.get("error", "Unknown error"))
     return result
 
 
@@ -182,7 +179,7 @@ async def api_deploy_site(sid: str):
 async def api_set_domain(sid: str, data: dict):
     domain = data.get("domain", "")
     if not domain:
-        return {"error": "Domain is required"}, 400
+        raise HTTPException(status_code=400, detail="Domain is required")
     result = set_site_domain(sid, domain)
     return result
 
@@ -191,7 +188,7 @@ async def api_set_domain(sid: str, data: dict):
 async def api_delete_site(sid: str):
     ok = delete_site(sid)
     if not ok:
-        return {"error": "Site not found"}, 404
+        raise HTTPException(status_code=404, detail="Site not found")
     return {"ok": True}
 
 
@@ -210,14 +207,14 @@ async def api_upload_asset(request: Request):
         site_id = form.get("site_id", "")
         file = form.get("file")
         if not file:
-            return {"error": "No file provided"}, 400
+            raise HTTPException(status_code=400, detail="No file provided")
         if not site_id:
-            return {"error": "site_id is required"}, 400
+            raise HTTPException(status_code=400, detail="site_id is required")
         content = await file.read()
         result = upload_asset(client_id, site_id, file.filename, content, file.content_type or "")
         return result, 201
     except Exception as e:
-        return {"error": str(e)}, 500
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/assets/file/{aid}")
@@ -225,10 +222,10 @@ async def api_asset_file(aid: str):
     data = load_data()
     a = data["assets"].get(aid)
     if not a:
-        return {"error": "Asset not found"}, 404
+        raise HTTPException(status_code=404, detail="Asset not found")
     fp = Path(a.get("path", ""))
     if not fp.exists():
-        return {"error": "File not found on disk"}, 404
+        raise HTTPException(status_code=404, detail="File not found on disk")
     return FileResponse(str(fp), media_type=a.get("content_type") or "application/octet-stream",
                         filename=a.get("filename", "file"))
 
@@ -237,7 +234,7 @@ async def api_asset_file(aid: str):
 async def api_delete_asset(aid: str):
     ok = delete_asset(aid)
     if not ok:
-        return {"error": "Asset not found"}, 404
+        raise HTTPException(status_code=404, detail="Asset not found")
     return {"ok": True}
 
 
@@ -247,7 +244,7 @@ async def api_delete_asset(aid: str):
 async def api_generate_portal_token(data: dict):
     cid = data.get("client_id", "")
     if not cid:
-        return {"error": "client_id is required"}, 400
+        raise HTTPException(status_code=400, detail="client_id is required")
     token = generate_portal_token(cid)
     return {"token": token, "portal_url": f"/portal/{token}"}
 
@@ -256,7 +253,7 @@ async def api_generate_portal_token(data: dict):
 async def api_verify_portal_token(token: str):
     result = verify_portal_token(token)
     if not result:
-        return {"error": "Invalid or expired token"}, 404
+        raise HTTPException(status_code=404, detail="Invalid or expired token")
     return result
 
 
@@ -265,10 +262,10 @@ async def api_portal_request(data: dict):
     """Submit a change request from client portal."""
     token = data.get("token", "")
     if not token:
-        return {"error": "token is required"}, 400
+        raise HTTPException(status_code=400, detail="token is required")
     result = verify_portal_token(token)
     if not result:
-        return {"error": "Invalid token"}, 403
+        raise HTTPException(status_code=403, detail="Invalid token")
 
     client = result.get("client", {})
     sites = result.get("sites", [])
@@ -326,7 +323,7 @@ async def api_preview(sid: str):
     data = load_data()
     s = data["sites"].get(sid)
     if not s:
-        return {"error": "Site not found"}, 404
+        raise HTTPException(status_code=404, detail="Site not found")
     site_dir = Path(s.get("directory", ""))
     dist_idx = site_dir / "dist" / "index.html"
     if dist_idx.exists():
@@ -355,13 +352,13 @@ async def api_preview_file(sid: str, file_path: str):
     data = load_data()
     s = data["sites"].get(sid)
     if not s:
-        return {"error": "Site not found"}, 404
+        raise HTTPException(status_code=404, detail="Site not found")
     base = Path(s.get("directory", "")) / "dist"
     for try_path in [base / file_path, base / "assets" / file_path]:
         if try_path.exists():
             mt, _ = mimetypes.guess_type(str(try_path))
             return FileResponse(str(try_path), media_type=mt or "application/octet-stream")
-    return {"error": "Not found"}, 404
+    raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.post("/api/preview/{sid}/save")
@@ -384,14 +381,14 @@ async def api_preview_save(sid: str, data: dict):
             if v != "" and v is not False:
                 filtered[k] = v
     if not filtered:
-        return {"error": "No fields to save"}, 400
+        raise HTTPException(status_code=400, detail="No fields to save")
 
     save_result = update_site_config(sid, filtered)
     if save_result is None:
-        return {"error": "Site not found"}, 404
+        raise HTTPException(status_code=404, detail="Site not found")
     build_result = build_site(sid)
     if not build_result.get("success"):
-        return {"error": "Build failed", "details": build_result.get("error")}, 400
+        raise HTTPException(status_code=400, detail="Build failed")
     return {"preview_url": "/api/preview/" + sid, "build_status": "ok"}
 
 
