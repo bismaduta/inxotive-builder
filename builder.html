@@ -33,7 +33,7 @@ html,body { height: 100%; margin: 0; padding: 0;
 .sidebar { width: 240px; min-width: 240px; background: var(--sidebar-bg);
   display: flex; flex-direction: column; z-index: 100;
   transition: width .25s ease, min-width .25s ease, margin .25s ease; }
-.sidebar.collapsed { width: 0; min-width: 0; overflow: hidden; margin-left: -240px; }
+.sidebar.collapsed { width: 0; min-width: 0; overflow: hidden; margin-left: 0; padding: 0; }
 .sidebar-header { padding: 18px 16px; display: flex; align-items: center;
   gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .sidebar-logo { font-size: 16px; font-weight: 700; color: #e0e7ff; }
