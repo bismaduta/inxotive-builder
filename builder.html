@@ -31,7 +31,9 @@ html,body { height: 100%; margin: 0; padding: 0;
   color: var(--text); overflow: hidden; }
 .app { display: flex; height: 100vh; overflow: hidden; }
 .sidebar { width: 240px; min-width: 240px; background: var(--sidebar-bg);
-  display: flex; flex-direction: column; z-index: 100; }
+  display: flex; flex-direction: column; z-index: 100;
+  transition: width .25s ease, min-width .25s ease, margin .25s ease; }
+.sidebar.collapsed { width: 0; min-width: 0; overflow: hidden; margin-left: -240px; }
 .sidebar-header { padding: 18px 16px; display: flex; align-items: center;
   gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); }
 .sidebar-logo { font-size: 16px; font-weight: 700; color: #e0e7ff; }
@@ -257,6 +259,7 @@ tr:hover td { background: var(--surface2); }
   <!-- Main -->
   <div class="main">
     <div class="topbar">
+      <button class="btn btn-secondary btn-sm" onclick="toggleSidebar()" style="margin-right:4px;padding:6px 10px;font-size:14px" title="Toggle sidebar"><i class="fas fa-bars"></i></button>
       <div class="topbar-content">
         <span id="page-title" style="font-size:15px;font-weight:600">Sites</span>
         <span id="page-subtitle" style="font-size:12px;color:var(--text-muted)">Web Agency Builder Dashboard</span>
@@ -1892,6 +1895,16 @@ function confirmDelete(type, id) {
 // ═══════════════════════════════════════════
 // Init
 // ═══════════════════════════════════════════
+function toggleSidebar() {
+  const sb = document.querySelector('.sidebar');
+  if (!sb) return;
+  sb.classList.toggle('collapsed');
+  const icon = document.querySelector('.topbar > button i');
+  if (icon) icon.className = sb.classList.contains('collapsed') ? 'fas fa-bars' : 'fas fa-bars';
+  // Persist preference
+  localStorage.setItem('builder_sidebar_collapsed', sb.classList.contains('collapsed'));
+}
+
 function refreshAll() {
   loadSites();
   const active = document.querySelector('.page-section.active');
@@ -1906,6 +1919,11 @@ function refreshAll() {
 
 // Init
 setTheme(STATE.theme);
+// Restore sidebar state
+if (localStorage.getItem('builder_sidebar_collapsed') === 'true') {
+  const sb = document.querySelector('.sidebar');
+  if (sb) sb.classList.add('collapsed');
+}
 
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
