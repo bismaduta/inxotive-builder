@@ -133,8 +133,8 @@ html,body { height: 100%; margin: 0; padding: 0;
 
 /* ── Editor Layout ── */
 .editor-layout { display: grid; grid-template-columns: 400px 1fr; gap: 20px;
-  height: calc(100vh - 100px); overflow: hidden; }
-.editor-form { overflow-y: auto; padding-right: 8px; }
+  flex: 1; min-height: 0; overflow: hidden; }
+.editor-form { overflow-y: auto; padding-right: 8px; min-height: 0; }
 .editor-preview { background: var(--surface); border-radius: var(--radius);
   border: 1px solid var(--border); overflow: hidden; display: flex;
   flex-direction: column; min-height: 500px; }
