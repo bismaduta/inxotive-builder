@@ -687,7 +687,7 @@ tr:hover td { background: var(--surface2); }
     <div class="form-group"><label class="form-label">Site Name</label><input class="form-input" id="ns-name"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Template</label>
-        <select class="form-select" id="ns-template"><option value="landing">Landing Page</option><option value="klinik">Klinik</option><option value="apotek">Apotek</option><option value="lab">Laboratorium</option></select>
+        <select class="form-select" id="ns-template"><option value="landing">Landing Page</option><option value="landing-fnb">🍽️ Warung Modern (HTML)</option><option value="company-profile">🏢 Company Profile (HTML)</option><option value="landing-healthcare">🏥 Klinik Sehat (HTML)</option><option value="landing-tech">🚀 Startup (HTML)</option><option value="ecommerce-fashion">👗 Fashion Store (HTML)</option><option value="klinik">Klinik (React)</option><option value="apotek">Apotek (React)</option><option value="lab">Lab (React)</option></select>
       </div>
       <div class="form-group"><label class="form-label">Theme</label>
         <select class="form-select" id="ns-theme"></select>
@@ -756,6 +756,11 @@ document.querySelectorAll('.nav-item[data-page]').forEach(el => {
   el.addEventListener('click', () => {
     const page = el.dataset.page;
     switchPage(page);
+    // If clicking Editor nav, open editor with current site or show picker
+    if (page === 'editor') {
+      if (STATE.currentSiteId) openEditor(STATE.currentSiteId);
+      else openEditor(null);
+    }
   });
 });
 
@@ -900,6 +905,7 @@ async function createNewSite() {
     closeModal('modal-new-site');
     document.getElementById('ns-name').value = '';
     loadSites();
+    openEditor(res.id);
   }
 }
 
@@ -1053,8 +1059,8 @@ function refreshPreview() {
     if (pf.contentWindow) savedScroll = pf.contentWindow.scrollY || 0;
   } catch(e) {}
 
-  // Reload preview
-  pf.src = '/api/preview/' + sid + '?_=' + Date.now();
+  // Reload preview — use correct builder endpoint
+  pf.src = '/api/sites/' + sid + '/preview?_=' + Date.now();
 
   // Restore scroll after load, clear status
   pf.onload = function() {
@@ -1162,9 +1168,17 @@ let VISUAL_THEMES = [];
 async function loadVisualThemes() {
   const data = await api('/api/themes/visuals');
   if (!data || !data.themes || !data.themes.length) return;
-  VISUAL_THEMES = data.themes;
+  // Map API response (key, primary_color, vibe, industry[]) to frontend format
+  VISUAL_THEMES = data.themes.map(t => ({
+    id: t.key,
+    name: t.name,
+    colors: [t.primary_color || '#6366f1', adjustColor(t.primary_color || '#6366f1', 20), '#e0e7ff'],
+    font: t.font || '',
+    category: t.vibe || '',
+    industry: t.industry || [],
+  }));
   const industry = document.getElementById('theme-industry-filter')?.value || '';
-  const filtered = industry ? VISUAL_THEMES.filter(t => t.industry === industry) : VISUAL_THEMES;
+  const filtered = industry ? VISUAL_THEMES.filter(t => t.industry.includes(industry)) : VISUAL_THEMES;
   const currentTheme = document.querySelector('.theme-option.active')?.dataset.themeId || '';
   const c = document.getElementById('ed-themes');
   if (!c) return;
@@ -1179,6 +1193,15 @@ async function loadVisualThemes() {
       </div>
     </div>`;
   }).join('');
+}
+
+// Helper: lighten/darken hex color
+function adjustColor(hex, percent) {
+  const num = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, (num >> 16) + percent);
+  const g = Math.min(255, ((num >> 8) & 0x00FF) + percent);
+  const b = Math.min(255, (num & 0x0000FF) + percent);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
 function selectVisualTheme(id) {

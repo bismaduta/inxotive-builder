@@ -476,15 +476,23 @@ def render_html_site(template_id: str, brand_name: str = "INXOTIVE",
         import asyncio
         from web_engine.templates import render_template
 
-        loop = asyncio.new_event_loop()
+        async def _render():
+            return await render_template(template_id, brand_name=brand_name,
+                                          content_overrides=content_overrides)
+
+        # Handle both sync and async call contexts
         try:
-            html = loop.run_until_complete(
-                render_template(template_id, brand_name=brand_name,
-                                content_overrides=content_overrides)
-            )
-            return html
-        finally:
-            loop.close()
+            loop = asyncio.get_running_loop()
+            # Already in async context — schedule and wait
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(asyncio.run, _render())
+                return future.result(timeout=30)
+        except RuntimeError:
+            # No running loop — use asyncio.run
+            pass
+
+        return asyncio.run(_render())
     except ImportError as e:
         return f"<!-- web_engine not available: {e} -->"
     except Exception as e:
@@ -517,20 +525,30 @@ def generate_multi_page_site(site_id: str, template_id: str = None,
             else:
                 page_configs.append(p)
 
-        loop = asyncio.new_event_loop()
-        try:
-            result = loop.run_until_complete(
-                render_multi_page_site(
-                    template_id=template_id or "landing",
-                    pages=page_configs,
-                    brand_name=brand_name,
-                    industry=industry,
-                    brand_color=brand_color,
-                )
+        async def _render():
+            return await render_multi_page_site(
+                template_id=template_id or "landing",
+                pages=page_configs,
+                brand_name=brand_name,
+                industry=industry,
+                brand_color=brand_color,
             )
-            return {"pages": result, "count": len(result)}
-        finally:
-            loop.close()
+
+        # Handle both sync and async call contexts
+        try:
+            asyncio.get_running_loop()
+            # Already in async context — run in separate thread
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(asyncio.run, _render())
+                result = future.result(timeout=30)
+                return {"pages": result, "count": len(result)}
+        except RuntimeError:
+            # No running loop — use asyncio.run directly
+            pass
+
+        result = asyncio.run(_render())
+        return {"pages": result, "count": len(result)}
     except ImportError as e:
         return {"error": f"web_engine multi_page not available: {e}", "pages": {}}
     except Exception as e:

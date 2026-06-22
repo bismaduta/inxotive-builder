@@ -185,7 +185,7 @@ async def api_create_site(data: dict):
     result = create_site(data)
     if "error" in result:
         raise HTTPException(status_code=400, detail=result.get("error", "Unknown error"))
-    return result, 201
+    return JSONResponse(result, status_code=201)
 
 
 @app.put("/api/sites/{sid}/config")
