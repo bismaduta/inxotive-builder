@@ -503,23 +503,32 @@ def generate_multi_page_site(site_id: str, template_id: str = None,
         import sys as _sys
         _sys.path.insert(0, str(HOME / "market-api"))
         import asyncio
-        from web_engine.multi_page import generate_site_pages
+        from web_engine.multi_page import render_multi_page_site, PAGE_TYPES
 
         if not pages:
-            pages = ["home", "about", "services", "contact"]
+            pages = list(PAGE_TYPES.keys())
+
+        # Convert page names (strings) to page config dicts
+        page_configs = []
+        for p in pages:
+            if isinstance(p, str):
+                pt = PAGE_TYPES.get(p, {}).copy()
+                page_configs.append({"slug": p, **pt})
+            else:
+                page_configs.append(p)
 
         loop = asyncio.new_event_loop()
         try:
             result = loop.run_until_complete(
-                generate_site_pages(
+                render_multi_page_site(
                     template_id=template_id or "landing",
+                    pages=page_configs,
                     brand_name=brand_name,
+                    industry=industry,
                     brand_color=brand_color,
-                    pages=pages,
-                    content_overrides=content_overrides or {},
                 )
             )
-            return result
+            return {"pages": result, "count": len(result)}
         finally:
             loop.close()
     except ImportError as e:
@@ -544,8 +553,13 @@ def save_multi_page_site(site_id: str, pages: dict) -> dict:
 
     saved = []
     for slug, html in pages.items():
-        filename = "index.html" if slug == "home" else f"{slug}.html"
+        # slug is already a path like "index.html" or "tentang/index.html"
+        if slug.endswith(".html"):
+            filename = slug
+        else:
+            filename = "index.html" if slug == "home" else f"{slug}.html"
         filepath = output_dir / filename
+        filepath.parent.mkdir(parents=True, exist_ok=True)
         filepath.write_text(html)
         saved.append({"slug": slug, "file": str(filepath)})
 
@@ -651,31 +665,33 @@ def get_site(site_id: str) -> dict:
 
 
 def create_site(data_in: dict) -> dict:
-    """Create site from template. Copies template dir to clients/."""
+    """Create site from template. For React: copies template dir. For HTML: lightweight record."""
     data = load_data()
     template_id = data_in.get("template", "landing")
     tpl = TEMPLATE_REGISTRY.get(template_id)
     if not tpl:
         return {"error": f"Template '{template_id}' not found", "valid_templates": list(TEMPLATE_REGISTRY.keys())}
 
-    tpl_dir = TEMPLATES_DIR / tpl["dir"]
-    if not tpl_dir.exists():
-        return {"error": f"Template directory not found on disk: {tpl_dir}"}
-
     sid = _gen_id()
     site_name = data_in.get("name", f"Site-{sid[:6]}")
     safe_name = site_name.lower().replace(" ", "-").replace("_", "-")[:30]
     site_dir = CLIENTS_DIR / f"site-{safe_name}"
 
-    # Copy template
-    if site_dir.exists():
-        shutil.rmtree(site_dir)
-    shutil.copytree(tpl_dir, site_dir, ignore=shutil.ignore_patterns("node_modules", "dist", ".git"))
-
-    # Write config
+    # Parse config
     config = data_in.get("config", {})
     theme = config.get("theme", data_in.get("theme", tpl["default_theme"]))
     brand_name = config.get("brand", {}).get("name", data_in.get("name", "Nama Bisnis"))
+
+    is_html = tpl.get("type") == "html"
+
+    if not is_html:
+        # REACT TEMPLATE: copy dir from disk
+        tpl_dir = TEMPLATES_DIR / tpl["dir"]
+        if not tpl_dir.exists():
+            return {"error": f"Template directory not found on disk: {tpl_dir}"}
+        if site_dir.exists():
+            shutil.rmtree(site_dir)
+        shutil.copytree(tpl_dir, site_dir, ignore=shutil.ignore_patterns("node_modules", "dist", ".git"))
 
     # Build full site config
     site_config = {
@@ -726,40 +742,43 @@ def create_site(data_in: dict) -> dict:
         },
     }
 
-    # Determine config file path
-    config_path = site_dir / "site.config.js"
-    if not config_path.exists():
-        config_path = site_dir / "src" / "config" / "site.config.js"
+    # ── Determine config path & write ──
+    if is_html:
+        # HTML templates: write JSON config to a data dir
+        site_dir.mkdir(parents=True, exist_ok=True)
+        config_path = site_dir / "site-config.json"
+        config_path.write_text(json.dumps(site_config, indent=2))
+        # Write placeholder index
+        (site_dir / "index.html").write_text(f"""<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>{site_name} — INXOTIVE</title></head><body>
+<!-- INXOTIVE HTML Template: {template_id} — rendered at preview/build time -->
+<h1 style="display:none">{site_name}</h1>
+</body></html>""")
+    else:
+        # REACT TEMPLATE: write site.config.js
+        config_path = site_dir / "site.config.js"
+        if not config_path.exists():
+            config_path = site_dir / "src" / "config" / "site.config.js"
+        config_path.write_text(f"export const siteConfig = {json.dumps(site_config, indent=2, ensure_ascii=False)};\n")
 
-    # Write config as JS module
-    config_path.write_text(f"export const siteConfig = {json.dumps(site_config, indent=2, ensure_ascii=False)};\n")
+        # Fix ghost branding
+        index_path = site_dir / "index.html"
+        if index_path.exists():
+            index_html = index_path.read_text()
+            index_html = re.sub(r'<title>.*?</title>', f'<title>{site_name} — INXOTIVE</title>', index_html)
+            index_html = index_html.replace('lang="en"', 'lang="id"')
+            index_path.write_text(index_html)
 
-    # ── Fix ghost branding ──
-    # Update <title> in index.html
-    index_path = site_dir / "index.html"
-    if index_path.exists():
-        index_html = index_path.read_text()
-        # Replace the <title> tag with the actual site name
-        index_html = re.sub(
-            r'<title>.*?</title>',
-            f'<title>{site_name} — INXOTIVE</title>',
-            index_html
-        )
-        # Update lang attribute to Indonesian
-        index_html = index_html.replace('lang="en"', 'lang="id"')
-        index_path.write_text(index_html)
+        pkg_path = site_dir / "package.json"
+        if pkg_path.exists():
+            try:
+                pkg = json.loads(pkg_path.read_text())
+                pkg["name"] = safe_name.replace("-", "")
+                pkg_path.write_text(json.dumps(pkg, indent=2) + "\n")
+            except (json.JSONDecodeError, Exception):
+                pass
 
-    # Update "name" in package.json
-    pkg_path = site_dir / "package.json"
-    if pkg_path.exists():
-        try:
-            pkg = json.loads(pkg_path.read_text())
-            pkg["name"] = safe_name.replace("-", "")
-            pkg_path.write_text(json.dumps(pkg, indent=2) + "\n")
-        except (json.JSONDecodeError, Exception):
-            pass  # Skip if package.json is malformed
-
-    # Record site
+    # ── Record site ──
     client_id = data_in.get("client_id", "")
     client_name = ""
     if client_id and client_id in data["clients"]:
@@ -796,26 +815,34 @@ def update_site_config(site_id: str, config_updates: dict) -> dict:
     if not site_dir.exists():
         return {"error": "Site directory not found"}
 
+    # Try HTML config (JSON) first, then React config (JS module)
     config_path = site_dir / s.get("config_path", "")
     if not config_path.exists():
-        config_path = site_dir / "src" / "config" / "site.config.js"
+        config_path = site_dir / "site-config.json"
     if not config_path.exists():
         config_path = site_dir / "site.config.js"
+    if not config_path.exists():
+        config_path = site_dir / "src" / "config" / "site.config.js"
     if not config_path.exists():
         return {"error": "Config file not found"}
 
     # Read current config
-    current_raw = config_path.read_text()
-    # Extract JSON from export const siteConfig = {...}
-    import re
-    m = re.search(r"export\s+const\s+siteConfig\s*=\s*(\{.*\})\s*;?\s*$", current_raw, re.DOTALL)
-    if not m:
-        return {"error": "Cannot parse existing config"}
-
-    try:
-        current = json.loads(m.group(1))
-    except json.JSONDecodeError:
-        return {"error": "Invalid JSON in config"}
+    is_json_config = config_path.suffix == ".json"
+    if is_json_config:
+        try:
+            current = json.loads(config_path.read_text())
+        except json.JSONDecodeError:
+            return {"error": "Invalid JSON in config"}
+    else:
+        current_raw = config_path.read_text()
+        import re
+        m = re.search(r"export\s+const\s+siteConfig\s*=\s*(\{.*\})\s*;?\s*$", current_raw, re.DOTALL)
+        if not m:
+            return {"error": "Cannot parse existing config"}
+        try:
+            current = json.loads(m.group(1))
+        except json.JSONDecodeError:
+            return {"error": "Invalid JSON in config"}
 
     # Deep merge updates
     def deep_merge(base, updates):
@@ -837,14 +864,17 @@ def update_site_config(site_id: str, config_updates: dict) -> dict:
     data["sites"][site_id] = s
 
     # Write updated config
-    config_path.write_text(f"export const siteConfig = {json.dumps(current, indent=2, ensure_ascii=False)};\n")
+    if is_json_config:
+        config_path.write_text(json.dumps(current, indent=2))
+    else:
+        config_path.write_text(f"export const siteConfig = {json.dumps(current, indent=2, ensure_ascii=False)};\n")
 
     save_data(data)
     return {"id": site_id, "updated": True, "theme": s["theme"], "name": s["name"]}
 
 
 def build_site(site_id: str) -> dict:
-    """Run npm build on site directory."""
+    """Build site. React: npm build. HTML: render via web_engine."""
     data = load_data()
     s = data["sites"].get(site_id)
     if not s:
@@ -854,15 +884,35 @@ def build_site(site_id: str) -> dict:
     if not site_dir.exists():
         return {"error": "Site directory not found"}
 
-    # Ensure node_modules
+    tpl = TEMPLATE_REGISTRY.get(s["template"], {})
+
+    # ── HTML template: render via web_engine ──
+    if tpl.get("type") == "html":
+        try:
+            html = render_html_site(
+                s["template"],
+                brand_name=s.get("name", "INXOTIVE"),
+                industry=s.get("industry", "general"),
+            )
+            dist_dir = site_dir / "dist"
+            dist_dir.mkdir(parents=True, exist_ok=True)
+            (dist_dir / "index.html").write_text(html)
+            s["status"] = "built"
+            s["updated"] = _now()
+            data["sites"][site_id] = s
+            save_data(data)
+            return {"success": True, "output": f"HTML rendered: {len(html)} chars"}
+        except Exception as e:
+            return {"success": False, "error": f"HTML render failed: {e}"}
+
+    # ── React template: npm build ──
     node_modules = site_dir / "node_modules"
     if not node_modules.exists():
-        # Copy from template
-        tpl = TEMPLATE_REGISTRY.get(s["template"])
-        if tpl:
-            tpl_dir = TEMPLATES_DIR / tpl["dir"]
-            if (tpl_dir / "node_modules").exists():
-                shutil.copytree(str(tpl_dir / "node_modules"), str(node_modules), symlinks=True)
+        tpl_item = TEMPLATE_REGISTRY.get(s["template"])
+        if tpl_item:
+            tpl_dir_item = TEMPLATES_DIR / tpl_item["dir"]
+            if (tpl_dir_item / "node_modules").exists():
+                shutil.copytree(str(tpl_dir_item / "node_modules"), str(node_modules), symlinks=True)
 
     try:
         result = subprocess.run(
