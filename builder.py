@@ -6,7 +6,7 @@ Data layer, template ops, Vercel deploy, site management.
 Storage: ~/.agency_data.json (JSON file, flat collections)
 """
 
-import json, os, shutil, uuid, subprocess, time
+import json, os, shutil, uuid, subprocess, time, re
 from pathlib import Path
 from datetime import datetime
 
@@ -22,12 +22,14 @@ VERCEL_TEAM = "bismadutas-projects"
 
 # ── Template Registry ──
 TEMPLATE_REGISTRY = {
+    # ── React Templates (Vite + site.config.js) ──
     "klinik": {
         "label": "Klinik",
         "dir": "klinik-template",
         "description": "Klinik, puskesmas, rumah sakit umum",
         "default_theme": "clinical-trust",
         "themes": ["clinical-trust", "warm-family", "precision-lab", "heritage-care", "fresh-apotek", "premium-resto"],
+        "type": "react",
     },
     "apotek": {
         "label": "Apotek",
@@ -35,6 +37,7 @@ TEMPLATE_REGISTRY = {
         "description": "Apotek, toko obat, health store",
         "default_theme": "fresh-apotek",
         "themes": ["clinical-trust", "warm-family", "precision-lab", "heritage-care", "fresh-apotek", "premium-resto"],
+        "type": "react",
     },
     "lab": {
         "label": "Laboratorium",
@@ -42,6 +45,7 @@ TEMPLATE_REGISTRY = {
         "description": "Lab diagnostik, lab kesehatan",
         "default_theme": "precision-lab",
         "themes": ["clinical-trust", "warm-family", "precision-lab", "heritage-care", "fresh-apotek", "premium-resto"],
+        "type": "react",
     },
     "landing": {
         "label": "Landing Page",
@@ -49,8 +53,232 @@ TEMPLATE_REGISTRY = {
         "description": "Landing page bisnis umum, restoran, jasa",
         "default_theme": "warm-family",
         "themes": ["clinical-trust", "warm-family", "precision-lab", "heritage-care", "fresh-apotek", "premium-resto"],
+        "type": "react",
+    },
+    # ── HTML Templates (web_engine rendered, no build needed) ──
+    "landing-healthcare": {
+        "label": "Klinik Sehat",
+        "dir": None,
+        "description": "Landing page modern untuk klinik/dokter",
+        "default_theme": "healthcare",
+        "themes": ["healthcare", "minimal", "corporate"],
+        "type": "html",
+        "industry": "healthcare",
+    },
+    "landing-fnb": {
+        "label": "Warung Modern",
+        "dir": None,
+        "description": "Landing page restoran dengan gallery makanan",
+        "default_theme": "fnb",
+        "themes": ["fnb", "luxury", "creative", "minimal"],
+        "type": "html",
+        "industry": "fnb",
+    },
+    "landing-tech": {
+        "label": "Startup Teknologi",
+        "dir": None,
+        "description": "Landing page SaaS dengan pricing dan showcase",
+        "default_theme": "tech",
+        "themes": ["tech", "inxotive", "corporate", "minimal"],
+        "type": "html",
+        "industry": "tech",
+    },
+    "landing-luxury": {
+        "label": "Luxury Brand",
+        "dir": None,
+        "description": "Landing premium dengan design elegan",
+        "default_theme": "luxury",
+        "themes": ["luxury", "minimal", "creative", "nature"],
+        "type": "html",
+        "industry": "luxury",
+    },
+    "landing-education": {
+        "label": "Edukasi Cerdas",
+        "dir": None,
+        "description": "Landing page kursus dan pendidikan",
+        "default_theme": "tech",
+        "themes": ["tech", "creative", "minimal", "nature"],
+        "type": "html",
+        "industry": "education",
+    },
+    "landing-fitness": {
+        "label": "Fitness Pro",
+        "dir": None,
+        "description": "Landing page gym/fitness bold design",
+        "default_theme": "creative",
+        "themes": ["creative", "tech", "corporate", "minimal"],
+        "type": "html",
+        "industry": "general",
+    },
+    "landing-restaurant": {
+        "label": "Restaurant Elite",
+        "dir": None,
+        "description": "Landing premium fine dining",
+        "default_theme": "fnb",
+        "themes": ["fnb", "luxury", "creative", "minimal"],
+        "type": "html",
+        "industry": "fnb",
+    },
+    "company-profile": {
+        "label": "Company Profile",
+        "dir": None,
+        "description": "Profil perusahaan lengkap 10 sections",
+        "default_theme": "corporate",
+        "themes": ["corporate", "inxotive", "minimal", "tech"],
+        "type": "html",
+        "industry": "general",
+    },
+    "company-profile-healthcare": {
+        "label": "Profil Klinik",
+        "dir": None,
+        "description": "Profil klinik dengan team dan fasilitas",
+        "default_theme": "healthcare",
+        "themes": ["healthcare", "corporate", "minimal", "nature"],
+        "type": "html",
+        "industry": "healthcare",
+    },
+    "web-app-saas": {
+        "label": "SaaS Dashboard",
+        "dir": None,
+        "description": "Landing page SaaS premium dengan pricing",
+        "default_theme": "tech",
+        "themes": ["tech", "inxotive", "corporate", "minimal"],
+        "type": "html",
+        "industry": "tech",
+    },
+    "ecommerce-fashion": {
+        "label": "Fashion Store",
+        "dir": None,
+        "description": "Toko fashion online dengan gallery",
+        "default_theme": "creative",
+        "themes": ["creative", "luxury", "minimal", "tech"],
+        "type": "html",
+        "industry": "fashion",
+    },
+    "portfolio-gallery": {
+        "label": "Portfolio Gallery",
+        "dir": None,
+        "description": "Portfolio/galeri karya",
+        "default_theme": "minimal",
+        "themes": ["minimal", "creative", "inxotive", "tech"],
+        "type": "html",
+        "industry": "general",
+    },
+    "booking-scheduling": {
+        "label": "Booking Scheduling",
+        "dir": None,
+        "description": "Halaman booking dengan form dan paket",
+        "default_theme": "inxotive",
+        "themes": ["inxotive", "tech", "creative", "minimal"],
+        "type": "html",
+        "industry": "general",
+    },
+    "landing-wellness": {
+        "label": "Wellness Spa",
+        "dir": None,
+        "description": "Landing spa/wellness dengan pricing",
+        "default_theme": "nature",
+        "themes": ["nature", "luxury", "minimal", "creative"],
+        "type": "html",
+        "industry": "general",
+    },
+    "event-landing": {
+        "label": "Event Conference",
+        "dir": None,
+        "description": "Landing page event dengan timeline",
+        "default_theme": "tech",
+        "themes": ["tech", "creative", "corporate", "inxotive"],
+        "type": "html",
+        "industry": "general",
+    },
+    "longform-sales": {
+        "label": "Longform Sales",
+        "dir": None,
+        "description": "Longform sales page premium",
+        "default_theme": "inxotive",
+        "themes": ["inxotive", "luxury", "corporate", "minimal"],
+        "type": "html",
+        "industry": "general",
+    },
+    "blog-default": {
+        "label": "Blog Standar",
+        "dir": None,
+        "description": "Blog dengan timeline dan newsletter",
+        "default_theme": "minimal",
+        "themes": ["minimal", "tech", "creative", "nature"],
+        "type": "html",
+        "industry": "general",
+    },
+    "ecommerce-store": {
+        "label": "Toko Online",
+        "dir": None,
+        "description": "Toko online dengan cart dan checkout",
+        "default_theme": "tech",
+        "themes": ["tech", "creative", "inxotive", "corporate"],
+        "type": "html",
+        "industry": "fashion",
+    },
+    "booking-packages": {
+        "label": "Booking Paket",
+        "dir": None,
+        "description": "Booking paket wisata",
+        "default_theme": "nature",
+        "themes": ["nature", "luxury", "creative", "tech"],
+        "type": "html",
+        "industry": "general",
+    },
+    "ecommerce-checkout": {
+        "label": "Checkout Premium",
+        "dir": None,
+        "description": "Trustworthy minimal checkout dengan comparison table",
+        "default_theme": "inxotive",
+        "themes": ["inxotive", "creative", "minimal", "tech"],
+        "type": "html",
+        "industry": "general",
+    },
+    "dashboard-agency": {
+        "label": "Dashboard Agency",
+        "dir": None,
+        "description": "Dashboard admin dengan sidebar, stat cards, data table, dan activity feed",
+        "default_theme": "inxotive",
+        "themes": ["inxotive", "creative", "minimal", "tech"],
+        "type": "html",
+        "industry": "general",
     },
 }
+
+# ── Visual Theme Data for Theme Picker ──
+BRAND_VISUALS = {
+    "inxotive": {"name": "INXOTIVE", "primary": "#4F46E5", "font": "Plus Jakarta Sans", "vibe": "Digital Agency", "industry": ["tech", "general"]},
+    "healthcare": {"name": "Healthcare", "primary": "#059669", "font": "Inter", "vibe": "Clean & Trustworthy", "industry": ["healthcare"]},
+    "fnb": {"name": "FnB", "primary": "#EA580C", "font": "Space Grotesk", "vibe": "Warm & Appetizing", "industry": ["fnb", "restaurant"]},
+    "luxury": {"name": "Luxury", "primary": "#B8860B", "font": "Playfair Display", "vibe": "Exclusive & Refined", "industry": ["luxury", "fashion"]},
+    "tech": {"name": "Tech", "primary": "#2563EB", "font": "Inter", "vibe": "Innovative & Fast", "industry": ["tech", "saas"]},
+    "creative": {"name": "Creative", "primary": "#FF6B6B", "font": "DM Sans", "vibe": "Vibrant & Playful", "industry": ["creative", "fashion"]},
+    "minimal": {"name": "Minimal", "primary": "#1A1A1A", "font": "Inter", "vibe": "Pure & Quiet", "industry": ["general", "portfolio"]},
+    "corporate": {"name": "Corporate", "primary": "#1B3A5C", "font": "Work Sans", "vibe": "Professional B2B", "industry": ["corporate", "tech"]},
+    "nature": {"name": "Nature", "primary": "#4A7C59", "font": "DM Sans", "vibe": "Calm & Organic", "industry": ["wellness", "nature", "general"]},
+    "education": {"name": "Education", "primary": "#6366F1", "font": "Plus Jakarta Sans", "vibe": "Friendly Approachable", "industry": ["education"]},
+    "fashion": {"name": "Fashion", "primary": "#EC4899", "font": "Space Grotesk", "vibe": "Bold & Stylish", "industry": ["fashion"]},
+    "fitness": {"name": "Fitness", "primary": "#DC2626", "font": "Inter", "vibe": "Energetic & Powerful", "industry": ["fitness", "sports"]},
+}
+
+
+def list_theme_visuals(industry: str = "") -> list:
+    """Return all theme visuals, optionally filtered by industry."""
+    visuals = []
+    for key, v in BRAND_VISUALS.items():
+        if industry and industry not in v["industry"]:
+            continue
+        visuals.append({
+            "key": key,
+            "name": v["name"],
+            "primary_color": v["primary"],
+            "font": v["font"],
+            "vibe": v["vibe"],
+            "industry": v["industry"],
+        })
+    return sorted(visuals, key=lambda x: x["name"])
 
 
 # ════════════════════════════════════════════════════════════════
@@ -210,23 +438,133 @@ def delete_client(client_id: str) -> bool:
 def list_templates():
     result = []
     for key, tpl in TEMPLATE_REGISTRY.items():
-        tpl_dir = TEMPLATES_DIR / tpl["dir"]
-        exists = tpl_dir.exists()
-        result.append({
-            "id": key,
-            "label": tpl["label"],
-            "description": tpl["description"],
-            "default_theme": tpl["default_theme"],
-            "themes": tpl["themes"],
-            "exists_on_disk": exists,
-        })
+        tpl_type = tpl.get("type", "react")
+        if tpl_type == "html":
+            result.append({
+                "id": key,
+                "label": tpl["label"],
+                "description": tpl["description"],
+                "default_theme": tpl["default_theme"],
+                "themes": tpl["themes"],
+                "type": "html",
+                "industry": tpl.get("industry", "general"),
+                "exists_on_disk": True,
+            })
+        else:
+            tpl_dir = TEMPLATES_DIR / tpl["dir"]
+            exists = tpl_dir.exists()
+            result.append({
+                "id": key,
+                "label": tpl["label"],
+                "description": tpl["description"],
+                "default_theme": tpl["default_theme"],
+                "themes": tpl["themes"],
+                "type": "react",
+                "exists_on_disk": exists,
+            })
     return result
+
+
+def render_html_site(template_id: str, brand_name: str = "INXOTIVE",
+                     industry: str = "general", brand_color: str = "4F46E5",
+                     content_overrides: dict = None) -> str:
+    """Render an HTML template via web_engine. No build step needed.
+    Returns full HTML page ready to serve directly."""
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(HOME / "market-api"))
+        import asyncio
+        from web_engine.templates import render_template
+
+        loop = asyncio.new_event_loop()
+        try:
+            html = loop.run_until_complete(
+                render_template(template_id, brand_name=brand_name,
+                                content_overrides=content_overrides)
+            )
+            return html
+        finally:
+            loop.close()
+    except ImportError as e:
+        return f"<!-- web_engine not available: {e} -->"
+    except Exception as e:
+        return f"<!-- Failed to render HTML template: {e} -->"
+
+
+def generate_multi_page_site(site_id: str, template_id: str = None,
+                              brand_name: str = "INXOTIVE", industry: str = "general",
+                              brand_color: str = "4F46E5",
+                              pages: list = None, content_overrides: dict = None) -> dict:
+    """Generate multi-page HTML site using web_engine multi_page.py.
+
+    Returns dict with {pages: {slug: html, ...}, page_list: [...], ...}
+    """
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(HOME / "market-api"))
+        import asyncio
+        from web_engine.multi_page import generate_site_pages
+
+        if not pages:
+            pages = ["home", "about", "services", "contact"]
+
+        loop = asyncio.new_event_loop()
+        try:
+            result = loop.run_until_complete(
+                generate_site_pages(
+                    template_id=template_id or "landing",
+                    brand_name=brand_name,
+                    brand_color=brand_color,
+                    pages=pages,
+                    content_overrides=content_overrides or {},
+                )
+            )
+            return result
+        finally:
+            loop.close()
+    except ImportError as e:
+        return {"error": f"web_engine multi_page not available: {e}", "pages": {}}
+    except Exception as e:
+        return {"error": f"Failed to generate multi-page: {e}", "pages": {}}
+
+
+def save_multi_page_site(site_id: str, pages: dict) -> dict:
+    """Save generated multi-page HTML files to site directory."""
+    data = load_data()
+    s = data["sites"].get(site_id)
+    if not s:
+        return {"error": "Site not found"}
+
+    site_dir = Path(s["directory"])
+    if not site_dir.exists():
+        return {"error": "Site directory not found"}
+
+    output_dir = site_dir / "dist"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    saved = []
+    for slug, html in pages.items():
+        filename = "index.html" if slug == "home" else f"{slug}.html"
+        filepath = output_dir / filename
+        filepath.write_text(html)
+        saved.append({"slug": slug, "file": str(filepath)})
+
+    s["multi_page"] = True
+    s["pages"] = list(pages.keys())
+    s["updated"] = _now()
+    data["sites"][site_id] = s
+    save_data(data)
+
+    return {"success": True, "pages": saved, "count": len(saved)}
 
 
 def get_template(template_id: str) -> dict:
     tpl = TEMPLATE_REGISTRY.get(template_id)
     if not tpl:
         return None
+    # HTML templates don't have a dir on disk - rendered by web_engine
+    if tpl.get("type") == "html":
+        return {"id": template_id, "type": "html", **tpl}
     tpl_dir = TEMPLATES_DIR / tpl["dir"]
     if not tpl_dir.exists():
         return {"id": template_id, "error": "template not found on disk", **tpl}
@@ -395,6 +733,31 @@ def create_site(data_in: dict) -> dict:
 
     # Write config as JS module
     config_path.write_text(f"export const siteConfig = {json.dumps(site_config, indent=2, ensure_ascii=False)};\n")
+
+    # ── Fix ghost branding ──
+    # Update <title> in index.html
+    index_path = site_dir / "index.html"
+    if index_path.exists():
+        index_html = index_path.read_text()
+        # Replace the <title> tag with the actual site name
+        index_html = re.sub(
+            r'<title>.*?</title>',
+            f'<title>{site_name} — INXOTIVE</title>',
+            index_html
+        )
+        # Update lang attribute to Indonesian
+        index_html = index_html.replace('lang="en"', 'lang="id"')
+        index_path.write_text(index_html)
+
+    # Update "name" in package.json
+    pkg_path = site_dir / "package.json"
+    if pkg_path.exists():
+        try:
+            pkg = json.loads(pkg_path.read_text())
+            pkg["name"] = safe_name.replace("-", "")
+            pkg_path.write_text(json.dumps(pkg, indent=2) + "\n")
+        except (json.JSONDecodeError, Exception):
+            pass  # Skip if package.json is malformed
 
     # Record site
     client_id = data_in.get("client_id", "")

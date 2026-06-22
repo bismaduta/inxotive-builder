@@ -9,6 +9,7 @@ import sys, os
 from pathlib import Path
 
 sys.path.insert(0, str(Path.home() / "market-api"))
+sys.path.insert(0, str(Path.home() / "inxotive-builder"))
 
 # Load env secrets
 _env_secrets = Path.home() / ".env_secrets"
@@ -29,6 +30,7 @@ from builder import (
     list_sites, get_site, create_site, update_site_config, build_site, deploy_site, set_site_domain, delete_site,
     list_assets, upload_asset, delete_asset,
     generate_portal_token, verify_portal_token,
+    generate_multi_page_site, save_multi_page_site,
 )
 
 app = FastAPI(title="INXOTIVE Builder", version="1.0")
@@ -38,9 +40,11 @@ app = FastAPI(title="INXOTIVE Builder", version="1.0")
 
 @app.get("/", response_class=HTMLResponse)
 async def builder_root():
-    path = Path.home() / "market-api" / "builder.html"
-    if path.exists():
-        return HTMLResponse(path.read_text())
+    # Check inxotive-builder first, fallback to market-api
+    for p in [Path.home() / "inxotive-builder", Path.home() / "market-api"]:
+        path = p / "builder.html"
+        if path.exists():
+            return HTMLResponse(path.read_text())
     return HTMLResponse("<h1>Builder not found</h1>", status_code=404)
 
 
@@ -86,6 +90,41 @@ async def api_template_detail(tid: str):
     if t is None:
         raise HTTPException(status_code=404, detail="Template not found")
     return t
+
+
+@app.get("/api/themes/visuals")
+async def api_theme_visuals(industry: str = ""):
+    from builder import list_theme_visuals
+    return {"themes": list_theme_visuals(industry)}
+
+
+@app.get("/api/stock/search")
+async def api_stock_search(q: str = "hero", count: int = 4):
+    """Search free stock images by keyword. No API key needed."""
+    try:
+        from web_engine.illustration_resolver import search_images, list_industry_images
+        urls = search_images(q, count=min(count, 12))
+        if not urls:
+            return {"query": q, "count": 0, "images": [], "suggestions": list(list_industry_images().keys())}
+        return {"query": q, "count": len(urls), "images": urls}
+    except ImportError:
+        return {"error": "Image resolver not available"}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/api/stock/categories")
+async def api_stock_categories():
+    """List all available stock image categories."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path.home() / "market-api"))
+        from web_engine.illustration_resolver import list_industry_images
+        return list_industry_images()
+    except ImportError:
+        return {"error": "Image resolver not available"}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 # ── Clients ──
@@ -190,6 +229,124 @@ async def api_delete_site(sid: str):
     if not ok:
         raise HTTPException(status_code=404, detail="Site not found")
     return {"ok": True}
+
+
+# ── Preview ──
+
+@app.get("/api/sites/{sid}/preview")
+async def api_preview_site(sid: str, page: str = "home"):
+    """Render live preview of site. Returns full HTML page.
+    For React templates, reads from dev server or dist.
+    For HTML templates, renders via web_engine on-the-fly.
+    """
+    from builder import get_site, render_html_site, generate_multi_page_site, load_data
+
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    template_id = site.get("template", "landing")
+
+    # Check if HTML template (web_engine rendered)
+    # We check by looking up the template registry
+    from builder import TEMPLATE_REGISTRY
+    tpl = TEMPLATE_REGISTRY.get(template_id, {})
+    if tpl.get("type") == "html":
+        # Render single page
+        content_overrides = {}
+        config = site.get("config", {})
+        if config:
+            content_overrides = {"brand": config.get("brand", {}), "contact": config.get("contact", {})}
+        try:
+            html = render_html_site(
+                template_id,
+                brand_name=site.get("name", "INXOTIVE"),
+                industry=site.get("industry", "general"),
+                content_overrides=content_overrides,
+            )
+            return HTMLResponse(html)
+        except Exception as e:
+            return HTMLResponse(f"<html><body><h2>Preview Error</h2><pre>{e}</pre></body></html>", status_code=500)
+
+    # React template -- serve dist/index.html or trigger build
+    site_dir = Path(site.get("directory", ""))
+    if not site_dir.exists():
+        return HTMLResponse("<html><body><h2>Site directory not found</h2></body></html>", status_code=404)
+
+    dist_index = site_dir / "dist" / "index.html"
+    if dist_index.exists():
+        return HTMLResponse(dist_index.read_text())
+
+    # Check for multi-page
+    if page != "home":
+        dist_page = site_dir / "dist" / f"{page}.html"
+        if dist_page.exists():
+            return HTMLResponse(dist_page.read_text())
+
+    return HTMLResponse(f"""<!DOCTYPE html><html><head><title>{site.get('name', 'Site')} &mdash; Preview</title>
+<style>body{{font-family:sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;flex-direction:column}}
+h1{{color:#38bdf8;margin-bottom:8px}}p{{color:#94a3b8}}button{{background:#4F46E5;color:white;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px}}</style>
+<body><div><h1>&#128640; Site Not Built Yet</h1><p>Click <strong>Build</strong> first to generate the site files.</p></div></body></html>""")
+
+
+@app.get("/api/sites/{sid}/preview-frame")
+async def api_preview_frame(sid: str):
+    """Return the preview iframe HTML inject for builder UI."""
+    from builder import get_site
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    template_id = site.get("template", "landing")
+
+    # Check if site has multi-page
+    pages = site.get("pages", ["home"])
+    page_buttons = "".join([f'<button class="pv-page-btn {"active" if p == "home" else ""}" onclick="previewPage(\'{p}\')">{p.title()}</button>' for p in pages])
+
+    html = f"""<!DOCTYPE html>
+<html><head><style>
+body{{margin:0;padding:0;background:#0f172a;font-family:sans-serif}}
+.pv-container{{display:flex;flex-direction:column;height:100vh}}
+.pv-toolbar{{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#1e293b;border-bottom:1px solid #334155;flex-wrap:wrap}}
+.pv-toolbar .pv-title{{color:#e2e8f0;font-size:13px;font-weight:600;margin-right:auto}}
+.pv-toolbar button{{padding:4px 12px;border-radius:4px;border:1px solid #475569;background:#334155;color:#cbd5e1;font-size:12px;cursor:pointer}}
+.pv-toolbar button.active{{background:#4F46E5;border-color:#4F46E5;color:white}}
+.pv-toolbar button:hover{{background:#475569}}
+.pv-toolbar .pv-badge{{font-size:10px;padding:2px 8px;border-radius:999px;background:#059669;color:white}}
+.pv-iframe-wrapper{{flex:1;overflow:hidden}}
+.pv-iframe-wrapper iframe{{width:100%;height:100%;border:none;background:white}}
+.pv-devices{{display:flex;gap:4px}}
+.pv-devices button{{padding:4px 8px;font-size:11px}}
+</style></head><body>
+<div class="pv-container">
+  <div class="pv-toolbar">
+    <span class="pv-title">&#128269; {site.get('name', 'Preview')}</span>
+    <span class="pv-badge">{template_id}</span>
+    <div class="pv-devices">
+      <button onclick="setPreviewWidth('100%')" class="active" id="pv-d-desktop">&#128187; Desktop</button>
+      <button onclick="setPreviewWidth('768px')" id="pv-d-tablet">&#128241; Tablet</button>
+      <button onclick="setPreviewWidth('375px')" id="pv-d-mobile">&#128241; Mobile</button>
+    </div>
+    <div style="display:flex;gap:4px">{page_buttons}</div>
+    <button onclick="refreshPreview()">&#128260; Refresh</button>
+  </div>
+  <div class="pv-iframe-wrapper" style="display:flex;justify-content:center;background:#1e293b">
+    <iframe id="pv-frame" src="/api/sites/{sid}/preview" style="max-width:100%;height:100%"></iframe>
+  </div>
+</div>
+<script>
+function setPreviewWidth(w) {{document.getElementById('pv-frame').style.width=w;
+  document.querySelectorAll('.pv-devices button').forEach(b=>b.classList.remove('active'));
+  if(w=='100%') document.getElementById('pv-d-desktop').classList.add('active');
+  else if(w=='768px') document.getElementById('pv-d-tablet').classList.add('active');
+  else document.getElementById('pv-d-mobile').classList.add('active');}}
+function refreshPreview() {{document.getElementById('pv-frame').src='/api/sites/{sid}/preview?t='+Date.now()}}
+function previewPage(p) {{document.getElementById('pv-frame').src='/api/sites/{sid}/preview?page='+p+'&t='+Date.now();
+  document.querySelectorAll('.pv-page-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');}}
+</script>
+</div></body></html>"""
+    return HTMLResponse(html)
 
 
 # ── Assets ──
@@ -361,6 +518,46 @@ async def api_preview_file(sid: str, file_path: str):
     raise HTTPException(status_code=404, detail="Not found")
 
 
+@app.get("/api/render/{template_id}")
+async def api_render_html(template_id: str, brand: str = "INXOTIVE", industry: str = "general"):
+    """Render an HTML template via web_engine. No build needed."""
+    try:
+        from builder import render_html_site, TEMPLATE_REGISTRY
+        if template_id not in TEMPLATE_REGISTRY:
+            raise HTTPException(status_code=404, detail=f"Template '{template_id}' not found")
+        tpl = TEMPLATE_REGISTRY[template_id]
+        if tpl.get("type") != "html":
+            return HTMLResponse(f'<div style="padding:40px;text-align:center;font-family:sans-serif"><p>This is a React template. Use /api/preview/{id} after build.</p></div>')
+        html = render_html_site(template_id, brand_name=brand, industry=industry)
+        return HTMLResponse(html)
+    except ImportError:
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse("Web engine not available. Install market-api first.", status_code=503)
+    except Exception as e:
+        return HTMLResponse(f'<div style="padding:40px;text-align:center;font-family:sans-serif"><p>Render error: {e}</p></div>')
+
+
+@app.get("/api/render")
+async def api_list_html_templates():
+    """List all available HTML templates (web_engine)."""
+    try:
+        from builder import TEMPLATE_REGISTRY
+        html_templates = []
+        for key, tpl in TEMPLATE_REGISTRY.items():
+            if tpl.get("type") == "html":
+                html_templates.append({
+                    "id": key,
+                    "label": tpl["label"],
+                    "description": tpl["description"],
+                    "industry": tpl.get("industry", "general"),
+                    "default_theme": tpl["default_theme"],
+                    "themes": tpl.get("themes", []),
+                })
+        return {"templates": html_templates, "count": len(html_templates)}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.post("/api/preview/{sid}/save")
 async def api_preview_save(sid: str, data: dict):
     """Save config + build + return preview URL. Only saves non-empty fields to prevent overwrite."""
@@ -391,6 +588,196 @@ async def api_preview_save(sid: str, data: dict):
         raise HTTPException(status_code=400, detail="Build failed")
     return {"preview_url": "/api/preview/" + sid, "build_status": "ok"}
 
+
+
+import sys as _sys
+from fastapi.responses import HTMLResponse, PlainTextResponse
+
+PREMIUM_BRANDS_CACHE = None
+
+def _get_brands_list():
+    global PREMIUM_BRANDS_CACHE
+    if PREMIUM_BRANDS_CACHE is not None:
+        return PREMIUM_BRANDS_CACHE
+    try:
+        _sys.path.insert(0, os.path.expanduser("~/market-api"))
+        from web_engine.css_framework import ALL_BRANDS
+        PREMIUM_BRANDS_CACHE = [
+            {
+                "slug": slug,
+                "name": data.get("name", slug),
+                "primary": data.get("primary", "#6366f1"),
+                "secondary": data.get("secondary", "#8b5cf6"),
+                "accent": data.get("accent", "#f59e0b"),
+                "bg": data.get("bg", "#ffffff"),
+            }
+            for slug, data in ALL_BRANDS.items()
+        ]
+    except Exception:
+        PREMIUM_BRANDS_CACHE = [
+            {"slug": s, "name": s.capitalize(), "primary": "#6366f1", "secondary": "#8b5cf6", "accent": "#f59e0b"}
+            for s in ["inxotive","tech","fnb","healthcare","luxury","apple","stripe","vercel","figma","notion","nike"]
+        ]
+    return PREMIUM_BRANDS_CACHE
+
+
+@app.get("/api/premium/brands")
+async def api_premium_brands():
+    return {"brands": _get_brands_list()}
+
+
+@app.get("/api/premium/html/{slug}")
+async def api_premium_html(slug: str, template: str = "landing", download: bool = False):
+    try:
+        _sys.path.insert(0, os.path.expanduser("~/market-api"))
+        from web_engine.css_framework import generate_premium_page
+        html = generate_premium_page(slug)
+        headers = {"X-Content-Type-Options": "nosniff"}
+        if download:
+            headers["Content-Disposition"] = f'attachment; filename="premium-{slug}.html"'
+        return HTMLResponse(content=html, headers=headers)
+    except ImportError:
+        return HTMLResponse(
+            content=f"<html><body style='padding:40px;font-family:sans-serif'><h2>Premium Engine Not Available</h2><p>Run: cd ~/market-api && python3 web_engine/premium_tailor.py</p></body></html>",
+            status_code=503,
+        )
+    except Exception as e:
+        return HTMLResponse(
+            content=f"<html><body style='padding:40px;font-family:sans-serif'><h2>Error</h2><p>{e}</p></body></html>",
+            status_code=500,
+        )
+
+
+@app.get("/api/premium/css/{slug}")
+async def api_premium_css(slug: str):
+    try:
+        _sys.path.insert(0, os.path.expanduser("~/market-api"))
+        from web_engine.css_framework import generate_framework
+        css = generate_framework(slug)
+        return PlainTextResponse(
+            content=css,
+            media_type="text/css",
+            headers={"Content-Disposition": f'attachment; filename="framework-{slug}.css"'},
+        )
+    except Exception as e:
+        return PlainTextResponse(content=f"/* Error: {e} */", status_code=500, media_type="text/css")
+
+
+@app.post("/api/premium/deploy/{slug}")
+async def api_premium_deploy(slug: str, data: dict = {}):
+    """
+    Generate premium HTML for brand slug and deploy to Vercel.
+    POST /api/premium/deploy/inxotive
+    Optional body: {"project_name": "my-project"}
+    """
+    import tempfile, subprocess as _sp
+
+    token = os.environ.get("VERCEL_TOKEN", "")
+    if not token:
+        raise HTTPException(status_code=503, detail="VERCEL_TOKEN not configured")
+
+    # 1. Generate premium HTML
+    try:
+        _sys.path.insert(0, os.path.expanduser("~/market-api"))
+        from web_engine.css_framework import generate_premium_page
+        html = generate_premium_page(slug)
+    except ImportError:
+        raise HTTPException(status_code=503, detail="Premium engine not available (web_engine.css_framework missing)")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"HTML generation failed: {e}")
+
+    # 2. Write to /tmp/premium-deploy-<slug>/
+    deploy_dir = Path(f"/tmp/premium-deploy-{slug}")
+    deploy_dir.mkdir(parents=True, exist_ok=True)
+
+    (deploy_dir / "index.html").write_text(html, encoding="utf-8")
+
+    vercel_json = {
+        "version": 2,
+        "name": data.get("project_name", f"inxotive-premium-{slug}"),
+        "builds": [{"src": "index.html", "use": "@vercel/static"}],
+        "routes": [{"src": "/(.*)", "dest": "/index.html"}],
+    }
+    (deploy_dir / "vercel.json").write_text(json.dumps(vercel_json, indent=2))
+
+    # 3. Deploy via npx vercel
+    try:
+        result = _sp.run(
+            ["npx", "vercel", "--token", token, "--yes", "--prod"],
+            cwd=str(deploy_dir),
+            capture_output=True,
+            text=True,
+            timeout=180,
+            env={**os.environ, "VERCEL_TOKEN": token},
+        )
+        stdout = result.stdout.strip()
+        stderr = result.stderr.strip()
+
+        # Extract URL — last non-empty line of stdout that starts with https
+        url = ""
+        for line in reversed(stdout.splitlines()):
+            line = line.strip()
+            if line.startswith("https://"):
+                url = line
+                break
+
+        if result.returncode == 0 and url:
+            return {
+                "success": True,
+                "url": url,
+                "slug": slug,
+                "deploy_dir": str(deploy_dir),
+                "stdout": stdout[-800:],
+            }
+        else:
+            return {
+                "success": False,
+                "slug": slug,
+                "returncode": result.returncode,
+                "stdout": stdout[-800:],
+                "stderr": stderr[-800:],
+            }
+    except _sp.TimeoutExpired:
+        raise HTTPException(status_code=504, detail="Deploy timed out (180s)")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Deploy error: {e}")
+
+
+# ── Multi-Page ──
+
+@app.post("/api/sites/{sid}/multi-page")
+async def api_multi_page_generate(sid: str, data: dict = {}):
+    """Generate multi-page site for existing site."""
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    pages = data.get("pages", ["home", "about", "services", "contact"])
+    result = generate_multi_page_site(
+        sid,
+        template_id=site.get("template"),
+        brand_name=site.get("name", "INXOTIVE"),
+        industry=site.get("industry", "general"),
+        brand_color=site.get("theme_color", "4F46E5"),
+        pages=pages,
+        content_overrides=data.get("content", {}),
+    )
+    if "error" in result:
+        raise HTTPException(status_code=500, detail=result["error"])
+
+    # Save to disk
+    saved = save_multi_page_site(sid, result.get("pages", {}))
+    return {"generation": result, "saved": saved}
+
+
+@app.get("/api/sites/{sid}/pages")
+async def api_site_pages(sid: str):
+    """List pages for a multi-page site."""
+    data = load_data()
+    s = data["sites"].get(sid)
+    if not s:
+        raise HTTPException(status_code=404, detail="Site not found")
+    return {"multi_page": s.get("multi_page", False), "pages": s.get("pages", ["home"])}
 
 
 if __name__ == "__main__":
