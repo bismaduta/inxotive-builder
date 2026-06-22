@@ -137,7 +137,7 @@ html,body { height: 100%; margin: 0; padding: 0;
 .editor-form { overflow-y: auto; padding-right: 8px; }
 .editor-preview { background: var(--surface); border-radius: var(--radius);
   border: 1px solid var(--border); overflow: hidden; display: flex;
-  flex-direction: column; }
+  flex-direction: column; min-height: 500px; }
 .editor-preview-toolbar { display: flex; align-items: center; gap: 8px;
   padding: 8px 14px; background: var(--surface2); border-bottom: 1px solid var(--border);
   font-size: 12px; color: var(--text-secondary); }
@@ -188,9 +188,8 @@ tr:hover td { background: var(--surface2); }
 .empty-state p { font-size: 14px; }
 
 /* ── Responsive ── */
+/* Responsive breakpoints */
 @media(max-width:1024px) {
-  .editor-layout { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
   .sidebar { width: 60px; min-width: 60px; }
   .sidebar span { display: none; }
   .sidebar-header span { display: none; }
@@ -199,6 +198,8 @@ tr:hover td { background: var(--surface2); }
   .nav-item i { width: auto; font-size: 18px; }
 }
 @media(max-width:768px) {
+  .editor-layout { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
   .site-grid { grid-template-columns: 1fr; }
   .stats-row { grid-template-columns: repeat(2,1fr); }
 }
@@ -217,9 +218,9 @@ tr:hover td { background: var(--surface2); }
 .section-divider { border-top: 1px solid var(--border); margin: 12px 0 16px; }
 /* ── Visual Theme Picker ── */
 .visual-theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 8px; margin-top: 4px; }
-.visual-theme-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; overflow: hidden; transition: all .15s; }
-.visual-theme-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
-.visual-theme-card.active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
+.visual-theme-card { background: var(--surface); border: 2px solid transparent; border-radius: var(--radius-sm); cursor: pointer; overflow: hidden; transition: all .15s; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.visual-theme-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.15); transform: translateY(-2px); }
+.visual-theme-card.active { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary), 0 4px 12px rgba(0,0,0,.12); }
 .theme-color-bar { display: flex; height: 36px; border-bottom: 1px solid var(--border); }
 .theme-color-bar span { flex: 1; }
 .theme-card-body { padding: 8px 10px; }
@@ -336,11 +337,15 @@ tr:hover td { background: var(--surface2); }
                 <option value="">All Industries</option>
                 <option value="tech">Tech / SaaS</option>
                 <option value="healthcare">Healthcare</option>
-                <option value="fnb">F&B</option>
-                <option value="retail">Retail / Ecommerce</option>
-                <option value="creative">Creative</option>
-                <option value="corporate">Corporate</option>
+                <option value="fnb">F&B / Restaurant</option>
+                <option value="corporate">Corporate / B2B</option>
+                <option value="creative">Creative / Fashion</option>
                 <option value="education">Education</option>
+                <option value="luxury">Luxury</option>
+                <option value="wellness">Wellness / Spa</option>
+                <option value="nature">Nature</option>
+                <option value="fitness">Fitness / Sports</option>
+                <option value="general">General / All</option>
               </select>
             </div>
             <div id="ed-themes" class="visual-theme-grid"></div>
@@ -513,7 +518,7 @@ tr:hover td { background: var(--surface2); }
               <option value="mobile">Mobile</option>
             </select>
           </div>
-          <div style="flex:1;overflow:hidden;position:relative" id="preview-container">
+          <div style="flex:1;overflow:hidden;position:relative;min-height:450px" id="preview-container">
             <iframe id="preview-iframe" style="width:100%;height:100%;border:none;background:#fff"></iframe>
           </div>
         </div>
@@ -1195,12 +1200,19 @@ async function loadVisualThemes() {
   }).join('');
 }
 
-// Helper: lighten/darken hex color
+// Helper: lighten hex color (works for dark themes too)
 function adjustColor(hex, percent) {
+  if (!hex || hex === '#000000') return '#6366f1';
   const num = parseInt(hex.replace('#',''), 16);
-  const r = Math.min(255, (num >> 16) + percent);
-  const g = Math.min(255, ((num >> 8) & 0x00FF) + percent);
-  const b = Math.min(255, (num & 0x0000FF) + percent);
+  let r = (num >> 16) & 0xFF;
+  let g = (num >> 8) & 0xFF;
+  let b = num & 0xFF;
+  // For dark colors, apply stronger lightening
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  if (brightness < 80) percent = percent * 3; // triple boost for dark themes
+  r = Math.min(255, r + percent);
+  g = Math.min(255, g + percent);
+  b = Math.min(255, b + percent);
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
