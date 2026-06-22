@@ -275,9 +275,13 @@ async def api_preview_site(sid: str, page: str = "home"):
 
     dist_index = site_dir / "dist" / "index.html"
     if dist_index.exists():
-        return HTMLResponse(dist_index.read_text())
+        html = dist_index.read_text()
+        # Rewrite asset paths to go through builder's static serving
+        html = html.replace('src="/assets/', 'src="/site-assets/' + sid + '/assets/')
+        html = html.replace('href="/assets/', 'href="/site-assets/' + sid + '/assets/')
+        return HTMLResponse(html)
 
-    # Check for multi-page
+    # Check for multi-page (on non-primary pages)
     if page != "home":
         dist_page = site_dir / "dist" / f"{page}.html"
         if dist_page.exists():
@@ -287,6 +291,55 @@ async def api_preview_site(sid: str, page: str = "home"):
 <style>body{{font-family:sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;flex-direction:column}}
 h1{{color:#38bdf8;margin-bottom:8px}}p{{color:#94a3b8}}button{{background:#4F46E5;color:white;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px}}</style>
 <body><div><h1>&#128640; Site Not Built Yet</h1><p>Click <strong>Build</strong> first to generate the site files.</p></div></body></html>""")
+
+
+# ── Static asset serving for site previews ──
+
+@app.get("/site-assets/{sid:path}")
+async def site_static_assets(sid: str):
+    """Serve static assets for site preview (JS/CSS/images from dist/assets/)."""
+    from builder import get_site, load_data
+    import os
+
+    data = load_data()
+
+    # sid format is "{site_id}/assets/{filepath}"
+    parts = sid.split("/", 1)
+    site_id = parts[0]
+    filepath = parts[1] if len(parts) > 1 else ""
+
+    if not site_id or not filepath:
+        raise HTTPException(status_code=400, detail="Invalid path")
+
+    s = data["sites"].get(site_id)
+    if not s:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    # Security: prevent path traversal
+    resolved = (Path(s["directory"]) / "dist" / filepath).resolve()
+    allowed_base = (Path(s["directory"]) / "dist").resolve()
+    if not str(resolved).startswith(str(allowed_base)):
+        raise HTTPException(status_code=403, detail="Path traversal blocked")
+    if not resolved.exists():
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    # Determine media type
+    ext = resolved.suffix.lower()
+    media_types = {
+        ".js": "application/javascript",
+        ".css": "text/css",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".gif": "image/gif",
+        ".svg": "image/svg+xml",
+        ".webp": "image/webp",
+        ".woff": "font/woff",
+        ".woff2": "font/woff2",
+        ".json": "application/json",
+    }
+    mtype = media_types.get(ext, "application/octet-stream")
+    return FileResponse(str(resolved), media_type=mtype)
 
 
 @app.get("/api/sites/{sid}/preview-frame")
