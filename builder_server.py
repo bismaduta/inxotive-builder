@@ -142,21 +142,79 @@ async def api_stock_categories():
 
 @app.post("/api/design/generate")
 async def api_design_generate(data: dict):
-    """Generate a website from natural language description."""
+    """Generate a website from natural language description.
+    Uses AI Orchestrator + Section Assembler for full AI-powered design.
+    """
     try:
         prompt = data.get("prompt", "").strip()
         template_id = data.get("template", "landing-tech")
         design_system = data.get("design_system")
         model = data.get("model", "9router-gemini-flash")
         images = data.get("images", [])
+        site_only = data.get("site_only", False)  # If True, only create site config, not full HTML
 
         if not prompt:
             raise HTTPException(status_code=400, detail="Prompt is required")
 
-        # Parse prompt to extract site config using the selected model
-        site_config = await parse_design_prompt(prompt, template_id, design_system, model)
+        # ── Use AI Orchestrator + Assembler ──
+        try:
+            from ai_orchestrator import AIOrchestrator
+            from ai_assembler import SectionAssembler
 
-        # Create site based on extracted config
+            orchestrator = AIOrchestrator()
+            spec = await orchestrator.generate_spec(prompt, model)
+
+            if spec and spec.get("sections"):
+                # Assemble full HTML
+                assembler = SectionAssembler()
+                html = assembler.assemble(spec)
+
+                # Extract site name
+                site_name = prompt.split()[:5]
+                site_name = " ".join(site_name).title()[:40]
+
+                # Create site
+                from builder import create_site, update_site_config
+                site_data = {
+                    "name": site_name,
+                    "template": template_id,
+                    "theme": design_system or spec.get("brand", "inxotive"),
+                    "config": {
+                        "name": site_name,
+                        "brand": spec.get("brand", "inxotive"),
+                        "sections": spec.get("sections", []),
+                        "ai_generated": True,
+                        "model": model,
+                        "prompt": prompt,
+                    }
+                }
+                site = create_site(site_data)
+
+                if site and site.get("id"):
+                    # Save the generated HTML
+                    import os
+                    from pathlib import Path
+                    clients_dir = Path.home() / "clients"
+                    site_dir = clients_dir / f"site-{site_name.lower().replace(' ', '-')[:30]}"
+                    site_dir.mkdir(parents=True, exist_ok=True)
+                    (site_dir / "index.html").write_text(html)
+
+                    update_site_config(site["id"], site_data["config"])
+                    return {
+                        "success": True,
+                        "siteId": site["id"],
+                        "html": html[:500] + "..." if len(html) > 500 else html,
+                        "message": f'✅ Situs "{site_name}" berhasil dibuat dengan AI!'
+                    }
+        except ImportError:
+            # Fallback to old method if orchestrator not available
+            pass
+        except Exception as e:
+            # Fallback on error
+            pass
+
+        # ── Fallback: Original parsing method ──
+        site_config = await parse_design_prompt(prompt, template_id, design_system, model)
         from builder import create_site, update_site_config
         site_name = site_config.get("name") or _extract_name(prompt)
         site_data = {
@@ -176,6 +234,57 @@ async def api_design_generate(data: dict):
             }
         else:
             return {"success": False, "error": "Gagal membuat site"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.post("/api/design/edit")
+async def api_design_edit(data: dict):
+    """Edit existing site using AI instruction.
+    Accepts siteId + instruction → modifies site config → returns updated preview.
+    """
+    try:
+        site_id = data.get("siteId", "").strip()
+        instruction = data.get("instruction", "").strip()
+        model = data.get("model", "9router-gemini-flash")
+
+        if not site_id or not instruction:
+            raise HTTPException(status_code=400, detail="siteId and instruction required")
+
+        from builder import get_site, update_site_config
+        site = get_site(site_id)
+        if not site:
+            return {"success": False, "error": "Site not found"}
+
+        # Use AI to adjust sections based on instruction
+        try:
+            from ai_orchestrator import AIOrchestrator
+            orchestrator = AIOrchestrator()
+
+            # Generate a refined spec based on instruction + existing config
+            context = f"{instruction} (site: {site.get('name', '')})"
+            spec = await orchestrator.generate_spec(context, model)
+
+            if spec and spec.get("sections"):
+                config = site.get("config", {})
+                config["sections"] = spec["sections"]
+                if spec.get("brand"):
+                    config["brand"] = spec["brand"]
+                config["ai_refined"] = True
+                config["ai_model"] = model
+                update_site_config(site_id, config)
+
+                return {
+                    "success": True,
+                    "siteId": site_id,
+                    "message": f'Site "{site.get("name", "")}" berhasil diperbarui!'
+                }
+        except ImportError:
+            pass
+
+        return {"success": False, "error": "AI edit failed - fallback to manual editing"}
     except HTTPException:
         raise
     except Exception as e:

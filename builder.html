@@ -2898,6 +2898,12 @@ function addAIMessage(text, role) {
 }
 
 async function generateDesignFromChat(prompt) {
+  // Show loading in preview
+  const iframe = document.getElementById('ai-preview-iframe');
+  const empty = document.getElementById('ai-empty-state');
+  if (iframe) iframe.style.display = 'none';
+  if (empty) empty.style.display = 'flex';
+
   try {
     const res = await fetch('/api/design/generate', {
       method: 'POST',
@@ -2910,13 +2916,41 @@ async function generateDesignFromChat(prompt) {
       })
     });
     const data = await res.json();
-    if (data.success && data.siteId) {
-      if (STATE.currentSiteId && STATE.currentSiteId !== data.siteId) { return { success: true, siteId: data.siteId, message: data.message }; }
-      else if (STATE.currentSiteId) { refreshPreview(); return { success: true, siteId: STATE.currentSiteId }; }
-      else { STATE.currentSiteId = data.siteId; openEditor(data.siteId); return { success: true, siteId: data.siteId }; }
+
+    // If API returns HTML, show it in the preview iframe
+    if (data.html) {
+      showAIPreview(data.html);
+    } else if (data.success && data.siteId) {
+      // Try to fetch the generated HTML
+      try {
+        const siteRes = await fetch('/api/sites/' + data.siteId);
+        const siteData = await siteRes.json();
+        if (siteData && siteData.config && siteData.config.ai_generated) {
+          showAIPreview('<div style="padding:40px;text-align:center;font-family:sans-serif"><h2>AI Site Created!</h2><p>Site "' + (siteData.name || '') + '" is ready. Switch to Manual mode to edit.</p><a href="/editor?site=' + data.siteId + '" style="display:inline-block;margin-top:20px;padding:12px 24px;background:#6366f1;color:#fff;border-radius:8px;text-decoration:none">Open Editor</a></div>');
+        } else {
+          return simulateAIPreview(prompt);
+        }
+      } catch(e) {
+        return simulateAIPreview(prompt);
+      }
+
+      if (!STATE.currentSiteId) {
+        STATE.currentSiteId = data.siteId;
+      }
+      return { success: true, siteId: data.siteId, message: data.message || 'Site created!' };
     }
     return simulateAIPreview(prompt);
   } catch (e) { return simulateAIPreview(prompt); }
+}
+
+function showAIPreview(html) {
+  const iframe = document.getElementById('ai-preview-iframe');
+  const empty = document.getElementById('ai-empty-state');
+  if (iframe && empty) {
+    empty.style.display = 'none';
+    iframe.style.display = 'block';
+    iframe.srcdoc = html;
+  }
 }
 
 async function simulateAIPreview(prompt) {
