@@ -1,0 +1,2311 @@
+{
+  "archetype_product_map": {
+    "editorial": [
+      "E-commerce Luxury",
+      "Luxury/Premium Brand",
+      "Beauty/Spa/Wellness Service",
+      "Portfolio/Personal",
+      "Creative Agency",
+      "Publishing"
+    ],
+    "bold": [
+      "Tech Startup",
+      "SaaS (General)",
+      "Micro SaaS",
+      "Fintech/Crypto",
+      "Gaming",
+      "AI/Chatbot Platform",
+      "Social Media App",
+      "NFT/Web3 Platform"
+    ],
+    "warm": [
+      "Restaurant/Food Service",
+      "Healthcare App",
+      "Educational App",
+      "Travel/Tourism Agency",
+      "Fitness/Gym App",
+      "Wellness/Mental Health"
+    ],
+    "corporate": [
+      "B2B Service",
+      "Financial Dashboard",
+      "Government/Public Service",
+      "Real Estate/Property",
+      "Productivity Tool",
+      "Knowledge Base",
+      "Service Landing Page"
+    ]
+  },
+  "palettes": {
+    "SaaS (General)": {
+      "primary": "#2563EB",
+      "secondary": "#3B82F6",
+      "cta": "#F97316",
+      "background": "#F8FAFC",
+      "text": "#1E293B",
+      "border": "#E2E8F0"
+    },
+    "Micro SaaS": {
+      "primary": "#6366F1",
+      "secondary": "#818CF8",
+      "cta": "#10B981",
+      "background": "#F5F3FF",
+      "text": "#1E1B4B",
+      "border": "#E0E7FF"
+    },
+    "E-commerce": {
+      "primary": "#059669",
+      "secondary": "#10B981",
+      "cta": "#F97316",
+      "background": "#ECFDF5",
+      "text": "#064E3B",
+      "border": "#A7F3D0"
+    },
+    "E-commerce Luxury": {
+      "primary": "#1C1917",
+      "secondary": "#44403C",
+      "cta": "#CA8A04",
+      "background": "#FAFAF9",
+      "text": "#0C0A09",
+      "border": "#D6D3D1"
+    },
+    "Service Landing Page": {
+      "primary": "#0EA5E9",
+      "secondary": "#38BDF8",
+      "cta": "#F97316",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#BAE6FD"
+    },
+    "B2B Service": {
+      "primary": "#0F172A",
+      "secondary": "#334155",
+      "cta": "#0369A1",
+      "background": "#F8FAFC",
+      "text": "#020617",
+      "border": "#E2E8F0"
+    },
+    "Financial Dashboard": {
+      "primary": "#0F172A",
+      "secondary": "#1E293B",
+      "cta": "#22C55E",
+      "background": "#020617",
+      "text": "#F8FAFC",
+      "border": "#334155"
+    },
+    "Analytics Dashboard": {
+      "primary": "#1E40AF",
+      "secondary": "#3B82F6",
+      "cta": "#F59E0B",
+      "background": "#F8FAFC",
+      "text": "#1E3A8A",
+      "border": "#DBEAFE"
+    },
+    "Healthcare App": {
+      "primary": "#0891B2",
+      "secondary": "#22D3EE",
+      "cta": "#059669",
+      "background": "#ECFEFF",
+      "text": "#164E63",
+      "border": "#A5F3FC"
+    },
+    "Educational App": {
+      "primary": "#4F46E5",
+      "secondary": "#818CF8",
+      "cta": "#F97316",
+      "background": "#EEF2FF",
+      "text": "#1E1B4B",
+      "border": "#C7D2FE"
+    },
+    "Creative Agency": {
+      "primary": "#EC4899",
+      "secondary": "#F472B6",
+      "cta": "#06B6D4",
+      "background": "#FDF2F8",
+      "text": "#831843",
+      "border": "#FBCFE8"
+    },
+    "Portfolio/Personal": {
+      "primary": "#18181B",
+      "secondary": "#3F3F46",
+      "cta": "#2563EB",
+      "background": "#FAFAFA",
+      "text": "#09090B",
+      "border": "#E4E4E7"
+    },
+    "Gaming": {
+      "primary": "#7C3AED",
+      "secondary": "#A78BFA",
+      "cta": "#F43F5E",
+      "background": "#0F0F23",
+      "text": "#E2E8F0",
+      "border": "#4C1D95"
+    },
+    "Government/Public Service": {
+      "primary": "#0F172A",
+      "secondary": "#334155",
+      "cta": "#0369A1",
+      "background": "#F8FAFC",
+      "text": "#020617",
+      "border": "#E2E8F0"
+    },
+    "Fintech/Crypto": {
+      "primary": "#F59E0B",
+      "secondary": "#FBBF24",
+      "cta": "#8B5CF6",
+      "background": "#0F172A",
+      "text": "#F8FAFC",
+      "border": "#334155"
+    },
+    "Social Media App": {
+      "primary": "#E11D48",
+      "secondary": "#FB7185",
+      "cta": "#2563EB",
+      "background": "#FFF1F2",
+      "text": "#881337",
+      "border": "#FECDD3"
+    },
+    "Productivity Tool": {
+      "primary": "#0D9488",
+      "secondary": "#14B8A6",
+      "cta": "#F97316",
+      "background": "#F0FDFA",
+      "text": "#134E4A",
+      "border": "#99F6E4"
+    },
+    "Design System/Component Library": {
+      "primary": "#4F46E5",
+      "secondary": "#6366F1",
+      "cta": "#F97316",
+      "background": "#EEF2FF",
+      "text": "#312E81",
+      "border": "#C7D2FE"
+    },
+    "AI/Chatbot Platform": {
+      "primary": "#7C3AED",
+      "secondary": "#A78BFA",
+      "cta": "#06B6D4",
+      "background": "#FAF5FF",
+      "text": "#1E1B4B",
+      "border": "#DDD6FE"
+    },
+    "NFT/Web3 Platform": {
+      "primary": "#8B5CF6",
+      "secondary": "#A78BFA",
+      "cta": "#FBBF24",
+      "background": "#0F0F23",
+      "text": "#F8FAFC",
+      "border": "#4C1D95"
+    },
+    "Creator Economy Platform": {
+      "primary": "#EC4899",
+      "secondary": "#F472B6",
+      "cta": "#F97316",
+      "background": "#FDF2F8",
+      "text": "#831843",
+      "border": "#FBCFE8"
+    },
+    "Sustainability/ESG Platform": {
+      "primary": "#059669",
+      "secondary": "#10B981",
+      "cta": "#0891B2",
+      "background": "#ECFDF5",
+      "text": "#064E3B",
+      "border": "#A7F3D0"
+    },
+    "Remote Work/Collaboration Tool": {
+      "primary": "#6366F1",
+      "secondary": "#818CF8",
+      "cta": "#10B981",
+      "background": "#F5F3FF",
+      "text": "#312E81",
+      "border": "#E0E7FF"
+    },
+    "Mental Health App": {
+      "primary": "#8B5CF6",
+      "secondary": "#C4B5FD",
+      "cta": "#10B981",
+      "background": "#FAF5FF",
+      "text": "#4C1D95",
+      "border": "#EDE9FE"
+    },
+    "Pet Tech App": {
+      "primary": "#F97316",
+      "secondary": "#FB923C",
+      "cta": "#2563EB",
+      "background": "#FFF7ED",
+      "text": "#9A3412",
+      "border": "#FED7AA"
+    },
+    "Smart Home/IoT Dashboard": {
+      "primary": "#1E293B",
+      "secondary": "#334155",
+      "cta": "#22C55E",
+      "background": "#0F172A",
+      "text": "#F8FAFC",
+      "border": "#475569"
+    },
+    "EV/Charging Ecosystem": {
+      "primary": "#0891B2",
+      "secondary": "#22D3EE",
+      "cta": "#22C55E",
+      "background": "#ECFEFF",
+      "text": "#164E63",
+      "border": "#A5F3FC"
+    },
+    "Subscription Box Service": {
+      "primary": "#D946EF",
+      "secondary": "#E879F9",
+      "cta": "#F97316",
+      "background": "#FDF4FF",
+      "text": "#86198F",
+      "border": "#F5D0FE"
+    },
+    "Podcast Platform": {
+      "primary": "#1E1B4B",
+      "secondary": "#312E81",
+      "cta": "#F97316",
+      "background": "#0F0F23",
+      "text": "#F8FAFC",
+      "border": "#4338CA"
+    },
+    "Dating App": {
+      "primary": "#E11D48",
+      "secondary": "#FB7185",
+      "cta": "#F97316",
+      "background": "#FFF1F2",
+      "text": "#881337",
+      "border": "#FECDD3"
+    },
+    "Micro-Credentials/Badges Platform": {
+      "primary": "#0369A1",
+      "secondary": "#0EA5E9",
+      "cta": "#CA8A04",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#BAE6FD"
+    },
+    "Knowledge Base/Documentation": {
+      "primary": "#475569",
+      "secondary": "#64748B",
+      "cta": "#2563EB",
+      "background": "#F8FAFC",
+      "text": "#1E293B",
+      "border": "#E2E8F0"
+    },
+    "Hyperlocal Services": {
+      "primary": "#059669",
+      "secondary": "#10B981",
+      "cta": "#F97316",
+      "background": "#ECFDF5",
+      "text": "#064E3B",
+      "border": "#A7F3D0"
+    },
+    "Beauty/Spa/Wellness Service": {
+      "primary": "#EC4899",
+      "secondary": "#F9A8D4",
+      "cta": "#8B5CF6",
+      "background": "#FDF2F8",
+      "text": "#831843",
+      "border": "#FBCFE8"
+    },
+    "Luxury/Premium Brand": {
+      "primary": "#1C1917",
+      "secondary": "#44403C",
+      "cta": "#CA8A04",
+      "background": "#FAFAF9",
+      "text": "#0C0A09",
+      "border": "#D6D3D1"
+    },
+    "Restaurant/Food Service": {
+      "primary": "#DC2626",
+      "secondary": "#F87171",
+      "cta": "#CA8A04",
+      "background": "#FEF2F2",
+      "text": "#450A0A",
+      "border": "#FECACA"
+    },
+    "Fitness/Gym App": {
+      "primary": "#F97316",
+      "secondary": "#FB923C",
+      "cta": "#22C55E",
+      "background": "#1F2937",
+      "text": "#F8FAFC",
+      "border": "#374151"
+    },
+    "Real Estate/Property": {
+      "primary": "#0F766E",
+      "secondary": "#14B8A6",
+      "cta": "#0369A1",
+      "background": "#F0FDFA",
+      "text": "#134E4A",
+      "border": "#99F6E4"
+    },
+    "Travel/Tourism Agency": {
+      "primary": "#0EA5E9",
+      "secondary": "#38BDF8",
+      "cta": "#F97316",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#BAE6FD"
+    },
+    "Hotel/Hospitality": {
+      "primary": "#1E3A8A",
+      "secondary": "#3B82F6",
+      "cta": "#CA8A04",
+      "background": "#F8FAFC",
+      "text": "#1E40AF",
+      "border": "#BFDBFE"
+    },
+    "Wedding/Event Planning": {
+      "primary": "#DB2777",
+      "secondary": "#F472B6",
+      "cta": "#CA8A04",
+      "background": "#FDF2F8",
+      "text": "#831843",
+      "border": "#FBCFE8"
+    },
+    "Legal Services": {
+      "primary": "#1E3A8A",
+      "secondary": "#1E40AF",
+      "cta": "#B45309",
+      "background": "#F8FAFC",
+      "text": "#0F172A",
+      "border": "#CBD5E1"
+    },
+    "Insurance Platform": {
+      "primary": "#0369A1",
+      "secondary": "#0EA5E9",
+      "cta": "#22C55E",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#BAE6FD"
+    },
+    "Banking/Traditional Finance": {
+      "primary": "#0F172A",
+      "secondary": "#1E3A8A",
+      "cta": "#CA8A04",
+      "background": "#F8FAFC",
+      "text": "#020617",
+      "border": "#E2E8F0"
+    },
+    "Online Course/E-learning": {
+      "primary": "#0D9488",
+      "secondary": "#2DD4BF",
+      "cta": "#F97316",
+      "background": "#F0FDFA",
+      "text": "#134E4A",
+      "border": "#5EEAD4"
+    },
+    "Non-profit/Charity": {
+      "primary": "#0891B2",
+      "secondary": "#22D3EE",
+      "cta": "#F97316",
+      "background": "#ECFEFF",
+      "text": "#164E63",
+      "border": "#A5F3FC"
+    },
+    "Music Streaming": {
+      "primary": "#1E1B4B",
+      "secondary": "#4338CA",
+      "cta": "#22C55E",
+      "background": "#0F0F23",
+      "text": "#F8FAFC",
+      "border": "#312E81"
+    },
+    "Video Streaming/OTT": {
+      "primary": "#0F0F23",
+      "secondary": "#1E1B4B",
+      "cta": "#E11D48",
+      "background": "#000000",
+      "text": "#F8FAFC",
+      "border": "#312E81"
+    },
+    "Job Board/Recruitment": {
+      "primary": "#0369A1",
+      "secondary": "#0EA5E9",
+      "cta": "#22C55E",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#BAE6FD"
+    },
+    "Marketplace (P2P)": {
+      "primary": "#7C3AED",
+      "secondary": "#A78BFA",
+      "cta": "#22C55E",
+      "background": "#FAF5FF",
+      "text": "#4C1D95",
+      "border": "#DDD6FE"
+    },
+    "Logistics/Delivery": {
+      "primary": "#2563EB",
+      "secondary": "#3B82F6",
+      "cta": "#F97316",
+      "background": "#EFF6FF",
+      "text": "#1E40AF",
+      "border": "#BFDBFE"
+    },
+    "Agriculture/Farm Tech": {
+      "primary": "#15803D",
+      "secondary": "#22C55E",
+      "cta": "#CA8A04",
+      "background": "#F0FDF4",
+      "text": "#14532D",
+      "border": "#BBF7D0"
+    },
+    "Construction/Architecture": {
+      "primary": "#64748B",
+      "secondary": "#94A3B8",
+      "cta": "#F97316",
+      "background": "#F8FAFC",
+      "text": "#334155",
+      "border": "#E2E8F0"
+    },
+    "Automotive/Car Dealership": {
+      "primary": "#1E293B",
+      "secondary": "#334155",
+      "cta": "#DC2626",
+      "background": "#F8FAFC",
+      "text": "#0F172A",
+      "border": "#E2E8F0"
+    },
+    "Photography Studio": {
+      "primary": "#18181B",
+      "secondary": "#27272A",
+      "cta": "#F8FAFC",
+      "background": "#000000",
+      "text": "#FAFAFA",
+      "border": "#3F3F46"
+    },
+    "Coworking Space": {
+      "primary": "#F59E0B",
+      "secondary": "#FBBF24",
+      "cta": "#2563EB",
+      "background": "#FFFBEB",
+      "text": "#78350F",
+      "border": "#FDE68A"
+    },
+    "Cleaning Service": {
+      "primary": "#0891B2",
+      "secondary": "#22D3EE",
+      "cta": "#22C55E",
+      "background": "#ECFEFF",
+      "text": "#164E63",
+      "border": "#A5F3FC"
+    },
+    "Home Services (Plumber/Electrician)": {
+      "primary": "#1E40AF",
+      "secondary": "#3B82F6",
+      "cta": "#F97316",
+      "background": "#EFF6FF",
+      "text": "#1E3A8A",
+      "border": "#BFDBFE"
+    },
+    "Childcare/Daycare": {
+      "primary": "#F472B6",
+      "secondary": "#FBCFE8",
+      "cta": "#22C55E",
+      "background": "#FDF2F8",
+      "text": "#9D174D",
+      "border": "#FCE7F3"
+    },
+    "Senior Care/Elderly": {
+      "primary": "#0369A1",
+      "secondary": "#38BDF8",
+      "cta": "#22C55E",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#E0F2FE"
+    },
+    "Medical Clinic": {
+      "primary": "#0891B2",
+      "secondary": "#22D3EE",
+      "cta": "#22C55E",
+      "background": "#F0FDFA",
+      "text": "#134E4A",
+      "border": "#CCFBF1"
+    },
+    "Pharmacy/Drug Store": {
+      "primary": "#15803D",
+      "secondary": "#22C55E",
+      "cta": "#0369A1",
+      "background": "#F0FDF4",
+      "text": "#14532D",
+      "border": "#BBF7D0"
+    },
+    "Dental Practice": {
+      "primary": "#0EA5E9",
+      "secondary": "#38BDF8",
+      "cta": "#FBBF24",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#BAE6FD"
+    },
+    "Veterinary Clinic": {
+      "primary": "#0D9488",
+      "secondary": "#14B8A6",
+      "cta": "#F97316",
+      "background": "#F0FDFA",
+      "text": "#134E4A",
+      "border": "#99F6E4"
+    },
+    "Florist/Plant Shop": {
+      "primary": "#15803D",
+      "secondary": "#22C55E",
+      "cta": "#EC4899",
+      "background": "#F0FDF4",
+      "text": "#14532D",
+      "border": "#BBF7D0"
+    },
+    "Bakery/Cafe": {
+      "primary": "#92400E",
+      "secondary": "#B45309",
+      "cta": "#F8FAFC",
+      "background": "#FEF3C7",
+      "text": "#78350F",
+      "border": "#FDE68A"
+    },
+    "Coffee Shop": {
+      "primary": "#78350F",
+      "secondary": "#92400E",
+      "cta": "#FBBF24",
+      "background": "#FEF3C7",
+      "text": "#451A03",
+      "border": "#FDE68A"
+    },
+    "Brewery/Winery": {
+      "primary": "#7C2D12",
+      "secondary": "#B91C1C",
+      "cta": "#CA8A04",
+      "background": "#FEF2F2",
+      "text": "#450A0A",
+      "border": "#FECACA"
+    },
+    "Airline": {
+      "primary": "#1E3A8A",
+      "secondary": "#3B82F6",
+      "cta": "#F97316",
+      "background": "#EFF6FF",
+      "text": "#1E40AF",
+      "border": "#BFDBFE"
+    },
+    "News/Media Platform": {
+      "primary": "#DC2626",
+      "secondary": "#EF4444",
+      "cta": "#1E40AF",
+      "background": "#FEF2F2",
+      "text": "#450A0A",
+      "border": "#FECACA"
+    },
+    "Magazine/Blog": {
+      "primary": "#18181B",
+      "secondary": "#3F3F46",
+      "cta": "#EC4899",
+      "background": "#FAFAFA",
+      "text": "#09090B",
+      "border": "#E4E4E7"
+    },
+    "Freelancer Platform": {
+      "primary": "#6366F1",
+      "secondary": "#818CF8",
+      "cta": "#22C55E",
+      "background": "#EEF2FF",
+      "text": "#312E81",
+      "border": "#C7D2FE"
+    },
+    "Consulting Firm": {
+      "primary": "#0F172A",
+      "secondary": "#334155",
+      "cta": "#CA8A04",
+      "background": "#F8FAFC",
+      "text": "#020617",
+      "border": "#E2E8F0"
+    },
+    "Marketing Agency": {
+      "primary": "#EC4899",
+      "secondary": "#F472B6",
+      "cta": "#06B6D4",
+      "background": "#FDF2F8",
+      "text": "#831843",
+      "border": "#FBCFE8"
+    },
+    "Event Management": {
+      "primary": "#7C3AED",
+      "secondary": "#A78BFA",
+      "cta": "#F97316",
+      "background": "#FAF5FF",
+      "text": "#4C1D95",
+      "border": "#DDD6FE"
+    },
+    "Conference/Webinar Platform": {
+      "primary": "#1E40AF",
+      "secondary": "#3B82F6",
+      "cta": "#22C55E",
+      "background": "#EFF6FF",
+      "text": "#1E3A8A",
+      "border": "#BFDBFE"
+    },
+    "Membership/Community": {
+      "primary": "#7C3AED",
+      "secondary": "#A78BFA",
+      "cta": "#22C55E",
+      "background": "#FAF5FF",
+      "text": "#4C1D95",
+      "border": "#DDD6FE"
+    },
+    "Newsletter Platform": {
+      "primary": "#0369A1",
+      "secondary": "#0EA5E9",
+      "cta": "#F97316",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#BAE6FD"
+    },
+    "Digital Products/Downloads": {
+      "primary": "#6366F1",
+      "secondary": "#818CF8",
+      "cta": "#22C55E",
+      "background": "#EEF2FF",
+      "text": "#312E81",
+      "border": "#C7D2FE"
+    },
+    "Church/Religious Organization": {
+      "primary": "#7C3AED",
+      "secondary": "#A78BFA",
+      "cta": "#CA8A04",
+      "background": "#FAF5FF",
+      "text": "#4C1D95",
+      "border": "#DDD6FE"
+    },
+    "Sports Team/Club": {
+      "primary": "#DC2626",
+      "secondary": "#EF4444",
+      "cta": "#FBBF24",
+      "background": "#FEF2F2",
+      "text": "#7F1D1D",
+      "border": "#FECACA"
+    },
+    "Museum/Gallery": {
+      "primary": "#18181B",
+      "secondary": "#27272A",
+      "cta": "#F8FAFC",
+      "background": "#FAFAFA",
+      "text": "#09090B",
+      "border": "#E4E4E7"
+    },
+    "Theater/Cinema": {
+      "primary": "#1E1B4B",
+      "secondary": "#312E81",
+      "cta": "#CA8A04",
+      "background": "#0F0F23",
+      "text": "#F8FAFC",
+      "border": "#4338CA"
+    },
+    "Language Learning App": {
+      "primary": "#4F46E5",
+      "secondary": "#818CF8",
+      "cta": "#22C55E",
+      "background": "#EEF2FF",
+      "text": "#312E81",
+      "border": "#C7D2FE"
+    },
+    "Coding Bootcamp": {
+      "primary": "#0F172A",
+      "secondary": "#1E293B",
+      "cta": "#22C55E",
+      "background": "#020617",
+      "text": "#F8FAFC",
+      "border": "#334155"
+    },
+    "Cybersecurity Platform": {
+      "primary": "#00FF41",
+      "secondary": "#0D0D0D",
+      "cta": "#FF3333",
+      "background": "#000000",
+      "text": "#E0E0E0",
+      "border": "#1F1F1F"
+    },
+    "Developer Tool / IDE": {
+      "primary": "#1E293B",
+      "secondary": "#334155",
+      "cta": "#22C55E",
+      "background": "#0F172A",
+      "text": "#F8FAFC",
+      "border": "#475569"
+    },
+    "Biotech / Life Sciences": {
+      "primary": "#0EA5E9",
+      "secondary": "#0284C7",
+      "cta": "#10B981",
+      "background": "#F0F9FF",
+      "text": "#0C4A6E",
+      "border": "#BAE6FD"
+    },
+    "Space Tech / Aerospace": {
+      "primary": "#F8FAFC",
+      "secondary": "#94A3B8",
+      "cta": "#3B82F6",
+      "background": "#0B0B10",
+      "text": "#F8FAFC",
+      "border": "#1E293B"
+    },
+    "Architecture / Interior": {
+      "primary": "#171717",
+      "secondary": "#404040",
+      "cta": "#D4AF37",
+      "background": "#FFFFFF",
+      "text": "#171717",
+      "border": "#E5E5E5"
+    },
+    "Quantum Computing": {
+      "primary": "#00FFFF",
+      "secondary": "#7B61FF",
+      "cta": "#FF00FF",
+      "background": "#050510",
+      "text": "#E0E0FF",
+      "border": "#333344"
+    },
+    "Biohacking / Longevity": {
+      "primary": "#FF4D4D",
+      "secondary": "#4D94FF",
+      "cta": "#00E676",
+      "background": "#F5F5F7",
+      "text": "#1C1C1E",
+      "border": "#E5E5EA"
+    },
+    "Autonomous Systems": {
+      "primary": "#00FF41",
+      "secondary": "#008F11",
+      "cta": "#FF3333",
+      "background": "#0D1117",
+      "text": "#E6EDF3",
+      "border": "#30363D"
+    },
+    "Generative AI Art": {
+      "primary": "#18181B",
+      "secondary": "#3F3F46",
+      "cta": "#EC4899",
+      "background": "#FAFAFA",
+      "text": "#09090B",
+      "border": "#E4E4E7"
+    },
+    "Spatial / Vision OS": {
+      "primary": "#FFFFFF",
+      "secondary": "#E5E5E5",
+      "cta": "#007AFF",
+      "background": "#888888",
+      "text": "#000000",
+      "border": "#CCCCCC"
+    },
+    "Climate Tech": {
+      "primary": "#059669",
+      "secondary": "#10B981",
+      "cta": "#FBBF24",
+      "background": "#ECFDF5",
+      "text": "#064E3B",
+      "border": "#A7F3D0"
+    }
+  },
+  "font_pairs": {
+    "Classic Elegant": {
+      "heading": "Playfair Display",
+      "body": "Inter",
+      "url": "https://fonts.google.com/share?selection.family=Inter:wght@300;400;500;600;700|Playfair+Display:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');",
+      "mood": "elegant, luxury, sophisticated, timeless, premium, editorial",
+      "best_for": "Luxury brands, fashion, spa, beauty, editorial, magazines, high-end e-commerce"
+    },
+    "Modern Professional": {
+      "heading": "Poppins",
+      "body": "Open Sans",
+      "url": "https://fonts.google.com/share?selection.family=Open+Sans:wght@300;400;500;600;700|Poppins:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');",
+      "mood": "modern, professional, clean, corporate, friendly, approachable",
+      "best_for": "SaaS, corporate sites, business apps, startups, professional services"
+    },
+    "Tech Startup": {
+      "heading": "Space Grotesk",
+      "body": "DM Sans",
+      "url": "https://fonts.google.com/share?selection.family=DM+Sans:wght@400;500;700|Space+Grotesk:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');",
+      "mood": "tech, startup, modern, innovative, bold, futuristic",
+      "best_for": "Tech companies, startups, SaaS, developer tools, AI products"
+    },
+    "Editorial Classic": {
+      "heading": "Cormorant Garamond",
+      "body": "Libre Baskerville",
+      "url": "https://fonts.google.com/share?selection.family=Cormorant+Garamond:wght@400;500;600;700|Libre+Baskerville:wght@400;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap');",
+      "mood": "editorial, classic, literary, traditional, refined, bookish",
+      "best_for": "Publishing, blogs, news sites, literary magazines, book covers"
+    },
+    "Minimal Swiss": {
+      "heading": "Inter",
+      "body": "Inter",
+      "url": "https://fonts.google.com/share?selection.family=Inter:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');",
+      "mood": "minimal, clean, swiss, functional, neutral, professional",
+      "best_for": "Dashboards, admin panels, documentation, enterprise apps, design systems"
+    },
+    "Playful Creative": {
+      "heading": "Fredoka",
+      "body": "Nunito",
+      "url": "https://fonts.google.com/share?selection.family=Fredoka:wght@400;500;600;700|Nunito:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap');",
+      "mood": "playful, friendly, fun, creative, warm, approachable",
+      "best_for": "Children's apps, educational, gaming, creative tools, entertainment"
+    },
+    "Bold Statement": {
+      "heading": "Bebas Neue",
+      "body": "Source Sans 3",
+      "url": "https://fonts.google.com/share?selection.family=Bebas+Neue|Source+Sans+3:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');",
+      "mood": "bold, impactful, strong, dramatic, modern, headlines",
+      "best_for": "Marketing sites, portfolios, agencies, event pages, sports"
+    },
+    "Wellness Calm": {
+      "heading": "Lora",
+      "body": "Raleway",
+      "url": "https://fonts.google.com/share?selection.family=Lora:wght@400;500;600;700|Raleway:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap');",
+      "mood": "calm, wellness, health, relaxing, natural, organic",
+      "best_for": "Health apps, wellness, spa, meditation, yoga, organic brands"
+    },
+    "Developer Mono": {
+      "heading": "JetBrains Mono",
+      "body": "IBM Plex Sans",
+      "url": "https://fonts.google.com/share?selection.family=IBM+Plex+Sans:wght@300;400;500;600;700|JetBrains+Mono:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');",
+      "mood": "code, developer, technical, precise, functional, hacker",
+      "best_for": "Developer tools, documentation, code editors, tech blogs, CLI apps"
+    },
+    "Retro Vintage": {
+      "heading": "Abril Fatface",
+      "body": "Merriweather",
+      "url": "https://fonts.google.com/share?selection.family=Abril+Fatface|Merriweather:wght@300;400;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Merriweather:wght@300;400;700&display=swap');",
+      "mood": "retro, vintage, nostalgic, dramatic, decorative, bold",
+      "best_for": "Vintage brands, breweries, restaurants, creative portfolios, posters"
+    },
+    "Geometric Modern": {
+      "heading": "Outfit",
+      "body": "Work Sans",
+      "url": "https://fonts.google.com/share?selection.family=Outfit:wght@300;400;500;600;700|Work+Sans:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap');",
+      "mood": "geometric, modern, clean, balanced, contemporary, versatile",
+      "best_for": "General purpose, portfolios, agencies, modern brands, landing pages"
+    },
+    "Luxury Serif": {
+      "heading": "Cormorant",
+      "body": "Montserrat",
+      "url": "https://fonts.google.com/share?selection.family=Cormorant:wght@400;500;600;700|Montserrat:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Cormorant:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');",
+      "mood": "luxury, high-end, fashion, elegant, refined, premium",
+      "best_for": "Fashion brands, luxury e-commerce, jewelry, high-end services"
+    },
+    "Friendly SaaS": {
+      "heading": "Plus Jakarta Sans",
+      "body": "Plus Jakarta Sans",
+      "url": "https://fonts.google.com/share?selection.family=Plus+Jakarta+Sans:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');",
+      "mood": "friendly, modern, saas, clean, approachable, professional",
+      "best_for": "SaaS products, web apps, dashboards, B2B, productivity tools"
+    },
+    "News Editorial": {
+      "heading": "Newsreader",
+      "body": "Roboto",
+      "url": "https://fonts.google.com/share?selection.family=Newsreader:wght@400;500;600;700|Roboto:wght@300;400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');",
+      "mood": "news, editorial, journalism, trustworthy, readable, informative",
+      "best_for": "News sites, blogs, magazines, journalism, content-heavy sites"
+    },
+    "Handwritten Charm": {
+      "heading": "Caveat",
+      "body": "Quicksand",
+      "url": "https://fonts.google.com/share?selection.family=Caveat:wght@400;500;600;700|Quicksand:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap');",
+      "mood": "handwritten, personal, friendly, casual, warm, charming",
+      "best_for": "Personal blogs, invitations, creative portfolios, lifestyle brands"
+    },
+    "Corporate Trust": {
+      "heading": "Lexend",
+      "body": "Source Sans 3",
+      "url": "https://fonts.google.com/share?selection.family=Lexend:wght@300;400;500;600;700|Source+Sans+3:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');",
+      "mood": "corporate, trustworthy, accessible, readable, professional, clean",
+      "best_for": "Enterprise, government, healthcare, finance, accessibility-focused"
+    },
+    "Brutalist Raw": {
+      "heading": "Space Mono",
+      "body": "Space Mono",
+      "url": "https://fonts.google.com/share?selection.family=Space+Mono:wght@400;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');",
+      "mood": "brutalist, raw, technical, monospace, minimal, stark",
+      "best_for": "Brutalist designs, developer portfolios, experimental, tech art"
+    },
+    "Fashion Forward": {
+      "heading": "Syne",
+      "body": "Manrope",
+      "url": "https://fonts.google.com/share?selection.family=Manrope:wght@300;400;500;600;700|Syne:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700&display=swap');",
+      "mood": "fashion, avant-garde, creative, bold, artistic, edgy",
+      "best_for": "Fashion brands, creative agencies, art galleries, design studios"
+    },
+    "Soft Rounded": {
+      "heading": "Varela Round",
+      "body": "Nunito Sans",
+      "url": "https://fonts.google.com/share?selection.family=Nunito+Sans:wght@300;400;500;600;700|Varela+Round",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700&family=Varela+Round&display=swap');",
+      "mood": "soft, rounded, friendly, approachable, warm, gentle",
+      "best_for": "Children's products, pet apps, friendly brands, wellness, soft UI"
+    },
+    "Premium Sans": {
+      "heading": "Satoshi",
+      "body": "General Sans",
+      "url": "https://fonts.google.com/share?selection.family=DM+Sans:wght@400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');",
+      "mood": "premium, modern, clean, sophisticated, versatile, balanced",
+      "best_for": "Premium brands, modern agencies, SaaS, portfolios, startups"
+    },
+    "Vietnamese Friendly": {
+      "heading": "Be Vietnam Pro",
+      "body": "Noto Sans",
+      "url": "https://fonts.google.com/share?selection.family=Be+Vietnam+Pro:wght@300;400;500;600;700|Noto+Sans:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap');",
+      "mood": "vietnamese, international, readable, clean, multilingual, accessible",
+      "best_for": "Vietnamese sites, multilingual apps, international products"
+    },
+    "Japanese Elegant": {
+      "heading": "Noto Serif JP",
+      "body": "Noto Sans JP",
+      "url": "https://fonts.google.com/share?selection.family=Noto+Sans+JP:wght@300;400;500;700|Noto+Serif+JP:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap');",
+      "mood": "japanese, elegant, traditional, modern, multilingual, readable",
+      "best_for": "Japanese sites, Japanese restaurants, cultural sites, anime/manga"
+    },
+    "Korean Modern": {
+      "heading": "Noto Sans KR",
+      "body": "Noto Sans KR",
+      "url": "https://fonts.google.com/share?selection.family=Noto+Sans+KR:wght@300;400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');",
+      "mood": "korean, modern, clean, professional, multilingual, readable",
+      "best_for": "Korean sites, K-beauty, K-pop, Korean businesses, multilingual"
+    },
+    "Chinese Traditional": {
+      "heading": "Noto Serif TC",
+      "body": "Noto Sans TC",
+      "url": "https://fonts.google.com/share?selection.family=Noto+Sans+TC:wght@300;400;500;700|Noto+Serif+TC:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap');",
+      "mood": "chinese, traditional, elegant, cultural, multilingual, readable",
+      "best_for": "Traditional Chinese sites, cultural content, Taiwan/Hong Kong markets"
+    },
+    "Chinese Simplified": {
+      "heading": "Noto Sans SC",
+      "body": "Noto Sans SC",
+      "url": "https://fonts.google.com/share?selection.family=Noto+Sans+SC:wght@300;400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');",
+      "mood": "chinese, simplified, modern, professional, multilingual, readable",
+      "best_for": "Simplified Chinese sites, mainland China market, business apps"
+    },
+    "Arabic Elegant": {
+      "heading": "Noto Naskh Arabic",
+      "body": "Noto Sans Arabic",
+      "url": "https://fonts.google.com/share?selection.family=Noto+Naskh+Arabic:wght@400;500;600;700|Noto+Sans+Arabic:wght@300;400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;700&display=swap');",
+      "mood": "arabic, elegant, traditional, cultural, RTL, readable",
+      "best_for": "Arabic sites, Middle East market, Islamic content, bilingual sites"
+    },
+    "Thai Modern": {
+      "heading": "Noto Sans Thai",
+      "body": "Noto Sans Thai",
+      "url": "https://fonts.google.com/share?selection.family=Noto+Sans+Thai:wght@300;400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;700&display=swap');",
+      "mood": "thai, modern, readable, clean, multilingual, accessible",
+      "best_for": "Thai sites, Southeast Asia, tourism, Thai restaurants"
+    },
+    "Hebrew Modern": {
+      "heading": "Noto Sans Hebrew",
+      "body": "Noto Sans Hebrew",
+      "url": "https://fonts.google.com/share?selection.family=Noto+Sans+Hebrew:wght@300;400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;700&display=swap');",
+      "mood": "hebrew, modern, RTL, clean, professional, readable",
+      "best_for": "Hebrew sites, Israeli market, Jewish content, bilingual sites"
+    },
+    "Legal Professional": {
+      "heading": "EB Garamond",
+      "body": "Lato",
+      "url": "https://fonts.google.com/share?selection.family=EB+Garamond:wght@400;500;600;700|Lato:wght@300;400;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');",
+      "mood": "legal, professional, traditional, trustworthy, formal, authoritative",
+      "best_for": "Law firms, legal services, contracts, formal documents, government"
+    },
+    "Medical Clean": {
+      "heading": "Figtree",
+      "body": "Noto Sans",
+      "url": "https://fonts.google.com/share?selection.family=Figtree:wght@300;400;500;600;700|Noto+Sans:wght@300;400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;700&display=swap');",
+      "mood": "medical, clean, accessible, professional, healthcare, trustworthy",
+      "best_for": "Healthcare, medical clinics, pharma, health apps, accessibility"
+    },
+    "Financial Trust": {
+      "heading": "IBM Plex Sans",
+      "body": "IBM Plex Sans",
+      "url": "https://fonts.google.com/share?selection.family=IBM+Plex+Sans:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');",
+      "mood": "financial, trustworthy, professional, corporate, banking, serious",
+      "best_for": "Banks, finance, insurance, investment, fintech, enterprise"
+    },
+    "Real Estate Luxury": {
+      "heading": "Cinzel",
+      "body": "Josefin Sans",
+      "url": "https://fonts.google.com/share?selection.family=Cinzel:wght@400;500;600;700|Josefin+Sans:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Josefin+Sans:wght@300;400;500;600;700&display=swap');",
+      "mood": "real estate, luxury, elegant, sophisticated, property, premium",
+      "best_for": "Real estate, luxury properties, architecture, interior design"
+    },
+    "Restaurant Menu": {
+      "heading": "Playfair Display SC",
+      "body": "Karla",
+      "url": "https://fonts.google.com/share?selection.family=Karla:wght@300;400;500;600;700|Playfair+Display+SC:wght@400;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700&family=Playfair+Display+SC:wght@400;700&display=swap');",
+      "mood": "restaurant, menu, culinary, elegant, foodie, hospitality",
+      "best_for": "Restaurants, cafes, food blogs, culinary, hospitality"
+    },
+    "Art Deco": {
+      "heading": "Poiret One",
+      "body": "Didact Gothic",
+      "url": "https://fonts.google.com/share?selection.family=Didact+Gothic|Poiret+One",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Poiret+One&display=swap');",
+      "mood": "art deco, vintage, 1920s, elegant, decorative, gatsby",
+      "best_for": "Vintage events, art deco themes, luxury hotels, classic cocktails"
+    },
+    "Magazine Style": {
+      "heading": "Libre Bodoni",
+      "body": "Public Sans",
+      "url": "https://fonts.google.com/share?selection.family=Libre+Bodoni:wght@400;500;600;700|Public+Sans:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Libre+Bodoni:wght@400;500;600;700&family=Public+Sans:wght@300;400;500;600;700&display=swap');",
+      "mood": "magazine, editorial, publishing, refined, journalism, print",
+      "best_for": "Magazines, online publications, editorial content, journalism"
+    },
+    "Crypto/Web3": {
+      "heading": "Orbitron",
+      "body": "Exo 2",
+      "url": "https://fonts.google.com/share?selection.family=Exo+2:wght@300;400;500;600;700|Orbitron:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap');",
+      "mood": "crypto, web3, futuristic, tech, blockchain, digital",
+      "best_for": "Crypto platforms, NFT, blockchain, web3, futuristic tech"
+    },
+    "Gaming Bold": {
+      "heading": "Russo One",
+      "body": "Chakra Petch",
+      "url": "https://fonts.google.com/share?selection.family=Chakra+Petch:wght@300;400;500;600;700|Russo+One",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Russo+One&display=swap');",
+      "mood": "gaming, bold, action, esports, competitive, energetic",
+      "best_for": "Gaming, esports, action games, competitive sports, entertainment"
+    },
+    "Indie/Craft": {
+      "heading": "Amatic SC",
+      "body": "Cabin",
+      "url": "https://fonts.google.com/share?selection.family=Amatic+SC:wght@400;700|Cabin:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Cabin:wght@400;500;600;700&display=swap');",
+      "mood": "indie, craft, handmade, artisan, organic, creative",
+      "best_for": "Craft brands, indie products, artisan, handmade, organic products"
+    },
+    "Startup Bold": {
+      "heading": "Clash Display",
+      "body": "Satoshi",
+      "url": "https://fonts.google.com/share?selection.family=Outfit:wght@400;500;600;700|Rubik:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap');",
+      "mood": "startup, bold, modern, innovative, confident, dynamic",
+      "best_for": "Startups, pitch decks, product launches, bold brands"
+    },
+    "E-commerce Clean": {
+      "heading": "Rubik",
+      "body": "Nunito Sans",
+      "url": "https://fonts.google.com/share?selection.family=Nunito+Sans:wght@300;400;500;600;700|Rubik:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap');",
+      "mood": "ecommerce, clean, shopping, product, retail, conversion",
+      "best_for": "E-commerce, online stores, product pages, retail, shopping"
+    },
+    "Academic/Research": {
+      "heading": "Crimson Pro",
+      "body": "Atkinson Hyperlegible",
+      "url": "https://fonts.google.com/share?selection.family=Atkinson+Hyperlegible:wght@400;700|Crimson+Pro:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Crimson+Pro:wght@400;500;600;700&display=swap');",
+      "mood": "academic, research, scholarly, accessible, readable, educational",
+      "best_for": "Universities, research papers, academic journals, educational"
+    },
+    "Dashboard Data": {
+      "heading": "Fira Code",
+      "body": "Fira Sans",
+      "url": "https://fonts.google.com/share?selection.family=Fira+Code:wght@400;500;600;700|Fira+Sans:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');",
+      "mood": "dashboard, data, analytics, code, technical, precise",
+      "best_for": "Dashboards, analytics, data visualization, admin panels"
+    },
+    "Music/Entertainment": {
+      "heading": "Righteous",
+      "body": "Poppins",
+      "url": "https://fonts.google.com/share?selection.family=Poppins:wght@300;400;500;600;700|Righteous",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Righteous&display=swap');",
+      "mood": "music, entertainment, fun, energetic, bold, performance",
+      "best_for": "Music platforms, entertainment, events, festivals, performers"
+    },
+    "Minimalist Portfolio": {
+      "heading": "Archivo",
+      "body": "Space Grotesk",
+      "url": "https://fonts.google.com/share?selection.family=Archivo:wght@300;400;500;600;700|Space+Grotesk:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');",
+      "mood": "minimal, portfolio, designer, creative, clean, artistic",
+      "best_for": "Design portfolios, creative professionals, minimalist brands"
+    },
+    "Kids/Education": {
+      "heading": "Baloo 2",
+      "body": "Comic Neue",
+      "url": "https://fonts.google.com/share?selection.family=Baloo+2:wght@400;500;600;700|Comic+Neue:wght@300;400;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Comic+Neue:wght@300;400;700&display=swap');",
+      "mood": "kids, education, playful, friendly, colorful, learning",
+      "best_for": "Children's apps, educational games, kid-friendly content"
+    },
+    "Wedding/Romance": {
+      "heading": "Great Vibes",
+      "body": "Cormorant Infant",
+      "url": "https://fonts.google.com/share?selection.family=Cormorant+Infant:wght@300;400;500;600;700|Great+Vibes",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Cormorant+Infant:wght@300;400;500;600;700&family=Great+Vibes&display=swap');",
+      "mood": "wedding, romance, elegant, script, invitation, feminine",
+      "best_for": "Wedding sites, invitations, romantic brands, bridal"
+    },
+    "Science/Tech": {
+      "heading": "Exo",
+      "body": "Roboto Mono",
+      "url": "https://fonts.google.com/share?selection.family=Exo:wght@300;400;500;600;700|Roboto+Mono:wght@300;400;500;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Exo:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500;700&display=swap');",
+      "mood": "science, technology, research, data, futuristic, precise",
+      "best_for": "Science, research, tech documentation, data-heavy sites"
+    },
+    "Accessibility First": {
+      "heading": "Atkinson Hyperlegible",
+      "body": "Atkinson Hyperlegible",
+      "url": "https://fonts.google.com/share?selection.family=Atkinson+Hyperlegible:wght@400;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');",
+      "mood": "accessible, readable, inclusive, WCAG, dyslexia-friendly, clear",
+      "best_for": "Accessibility-critical sites, government, healthcare, inclusive design"
+    },
+    "Sports/Fitness": {
+      "heading": "Barlow Condensed",
+      "body": "Barlow",
+      "url": "https://fonts.google.com/share?selection.family=Barlow+Condensed:wght@400;500;600;700|Barlow:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500;600;700&display=swap');",
+      "mood": "sports, fitness, athletic, energetic, condensed, action",
+      "best_for": "Sports, fitness, gyms, athletic brands, competition"
+    },
+    "Luxury Minimalist": {
+      "heading": "Bodoni Moda",
+      "body": "Jost",
+      "url": "https://fonts.google.com/share?selection.family=Bodoni+Moda:wght@400;500;600;700|Jost:wght@300;400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700&family=Jost:wght@300;400;500;600;700&display=swap');",
+      "mood": "luxury, minimalist, high-end, sophisticated, refined, premium",
+      "best_for": "Luxury minimalist brands, high-end fashion, premium products"
+    },
+    "Tech/HUD Mono": {
+      "heading": "Share Tech Mono",
+      "body": "Fira Code",
+      "url": "https://fonts.google.com/share?selection.family=Fira+Code:wght@300;400;500;600;700|Share+Tech+Mono",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');",
+      "mood": "tech, futuristic, hud, sci-fi, data, monospaced, precise",
+      "best_for": "Sci-fi interfaces, developer tools, cybersecurity, dashboards"
+    },
+    "Pixel Retro": {
+      "heading": "Press Start 2P",
+      "body": "VT323",
+      "url": "https://fonts.google.com/share?selection.family=Press+Start+2P|VT323",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');",
+      "mood": "pixel, retro, gaming, 8-bit, nostalgic, arcade",
+      "best_for": "Pixel art games, retro websites, creative portfolios"
+    },
+    "Neubrutalist Bold": {
+      "heading": "Lexend Mega",
+      "body": "Public Sans",
+      "url": "https://fonts.google.com/share?selection.family=Lexend+Mega:wght@100..900|Public+Sans:wght@100..900",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Lexend+Mega:wght@100..900&family=Public+Sans:wght@100..900&display=swap');",
+      "mood": "bold, neubrutalist, loud, strong, geometric, quirky",
+      "best_for": "Neubrutalist designs, Gen Z brands, bold marketing"
+    },
+    "Academic/Archival": {
+      "heading": "EB Garamond",
+      "body": "Crimson Text",
+      "url": "https://fonts.google.com/share?selection.family=Crimson+Text:wght@400;600;700|EB+Garamond:wght@400;500;600;700;800",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=EB+Garamond:wght@400;500;600;700;800&display=swap');",
+      "mood": "academic, old-school, university, research, serious, traditional",
+      "best_for": "University sites, archives, research papers, history"
+    },
+    "Spatial Clear": {
+      "heading": "Inter",
+      "body": "Inter",
+      "url": "https://fonts.google.com/share?selection.family=Inter:wght@300;400;500;600",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');",
+      "mood": "spatial, legible, glass, system, clean, neutral",
+      "best_for": "Spatial computing, AR/VR, glassmorphism interfaces"
+    },
+    "Kinetic Motion": {
+      "heading": "Syncopate",
+      "body": "Space Mono",
+      "url": "https://fonts.google.com/share?selection.family=Space+Mono:wght@400;700|Syncopate:wght@400;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap');",
+      "mood": "kinetic, motion, futuristic, speed, wide, tech",
+      "best_for": "Music festivals, automotive, high-energy brands"
+    },
+    "Gen Z Brutal": {
+      "heading": "Anton",
+      "body": "Epilogue",
+      "url": "https://fonts.google.com/share?selection.family=Anton|Epilogue:wght@400;500;600;700",
+      "css_import": "@import url('https://fonts.googleapis.com/css2?family=Anton&family=Epilogue:wght@400;500;600;700&display=swap');",
+      "mood": "brutal, loud, shouty, meme, internet, bold",
+      "best_for": "Gen Z marketing, streetwear, viral campaigns"
+    }
+  },
+  "anti_patterns": {
+    "SaaS (General)": {
+      "recommended_pattern": "Hero + Features + CTA",
+      "anti_patterns": "Excessive animation + Dark mode by default",
+      "severity": "HIGH",
+      "color_mood": "Trust blue + Accent contrast",
+      "typography_mood": "Professional + Hierarchy",
+      "effects": "Subtle hover (200-250ms) + Smooth transitions"
+    },
+    "Micro SaaS": {
+      "recommended_pattern": "Minimal & Direct + Demo",
+      "anti_patterns": "Complex onboarding flow + Cluttered layout",
+      "severity": "HIGH",
+      "color_mood": "Vibrant primary + White space",
+      "typography_mood": "Bold + Clean typography",
+      "effects": "Large CTA hover (300ms) + Scroll reveal"
+    },
+    "E-commerce": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Flat design without depth + Text-heavy pages",
+      "severity": "HIGH",
+      "color_mood": "Brand primary + Success green",
+      "typography_mood": "Engaging + Clear hierarchy",
+      "effects": "Card hover lift (200ms) + Scale effect"
+    },
+    "E-commerce Luxury": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Vibrant & Block-based + Playful colors",
+      "severity": "HIGH",
+      "color_mood": "Premium colors + Minimal accent",
+      "typography_mood": "Elegant + Refined typography",
+      "effects": "Chromatic aberration + Fluid animations (400-600ms)"
+    },
+    "Healthcare App": {
+      "recommended_pattern": "Social Proof-Focused",
+      "anti_patterns": "Bright neon colors + Motion-heavy animations + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Calm blue + Health green",
+      "typography_mood": "Readable + Large type (16px+)",
+      "effects": "Soft box-shadow + Smooth press (150ms)"
+    },
+    "Fintech/Crypto": {
+      "recommended_pattern": "Conversion-Optimized",
+      "anti_patterns": "Light backgrounds + No security indicators",
+      "severity": "HIGH",
+      "color_mood": "Dark tech colors + Vibrant accents",
+      "typography_mood": "Modern + Confident typography",
+      "effects": "Real-time chart animations + Alert pulse/glow"
+    },
+    "Education": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Dark modes + Complex jargon",
+      "severity": "MEDIUM",
+      "color_mood": "Playful colors + Clear hierarchy",
+      "typography_mood": "Friendly + Engaging typography",
+      "effects": "Soft press (200ms) + Fluffy elements"
+    },
+    "Portfolio/Personal": {
+      "recommended_pattern": "Storytelling-Driven",
+      "anti_patterns": "Corporate templates + Generic layouts",
+      "severity": "MEDIUM",
+      "color_mood": "Brand primary + Artistic",
+      "typography_mood": "Expressive + Variable typography",
+      "effects": "Parallax (3-5 layers) + Scroll-triggered reveals"
+    },
+    "Government/Public": {
+      "recommended_pattern": "Minimal & Direct",
+      "anti_patterns": "Ornate design + Low contrast + Motion effects + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Professional blue + High contrast",
+      "typography_mood": "Clear + Large typography",
+      "effects": "Clear focus rings (3-4px) + Skip links"
+    },
+    "Fintech (Banking)": {
+      "recommended_pattern": "Trust & Authority",
+      "anti_patterns": "Playful design + Unclear fees + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Navy + Trust Blue + Gold",
+      "typography_mood": "Professional + Trustworthy",
+      "effects": "Smooth state transitions + Number animations"
+    },
+    "Social Media App": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Heavy skeuomorphism + Accessibility ignored",
+      "severity": "MEDIUM",
+      "color_mood": "Vibrant + Engagement colors",
+      "typography_mood": "Modern + Bold typography",
+      "effects": "Large scroll animations + Icon animations"
+    },
+    "Startup Landing": {
+      "recommended_pattern": "Hero-Centric + Trust",
+      "anti_patterns": "Static design + No video + Poor mobile",
+      "severity": "HIGH",
+      "color_mood": "Bold primaries + Accent contrast",
+      "typography_mood": "Modern + Energetic typography",
+      "effects": "Scroll-triggered animations + Parallax"
+    },
+    "Gaming": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Minimalist design + Static assets",
+      "severity": "HIGH",
+      "color_mood": "Vibrant + Neon + Immersive",
+      "typography_mood": "Bold + Impactful typography",
+      "effects": "WebGL 3D rendering + Glitch effects"
+    },
+    "Creative Agency": {
+      "recommended_pattern": "Storytelling-Driven",
+      "anti_patterns": "Corporate minimalism + Hidden portfolio",
+      "severity": "HIGH",
+      "color_mood": "Bold primaries + Artistic freedom",
+      "typography_mood": "Bold + Expressive typography",
+      "effects": "CRT scanlines + Neon glow + Glitch effects"
+    },
+    "Wellness/Mental Health": {
+      "recommended_pattern": "Social Proof-Focused",
+      "anti_patterns": "Bright neon + Motion overload",
+      "severity": "HIGH",
+      "color_mood": "Calm Pastels + Trust colors",
+      "typography_mood": "Calming + Readable typography",
+      "effects": "Soft press + Breathing animations"
+    },
+    "Restaurant/Food": {
+      "recommended_pattern": "Hero-Centric + Conversion",
+      "anti_patterns": "Low-quality imagery + Outdated hours",
+      "severity": "HIGH",
+      "color_mood": "Warm colors (Orange Red Brown)",
+      "typography_mood": "Appetizing + Clear typography",
+      "effects": "Food image reveal + Menu hover effects"
+    },
+    "Real Estate": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "Poor photos + No virtual tours",
+      "severity": "HIGH",
+      "color_mood": "Trust Blue + Gold + White",
+      "typography_mood": "Professional + Confident",
+      "effects": "3D property tour zoom + Map hover"
+    },
+    "Travel/Tourism": {
+      "recommended_pattern": "Storytelling-Driven + Hero",
+      "anti_patterns": "Generic photos + Complex booking",
+      "severity": "HIGH",
+      "color_mood": "Vibrant destination + Sky Blue",
+      "typography_mood": "Inspirational + Engaging",
+      "effects": "Destination parallax + Itinerary animations"
+    },
+    "SaaS Dashboard": {
+      "recommended_pattern": "Data-Dense Dashboard",
+      "anti_patterns": "Ornate design + Slow rendering",
+      "severity": "HIGH",
+      "color_mood": "Cool to Hot gradients + Neutral grey",
+      "typography_mood": "Clear + Readable typography",
+      "effects": "Hover tooltips + Chart zoom + Real-time pulse"
+    },
+    "B2B SaaS Enterprise": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Playful design + Hidden features + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Professional blue + Neutral grey",
+      "typography_mood": "Formal + Clear typography",
+      "effects": "Subtle section transitions + Feature reveals"
+    },
+    "Music/Entertainment": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Cluttered layout + Poor audio player UX",
+      "severity": "HIGH",
+      "color_mood": "Dark (#121212) + Vibrant accents + Album art colors",
+      "typography_mood": "Modern + Bold typography",
+      "effects": "Waveform visualization + Playlist animations"
+    },
+    "Video Streaming/OTT": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "Static layout + Slow video player",
+      "severity": "HIGH",
+      "color_mood": "Dark bg + Poster colors + Brand accent",
+      "typography_mood": "Bold + Engaging typography",
+      "effects": "Video player animations + Content carousel (parallax)"
+    },
+    "Job Board/Recruitment": {
+      "recommended_pattern": "Conversion-Optimized + Feature-Rich",
+      "anti_patterns": "Outdated forms + Hidden filters",
+      "severity": "HIGH",
+      "color_mood": "Professional Blue + Success Green + Neutral",
+      "typography_mood": "Clear + Professional typography",
+      "effects": "Search/filter animations + Application flow"
+    },
+    "Marketplace (P2P)": {
+      "recommended_pattern": "Feature-Rich Showcase + Social Proof",
+      "anti_patterns": "Low trust signals + Confusing layout",
+      "severity": "HIGH",
+      "color_mood": "Trust colors + Category colors + Success green",
+      "typography_mood": "Modern + Engaging typography",
+      "effects": "Review star animations + Listing hover effects"
+    },
+    "Logistics/Delivery": {
+      "recommended_pattern": "Feature-Rich Showcase + Real-Time",
+      "anti_patterns": "Static tracking + No map integration + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Blue (#2563EB) + Orange (tracking) + Green",
+      "typography_mood": "Clear + Functional typography",
+      "effects": "Real-time tracking animation + Status pulse"
+    },
+    "Agriculture/Farm Tech": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Generic design + Ignored accessibility + AI purple/pink gradients",
+      "severity": "MEDIUM",
+      "color_mood": "Earth Green (#4A7C23) + Brown + Sky Blue",
+      "typography_mood": "Clear + Informative typography",
+      "effects": "Data visualization + Weather animations"
+    },
+    "Construction/Architecture": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "2D-only layouts + Poor image quality + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Grey (#4A4A4A) + Orange (safety) + Blueprint Blue",
+      "typography_mood": "Professional + Bold typography",
+      "effects": "3D model viewer + Timeline animations"
+    },
+    "Automotive/Car Dealership": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "Static product pages + Poor UX",
+      "severity": "HIGH",
+      "color_mood": "Brand colors + Metallic + Dark/Light",
+      "typography_mood": "Bold + Confident typography",
+      "effects": "360 product view + Configurator animations"
+    },
+    "Photography Studio": {
+      "recommended_pattern": "Storytelling-Driven + Hero-Centric",
+      "anti_patterns": "Heavy text + Poor image showcase",
+      "severity": "HIGH",
+      "color_mood": "Black + White + Minimal accent",
+      "typography_mood": "Elegant + Minimal typography",
+      "effects": "Full-bleed gallery + Before/after reveal"
+    },
+    "Coworking Space": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "Outdated photos + Confusing layout",
+      "severity": "MEDIUM",
+      "color_mood": "Energetic colors + Wood tones + Brand",
+      "typography_mood": "Modern + Engaging typography",
+      "effects": "Space tour video + Amenity reveal animations"
+    },
+    "Cleaning Service": {
+      "recommended_pattern": "Conversion-Optimized + Trust",
+      "anti_patterns": "Poor before/after imagery + Hidden pricing",
+      "severity": "HIGH",
+      "color_mood": "Fresh Blue (#00B4D8) + Clean White + Green",
+      "typography_mood": "Friendly + Clear typography",
+      "effects": "Before/after gallery + Service package reveal"
+    },
+    "Home Services": {
+      "recommended_pattern": "Conversion-Optimized + Trust",
+      "anti_patterns": "Hidden contact info + No certifications",
+      "severity": "HIGH",
+      "color_mood": "Trust Blue + Safety Orange + Grey",
+      "typography_mood": "Professional + Clear typography",
+      "effects": "Emergency contact highlight + Service menu animations"
+    },
+    "Childcare/Daycare": {
+      "recommended_pattern": "Social Proof-Focused + Trust",
+      "anti_patterns": "Generic design + Hidden safety info",
+      "severity": "HIGH",
+      "color_mood": "Playful pastels + Safe colors + Warm",
+      "typography_mood": "Friendly + Playful typography",
+      "effects": "Parent portal animations + Activity gallery reveal"
+    },
+    "Senior Care/Elderly": {
+      "recommended_pattern": "Trust & Authority + Accessible",
+      "anti_patterns": "Small text + Complex navigation + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Calm Blue + Warm neutrals + Large text",
+      "typography_mood": "Large + Clear typography (18px+)",
+      "effects": "Large touch targets + Clear navigation"
+    },
+    "Medical Clinic": {
+      "recommended_pattern": "Trust & Authority + Conversion",
+      "anti_patterns": "Outdated interface + Confusing booking + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Medical Blue (#0077B6) + Trust White",
+      "typography_mood": "Professional + Readable typography",
+      "effects": "Online booking flow + Doctor profile reveals"
+    },
+    "Pharmacy/Drug Store": {
+      "recommended_pattern": "Conversion-Optimized + Trust",
+      "anti_patterns": "Confusing layout + Privacy concerns + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Pharmacy Green + Trust Blue + Clean White",
+      "typography_mood": "Clear + Functional typography",
+      "effects": "Prescription upload flow + Refill reminders"
+    },
+    "Dental Practice": {
+      "recommended_pattern": "Social Proof-Focused + Conversion",
+      "anti_patterns": "Poor imagery + No testimonials",
+      "severity": "HIGH",
+      "color_mood": "Fresh Blue + White + Smile Yellow",
+      "typography_mood": "Friendly + Professional typography",
+      "effects": "Before/after gallery + Patient testimonial carousel"
+    },
+    "Veterinary Clinic": {
+      "recommended_pattern": "Social Proof-Focused + Trust",
+      "anti_patterns": "Generic design + Hidden services",
+      "severity": "MEDIUM",
+      "color_mood": "Caring Blue + Pet colors + Warm",
+      "typography_mood": "Friendly + Welcoming typography",
+      "effects": "Pet profile management + Service animations"
+    },
+    "News/Media Platform": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "Cluttered layout + Slow loading",
+      "severity": "HIGH",
+      "color_mood": "Brand colors + High contrast",
+      "typography_mood": "Clear + Readable typography",
+      "effects": "Breaking news badge + Article reveal animations"
+    },
+    "Legal Services": {
+      "recommended_pattern": "Trust & Authority + Minimal",
+      "anti_patterns": "Outdated design + Hidden credentials + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Navy Blue (#1E3A5F) + Gold + White",
+      "typography_mood": "Professional + Authoritative typography",
+      "effects": "Practice area reveal + Attorney profile animations"
+    },
+    "Beauty/Spa/Wellness Service": {
+      "recommended_pattern": "Hero-Centric + Social Proof",
+      "anti_patterns": "Bright neon colors + Harsh animations + Dark mode",
+      "severity": "HIGH",
+      "color_mood": "Soft pastels (Pink Sage Cream) + Gold accents",
+      "typography_mood": "Elegant + Calming typography",
+      "effects": "Soft shadows + Smooth transitions (200-300ms) + Gentle hover"
+    },
+    "Service Landing Page": {
+      "recommended_pattern": "Hero-Centric + Trust & Authority",
+      "anti_patterns": "Complex navigation + Hidden contact info",
+      "severity": "HIGH",
+      "color_mood": "Brand primary + Trust colors",
+      "typography_mood": "Professional + Clear typography",
+      "effects": "Testimonial carousel + CTA hover (200ms)"
+    },
+    "B2B Service": {
+      "recommended_pattern": "Feature-Rich Showcase + Trust",
+      "anti_patterns": "Playful design + Hidden credentials + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Professional blue + Neutral grey",
+      "typography_mood": "Formal + Clear typography",
+      "effects": "Section transitions + Feature reveals"
+    },
+    "Financial Dashboard": {
+      "recommended_pattern": "Data-Dense Dashboard",
+      "anti_patterns": "Light mode default + Slow rendering",
+      "severity": "HIGH",
+      "color_mood": "Dark bg + Red/Green alerts + Trust blue",
+      "typography_mood": "Clear + Readable typography",
+      "effects": "Real-time number animations + Alert pulse"
+    },
+    "Analytics Dashboard": {
+      "recommended_pattern": "Data-Dense + Drill-Down",
+      "anti_patterns": "Ornate design + No filtering",
+      "severity": "HIGH",
+      "color_mood": "Cool\u2192Hot gradients + Neutral grey",
+      "typography_mood": "Clear + Functional typography",
+      "effects": "Hover tooltips + Chart zoom + Filter animations"
+    },
+    "Productivity Tool": {
+      "recommended_pattern": "Interactive Demo + Feature-Rich",
+      "anti_patterns": "Complex onboarding + Slow performance",
+      "severity": "HIGH",
+      "color_mood": "Clear hierarchy + Functional colors",
+      "typography_mood": "Clean + Efficient typography",
+      "effects": "Quick actions (150ms) + Task animations"
+    },
+    "Design System/Component Library": {
+      "recommended_pattern": "Feature-Rich + Documentation",
+      "anti_patterns": "Poor documentation + No live preview",
+      "severity": "HIGH",
+      "color_mood": "Clear hierarchy + Code-like structure",
+      "typography_mood": "Monospace + Clear typography",
+      "effects": "Code copy animations + Component previews"
+    },
+    "AI/Chatbot Platform": {
+      "recommended_pattern": "Interactive Demo + Minimal",
+      "anti_patterns": "Heavy chrome + Slow response feedback",
+      "severity": "HIGH",
+      "color_mood": "Neutral + AI Purple (#6366F1)",
+      "typography_mood": "Modern + Clear typography",
+      "effects": "Streaming text + Typing indicators + Fade-in"
+    },
+    "NFT/Web3 Platform": {
+      "recommended_pattern": "Feature-Rich Showcase",
+      "anti_patterns": "Light mode default + No transaction status",
+      "severity": "HIGH",
+      "color_mood": "Dark + Neon + Gold (#FFD700)",
+      "typography_mood": "Bold + Modern typography",
+      "effects": "Wallet connect animations + Transaction feedback"
+    },
+    "Creator Economy Platform": {
+      "recommended_pattern": "Social Proof + Feature-Rich",
+      "anti_patterns": "Generic layout + Hidden earnings",
+      "severity": "MEDIUM",
+      "color_mood": "Vibrant + Brand colors",
+      "typography_mood": "Modern + Bold typography",
+      "effects": "Engagement counter animations + Profile reveals"
+    },
+    "Sustainability/ESG Platform": {
+      "recommended_pattern": "Trust & Authority + Data",
+      "anti_patterns": "Greenwashing visuals + No data",
+      "severity": "HIGH",
+      "color_mood": "Green (#228B22) + Earth tones",
+      "typography_mood": "Clear + Informative typography",
+      "effects": "Progress indicators + Impact animations"
+    },
+    "Remote Work/Collaboration": {
+      "recommended_pattern": "Feature-Rich + Real-Time",
+      "anti_patterns": "Cluttered interface + No presence",
+      "severity": "HIGH",
+      "color_mood": "Calm Blue + Neutral grey",
+      "typography_mood": "Clean + Readable typography",
+      "effects": "Real-time presence indicators + Notification badges"
+    },
+    "Pet Tech App": {
+      "recommended_pattern": "Storytelling + Feature-Rich",
+      "anti_patterns": "Generic design + No personality",
+      "severity": "MEDIUM",
+      "color_mood": "Playful + Warm colors",
+      "typography_mood": "Friendly + Playful typography",
+      "effects": "Pet profile animations + Health tracking charts"
+    },
+    "Smart Home/IoT Dashboard": {
+      "recommended_pattern": "Real-Time Monitoring",
+      "anti_patterns": "Slow updates + No automation",
+      "severity": "HIGH",
+      "color_mood": "Dark + Status indicator colors",
+      "typography_mood": "Clear + Functional typography",
+      "effects": "Device status pulse + Quick action animations"
+    },
+    "EV/Charging Ecosystem": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "Poor map UX + Hidden costs",
+      "severity": "HIGH",
+      "color_mood": "Electric Blue (#009CD1) + Green",
+      "typography_mood": "Modern + Clear typography",
+      "effects": "Range estimation animations + Map interactions"
+    },
+    "Subscription Box Service": {
+      "recommended_pattern": "Feature-Rich + Conversion",
+      "anti_patterns": "Confusing pricing + No unboxing preview",
+      "severity": "HIGH",
+      "color_mood": "Brand + Excitement colors",
+      "typography_mood": "Engaging + Clear typography",
+      "effects": "Unboxing reveal animations + Product carousel"
+    },
+    "Podcast Platform": {
+      "recommended_pattern": "Storytelling + Feature-Rich",
+      "anti_patterns": "Poor audio player + Cluttered layout",
+      "severity": "HIGH",
+      "color_mood": "Dark + Audio waveform accents",
+      "typography_mood": "Modern + Clear typography",
+      "effects": "Waveform visualizations + Episode transitions"
+    },
+    "Dating App": {
+      "recommended_pattern": "Social Proof + Feature-Rich",
+      "anti_patterns": "Generic profiles + No safety",
+      "severity": "HIGH",
+      "color_mood": "Warm + Romantic (Pink/Red gradients)",
+      "typography_mood": "Modern + Friendly typography",
+      "effects": "Profile card swipe + Match animations"
+    },
+    "Micro-Credentials/Badges": {
+      "recommended_pattern": "Trust & Authority + Feature",
+      "anti_patterns": "No verification + Hidden progress",
+      "severity": "MEDIUM",
+      "color_mood": "Trust Blue + Gold (#FFD700)",
+      "typography_mood": "Professional + Clear typography",
+      "effects": "Badge reveal animations + Progress tracking"
+    },
+    "Knowledge Base/Documentation": {
+      "recommended_pattern": "FAQ + Minimal",
+      "anti_patterns": "Poor navigation + No search",
+      "severity": "HIGH",
+      "color_mood": "Clean hierarchy + Minimal color",
+      "typography_mood": "Clear + Readable typography",
+      "effects": "Search highlight + Smooth scrolling"
+    },
+    "Hyperlocal Services": {
+      "recommended_pattern": "Conversion + Feature-Rich",
+      "anti_patterns": "No map + Hidden reviews",
+      "severity": "HIGH",
+      "color_mood": "Location markers + Trust colors",
+      "typography_mood": "Clear + Functional typography",
+      "effects": "Map hover + Provider card reveals"
+    },
+    "Luxury/Premium Brand": {
+      "recommended_pattern": "Storytelling + Feature-Rich",
+      "anti_patterns": "Cheap visuals + Fast animations",
+      "severity": "HIGH",
+      "color_mood": "Black + Gold (#FFD700) + White",
+      "typography_mood": "Elegant + Refined typography",
+      "effects": "Slow parallax + Premium reveals (400-600ms)"
+    },
+    "Fitness/Gym App": {
+      "recommended_pattern": "Feature-Rich + Data",
+      "anti_patterns": "Static design + No gamification",
+      "severity": "HIGH",
+      "color_mood": "Energetic (Orange #FF6B35) + Dark bg",
+      "typography_mood": "Bold + Motivational typography",
+      "effects": "Progress ring animations + Achievement unlocks"
+    },
+    "Hotel/Hospitality": {
+      "recommended_pattern": "Hero-Centric + Social Proof",
+      "anti_patterns": "Poor photos + Complex booking",
+      "severity": "HIGH",
+      "color_mood": "Warm neutrals + Gold (#D4AF37)",
+      "typography_mood": "Elegant + Welcoming typography",
+      "effects": "Room gallery + Amenity reveals"
+    },
+    "Wedding/Event Planning": {
+      "recommended_pattern": "Storytelling + Social Proof",
+      "anti_patterns": "Generic templates + No portfolio",
+      "severity": "HIGH",
+      "color_mood": "Soft Pink (#FFD6E0) + Gold + Cream",
+      "typography_mood": "Elegant + Romantic typography",
+      "effects": "Gallery reveals + Timeline animations"
+    },
+    "Insurance Platform": {
+      "recommended_pattern": "Conversion + Trust",
+      "anti_patterns": "Confusing pricing + No trust signals + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Trust Blue (#0066CC) + Green + Neutral",
+      "typography_mood": "Clear + Professional typography",
+      "effects": "Quote calculator animations + Policy comparison"
+    },
+    "Banking/Traditional Finance": {
+      "recommended_pattern": "Trust & Authority + Feature",
+      "anti_patterns": "Playful design + Poor security UX + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Navy (#0A1628) + Trust Blue + Gold",
+      "typography_mood": "Professional + Trustworthy typography",
+      "effects": "Smooth number animations + Security indicators"
+    },
+    "Online Course/E-learning": {
+      "recommended_pattern": "Feature-Rich + Social Proof",
+      "anti_patterns": "Boring design + No gamification",
+      "severity": "HIGH",
+      "color_mood": "Vibrant learning colors + Progress green",
+      "typography_mood": "Friendly + Engaging typography",
+      "effects": "Progress bar animations + Certificate reveals"
+    },
+    "Non-profit/Charity": {
+      "recommended_pattern": "Storytelling + Trust",
+      "anti_patterns": "No impact data + Hidden financials",
+      "severity": "HIGH",
+      "color_mood": "Cause-related colors + Trust + Warm",
+      "typography_mood": "Heartfelt + Readable typography",
+      "effects": "Impact counter animations + Story reveals"
+    },
+    "Florist/Plant Shop": {
+      "recommended_pattern": "Hero-Centric + Conversion",
+      "anti_patterns": "Poor imagery + No seasonal content",
+      "severity": "MEDIUM",
+      "color_mood": "Natural Green + Floral pinks/purples",
+      "typography_mood": "Elegant + Natural typography",
+      "effects": "Product reveal + Seasonal transitions"
+    },
+    "Bakery/Cafe": {
+      "recommended_pattern": "Hero-Centric + Conversion",
+      "anti_patterns": "Poor food photos + Hidden hours",
+      "severity": "HIGH",
+      "color_mood": "Warm Brown + Cream + Appetizing accents",
+      "typography_mood": "Warm + Inviting typography",
+      "effects": "Menu hover + Order animations"
+    },
+    "Coffee Shop": {
+      "recommended_pattern": "Hero-Centric + Minimal",
+      "anti_patterns": "Generic design + No atmosphere",
+      "severity": "MEDIUM",
+      "color_mood": "Coffee Brown (#6F4E37) + Cream + Warm",
+      "typography_mood": "Cozy + Clean typography",
+      "effects": "Menu transitions + Loyalty animations"
+    },
+    "Brewery/Winery": {
+      "recommended_pattern": "Storytelling + Hero-Centric",
+      "anti_patterns": "Generic product pages + No story",
+      "severity": "HIGH",
+      "color_mood": "Deep amber/burgundy + Gold + Craft",
+      "typography_mood": "Artisanal + Heritage typography",
+      "effects": "Tasting note reveals + Heritage timeline"
+    },
+    "Airline": {
+      "recommended_pattern": "Conversion + Feature-Rich",
+      "anti_patterns": "Complex booking + Poor mobile",
+      "severity": "HIGH",
+      "color_mood": "Sky Blue + Brand colors + Trust",
+      "typography_mood": "Clear + Professional typography",
+      "effects": "Flight search animations + Boarding pass reveals"
+    },
+    "Magazine/Blog": {
+      "recommended_pattern": "Storytelling + Hero-Centric",
+      "anti_patterns": "Poor typography + Slow loading",
+      "severity": "HIGH",
+      "color_mood": "Editorial colors + Brand + Clean white",
+      "typography_mood": "Editorial + Elegant typography",
+      "effects": "Article transitions + Category reveals"
+    },
+    "Freelancer Platform": {
+      "recommended_pattern": "Feature-Rich + Conversion",
+      "anti_patterns": "Poor profiles + No reviews",
+      "severity": "HIGH",
+      "color_mood": "Professional Blue + Success Green",
+      "typography_mood": "Clear + Professional typography",
+      "effects": "Skill match animations + Review reveals"
+    },
+    "Consulting Firm": {
+      "recommended_pattern": "Trust & Authority + Minimal",
+      "anti_patterns": "Generic content + No credentials + AI purple/pink gradients",
+      "severity": "HIGH",
+      "color_mood": "Navy + Gold + Professional grey",
+      "typography_mood": "Authoritative + Clear typography",
+      "effects": "Case study reveals + Team profiles"
+    },
+    "Marketing Agency": {
+      "recommended_pattern": "Storytelling + Feature-Rich",
+      "anti_patterns": "Boring design + Hidden work",
+      "severity": "HIGH",
+      "color_mood": "Bold brand colors + Creative freedom",
+      "typography_mood": "Bold + Expressive typography",
+      "effects": "Portfolio reveals + Results animations"
+    },
+    "Event Management": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "Confusing registration + No countdown",
+      "severity": "HIGH",
+      "color_mood": "Event theme colors + Excitement accents",
+      "typography_mood": "Bold + Engaging typography",
+      "effects": "Countdown timer + Registration flow"
+    },
+    "Conference/Webinar Platform": {
+      "recommended_pattern": "Feature-Rich + Conversion",
+      "anti_patterns": "Poor video UX + No networking",
+      "severity": "HIGH",
+      "color_mood": "Professional Blue + Video accent",
+      "typography_mood": "Professional + Clear typography",
+      "effects": "Live stream integration + Agenda transitions"
+    },
+    "Membership/Community": {
+      "recommended_pattern": "Social Proof + Conversion",
+      "anti_patterns": "Hidden benefits + No community proof",
+      "severity": "HIGH",
+      "color_mood": "Community brand colors + Engagement",
+      "typography_mood": "Friendly + Engaging typography",
+      "effects": "Member counter + Benefit reveals"
+    },
+    "Newsletter Platform": {
+      "recommended_pattern": "Minimal + Conversion",
+      "anti_patterns": "Complex signup + No preview",
+      "severity": "MEDIUM",
+      "color_mood": "Brand primary + Clean white + CTA",
+      "typography_mood": "Clean + Readable typography",
+      "effects": "Subscribe form + Archive reveals"
+    },
+    "Digital Products/Downloads": {
+      "recommended_pattern": "Feature-Rich + Conversion",
+      "anti_patterns": "No preview + Slow delivery",
+      "severity": "HIGH",
+      "color_mood": "Product colors + Brand + Success green",
+      "typography_mood": "Modern + Clear typography",
+      "effects": "Product preview + Instant delivery animations"
+    },
+    "Church/Religious Organization": {
+      "recommended_pattern": "Hero-Centric + Social Proof",
+      "anti_patterns": "Outdated design + Hidden info",
+      "severity": "MEDIUM",
+      "color_mood": "Warm Gold + Deep Purple/Blue + White",
+      "typography_mood": "Welcoming + Clear typography",
+      "effects": "Service time highlights + Event calendar"
+    },
+    "Sports Team/Club": {
+      "recommended_pattern": "Hero-Centric + Feature-Rich",
+      "anti_patterns": "Static content + Poor fan engagement",
+      "severity": "HIGH",
+      "color_mood": "Team colors + Energetic accents",
+      "typography_mood": "Bold + Impactful typography",
+      "effects": "Score animations + Schedule reveals"
+    },
+    "Museum/Gallery": {
+      "recommended_pattern": "Storytelling + Feature-Rich",
+      "anti_patterns": "Cluttered layout + No online access",
+      "severity": "HIGH",
+      "color_mood": "Art-appropriate neutrals + Exhibition accents",
+      "typography_mood": "Elegant + Minimal typography",
+      "effects": "Virtual tour + Collection reveals"
+    },
+    "Theater/Cinema": {
+      "recommended_pattern": "Hero-Centric + Conversion",
+      "anti_patterns": "Poor booking UX + No trailers",
+      "severity": "HIGH",
+      "color_mood": "Dark + Spotlight accents + Gold",
+      "typography_mood": "Dramatic + Bold typography",
+      "effects": "Seat selection + Trailer reveals"
+    },
+    "Language Learning App": {
+      "recommended_pattern": "Feature-Rich + Social Proof",
+      "anti_patterns": "Boring design + No motivation",
+      "severity": "HIGH",
+      "color_mood": "Playful colors + Progress indicators",
+      "typography_mood": "Friendly + Clear typography",
+      "effects": "Progress animations + Achievement unlocks"
+    },
+    "Coding Bootcamp": {
+      "recommended_pattern": "Feature-Rich + Social Proof",
+      "anti_patterns": "Light mode only + Hidden results",
+      "severity": "HIGH",
+      "color_mood": "Code editor colors + Brand + Success",
+      "typography_mood": "Technical + Clear typography",
+      "effects": "Terminal animations + Career outcome reveals"
+    },
+    "Cybersecurity Platform": {
+      "recommended_pattern": "Trust & Authority + Real-Time",
+      "anti_patterns": "Light mode + Poor data viz",
+      "severity": "HIGH",
+      "color_mood": "Matrix Green (#00FF00) + Deep Black",
+      "typography_mood": "Technical + Clear typography",
+      "effects": "Threat visualization + Alert animations"
+    },
+    "Developer Tool/IDE": {
+      "recommended_pattern": "Minimal + Documentation",
+      "anti_patterns": "Light mode default + Slow performance",
+      "severity": "HIGH",
+      "color_mood": "Dark syntax theme + Blue focus",
+      "typography_mood": "Monospace + Functional typography",
+      "effects": "Syntax highlighting + Command palette"
+    },
+    "Biotech/Life Sciences": {
+      "recommended_pattern": "Storytelling + Data",
+      "anti_patterns": "Cluttered data + Poor credibility",
+      "severity": "HIGH",
+      "color_mood": "Sterile White + DNA Blue + Life Green",
+      "typography_mood": "Scientific + Clear typography",
+      "effects": "Data visualization + Research reveals"
+    },
+    "Space Tech/Aerospace": {
+      "recommended_pattern": "Immersive + Feature-Rich",
+      "anti_patterns": "Generic design + No immersion",
+      "severity": "HIGH",
+      "color_mood": "Deep Space Black + Star White + Metallic",
+      "typography_mood": "Futuristic + Precise typography",
+      "effects": "Telemetry animations + 3D renders"
+    },
+    "Architecture/Interior": {
+      "recommended_pattern": "Portfolio + Hero-Centric",
+      "anti_patterns": "Poor imagery + Cluttered layout",
+      "severity": "HIGH",
+      "color_mood": "Monochrome + Gold Accent + High Imagery",
+      "typography_mood": "Architectural + Elegant typography",
+      "effects": "Project gallery + Blueprint reveals"
+    },
+    "Quantum Computing": {
+      "recommended_pattern": "Immersive + Interactive",
+      "anti_patterns": "Generic tech design + No viz",
+      "severity": "HIGH",
+      "color_mood": "Quantum Blue (#00FFFF) + Deep Black",
+      "typography_mood": "Futuristic + Scientific typography",
+      "effects": "Probability visualizations + Qubit state animations"
+    },
+    "Biohacking/Longevity App": {
+      "recommended_pattern": "Data-Dense + Storytelling",
+      "anti_patterns": "Generic health app + No privacy",
+      "severity": "HIGH",
+      "color_mood": "Cellular Pink/Red + DNA Blue + White",
+      "typography_mood": "Scientific + Clear typography",
+      "effects": "Biological data viz + Progress animations"
+    },
+    "Autonomous Drone Fleet": {
+      "recommended_pattern": "Real-Time + Feature-Rich",
+      "anti_patterns": "Slow updates + Poor spatial viz",
+      "severity": "HIGH",
+      "color_mood": "Tactical Green + Alert Red + Map Dark",
+      "typography_mood": "Technical + Functional typography",
+      "effects": "Telemetry animations + 3D spatial awareness"
+    },
+    "Generative Art Platform": {
+      "recommended_pattern": "Showcase + Feature-Rich",
+      "anti_patterns": "Heavy chrome + Slow loading",
+      "severity": "HIGH",
+      "color_mood": "Neutral (#F5F5F5) + User Content",
+      "typography_mood": "Minimal + Content-focused typography",
+      "effects": "Gallery masonry + Minting animations"
+    },
+    "Spatial Computing OS": {
+      "recommended_pattern": "Immersive + Interactive",
+      "anti_patterns": "2D design + No spatial depth",
+      "severity": "HIGH",
+      "color_mood": "Frosted Glass + System Colors + Depth",
+      "typography_mood": "Spatial + Readable typography",
+      "effects": "Depth hierarchy + Gaze interactions"
+    },
+    "Sustainable Energy/Climate": {
+      "recommended_pattern": "Data + Trust",
+      "anti_patterns": "Greenwashing + No real data",
+      "severity": "HIGH",
+      "color_mood": "Earth Green + Sky Blue + Solar Yellow",
+      "typography_mood": "Clear + Informative typography",
+      "effects": "Impact viz + Progress animations"
+    }
+  },
+  "ux_guidelines": [
+    {
+      "No": "1",
+      "Category": "Navigation",
+      "Issue": "Smooth Scroll",
+      "Platform": "Web",
+      "Description": "Anchor links should scroll smoothly to target section",
+      "Do": "Use scroll-behavior: smooth on html element",
+      "Don't": "Jump directly without transition",
+      "Code Example Good": "html { scroll-behavior: smooth; }",
+      "Code Example Bad": "<a href='#section'> without CSS",
+      "Severity": "High"
+    },
+    {
+      "No": "2",
+      "Category": "Navigation",
+      "Issue": "Sticky Navigation",
+      "Platform": "Web",
+      "Description": "Fixed nav should not obscure content",
+      "Do": "Add padding-top to body equal to nav height",
+      "Don't": "Let nav overlap first section content",
+      "Code Example Good": "pt-20 (if nav is h-20)",
+      "Code Example Bad": "No padding compensation",
+      "Severity": "Medium"
+    },
+    {
+      "No": "3",
+      "Category": "Navigation",
+      "Issue": "Active State",
+      "Platform": "All",
+      "Description": "Current page/section should be visually indicated",
+      "Do": "Highlight active nav item with color/underline",
+      "Don't": "No visual feedback on current location",
+      "Code Example Good": "text-primary border-b-2",
+      "Code Example Bad": "All links same style",
+      "Severity": "Medium"
+    },
+    {
+      "No": "4",
+      "Category": "Navigation",
+      "Issue": "Back Button",
+      "Platform": "Mobile",
+      "Description": "Users expect back to work predictably",
+      "Do": "Preserve navigation history properly",
+      "Don't": "Break browser/app back button behavior",
+      "Code Example Good": "history.pushState()",
+      "Code Example Bad": "location.replace()",
+      "Severity": "High"
+    },
+    {
+      "No": "5",
+      "Category": "Navigation",
+      "Issue": "Deep Linking",
+      "Platform": "All",
+      "Description": "URLs should reflect current state for sharing",
+      "Do": "Update URL on state/view changes",
+      "Don't": "Static URLs for dynamic content",
+      "Code Example Good": "Use query params or hash",
+      "Code Example Bad": "Single URL for all states",
+      "Severity": "Medium"
+    },
+    {
+      "No": "6",
+      "Category": "Navigation",
+      "Issue": "Breadcrumbs",
+      "Platform": "Web",
+      "Description": "Show user location in site hierarchy",
+      "Do": "Use for sites with 3+ levels of depth",
+      "Don't": "Use for flat single-level sites",
+      "Code Example Good": "Home > Category > Product",
+      "Code Example Bad": "Only on deep nested pages",
+      "Severity": "Low"
+    },
+    {
+      "No": "7",
+      "Category": "Animation",
+      "Issue": "Excessive Motion",
+      "Platform": "All",
+      "Description": "Too many animations cause distraction and motion sickness",
+      "Do": "Animate 1-2 key elements per view maximum",
+      "Don't": "Animate everything that moves",
+      "Code Example Good": "Single hero animation",
+      "Code Example Bad": "animate-bounce on 5+ elements",
+      "Severity": "High"
+    },
+    {
+      "No": "8",
+      "Category": "Animation",
+      "Issue": "Duration Timing",
+      "Platform": "All",
+      "Description": "Animations should feel responsive not sluggish",
+      "Do": "Use 150-300ms for micro-interactions",
+      "Don't": "Use animations longer than 500ms for UI",
+      "Code Example Good": "transition-all duration-200",
+      "Code Example Bad": "duration-1000",
+      "Severity": "Medium"
+    },
+    {
+      "No": "9",
+      "Category": "Animation",
+      "Issue": "Reduced Motion",
+      "Platform": "All",
+      "Description": "Respect user's motion preferences",
+      "Do": "Check prefers-reduced-motion media query",
+      "Don't": "Ignore accessibility motion settings",
+      "Code Example Good": "@media (prefers-reduced-motion: reduce)",
+      "Code Example Bad": "No motion query check",
+      "Severity": "High"
+    },
+    {
+      "No": "10",
+      "Category": "Animation",
+      "Issue": "Loading States",
+      "Platform": "All",
+      "Description": "Show feedback during async operations",
+      "Do": "Use skeleton screens or spinners",
+      "Don't": "Leave UI frozen with no feedback",
+      "Code Example Good": "animate-pulse skeleton",
+      "Code Example Bad": "Blank screen while loading",
+      "Severity": "High"
+    },
+    {
+      "No": "11",
+      "Category": "Animation",
+      "Issue": "Hover vs Tap",
+      "Platform": "All",
+      "Description": "Hover effects don't work on touch devices",
+      "Do": "Use click/tap for primary interactions",
+      "Don't": "Rely only on hover for important actions",
+      "Code Example Good": "onClick handler",
+      "Code Example Bad": "onMouseEnter only",
+      "Severity": "High"
+    },
+    {
+      "No": "12",
+      "Category": "Animation",
+      "Issue": "Continuous Animation",
+      "Platform": "All",
+      "Description": "Infinite animations are distracting",
+      "Do": "Use for loading indicators only",
+      "Don't": "Use for decorative elements",
+      "Code Example Good": "animate-spin on loader",
+      "Code Example Bad": "animate-bounce on icons",
+      "Severity": "Medium"
+    },
+    {
+      "No": "13",
+      "Category": "Animation",
+      "Issue": "Transform Performance",
+      "Platform": "Web",
+      "Description": "Some CSS properties trigger expensive repaints",
+      "Do": "Use transform and opacity for animations",
+      "Don't": "Animate width/height/top/left properties",
+      "Code Example Good": "transform: translateY()",
+      "Code Example Bad": "top: 10px animation",
+      "Severity": "Medium"
+    },
+    {
+      "No": "14",
+      "Category": "Animation",
+      "Issue": "Easing Functions",
+      "Platform": "All",
+      "Description": "Linear motion feels robotic",
+      "Do": "Use ease-out for entering ease-in for exiting",
+      "Don't": "Use linear for UI transitions",
+      "Code Example Good": "ease-out",
+      "Code Example Bad": "linear",
+      "Severity": "Low"
+    },
+    {
+      "No": "15",
+      "Category": "Layout",
+      "Issue": "Z-Index Management",
+      "Platform": "Web",
+      "Description": "Stacking context conflicts cause hidden elements",
+      "Do": "Define z-index scale system (10 20 30 50)",
+      "Don't": "Use arbitrary large z-index values",
+      "Code Example Good": "z-10 z-20 z-50",
+      "Code Example Bad": "z-[9999]",
+      "Severity": "High"
+    },
+    {
+      "No": "16",
+      "Category": "Layout",
+      "Issue": "Overflow Hidden",
+      "Platform": "Web",
+      "Description": "Hidden overflow can clip important content",
+      "Do": "Test all content fits within containers",
+      "Don't": "Blindly apply overflow-hidden",
+      "Code Example Good": "overflow-auto with scroll",
+      "Code Example Bad": "overflow-hidden truncating content",
+      "Severity": "Medium"
+    },
+    {
+      "No": "17",
+      "Category": "Layout",
+      "Issue": "Fixed Positioning",
+      "Platform": "Web",
+      "Description": "Fixed elements can overlap or be inaccessible",
+      "Do": "Account for safe areas and other fixed elements",
+      "Don't": "Stack multiple fixed elements carelessly",
+      "Code Example Good": "Fixed nav + fixed bottom with gap",
+      "Code Example Bad": "Multiple overlapping fixed elements",
+      "Severity": "Medium"
+    },
+    {
+      "No": "18",
+      "Category": "Layout",
+      "Issue": "Stacking Context",
+      "Platform": "Web",
+      "Description": "New stacking contexts reset z-index",
+      "Do": "Understand what creates new stacking context",
+      "Don't": "Expect z-index to work across contexts",
+      "Code Example Good": "Parent with z-index isolates children",
+      "Code Example Bad": "z-index: 9999 not working",
+      "Severity": "Medium"
+    },
+    {
+      "No": "19",
+      "Category": "Layout",
+      "Issue": "Content Jumping",
+      "Platform": "Web",
+      "Description": "Layout shift when content loads is jarring",
+      "Do": "Reserve space for async content",
+      "Don't": "Let images/content push layout around",
+      "Code Example Good": "aspect-ratio or fixed height",
+      "Code Example Bad": "No dimensions on images",
+      "Severity": "High"
+    },
+    {
+      "No": "20",
+      "Category": "Layout",
+      "Issue": "Viewport Units",
+      "Platform": "Web",
+      "Description": "100vh can be problematic on mobile browsers",
+      "Do": "Use dvh or account for mobile browser chrome",
+      "Don't": "Use 100vh for full-screen mobile layouts",
+      "Code Example Good": "min-h-dvh or min-h-screen",
+      "Code Example Bad": "h-screen on mobile",
+      "Severity": "Medium"
+    }
+  ]
+}

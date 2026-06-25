@@ -143,7 +143,8 @@ export default function App() {
         <div style={{ position: "absolute", bottom: "8%", left: "-4%", width: 300, height: 300, borderRadius: "50%", background: `radial-gradient(circle,${cl.accent}22,transparent 70%)`, animation: "floaty 9s ease-in-out infinite" }} />
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "120px 24px 60px", position: "relative", zIndex: 2 }}>
           <Reveal><span style={{ display: "inline-block", padding: "8px 18px", borderRadius: r.pill, background: "#fff", color: cl.primary, fontSize: 13, fontWeight: 600, letterSpacing: 1, marginBottom: 28, boxShadow: T.shadow }}>{C.brand.badge}</span></Reveal>
-          <Reveal delay={0.1}><h1 className="display" style={{ fontSize: "clamp(38px,6vw,66px)", fontWeight: 700, lineHeight: 1.05, maxWidth: 720, marginBottom: 24 }}>{C.brand.tagline}</h1></Reveal>
+          {/* FIX: Siklus 3 -- H1=800 heading hierarchy */}
+          <Reveal delay={0.1}><h1 className="display" style={{ fontSize: "clamp(38px,6vw,66px)", fontWeight: 800, lineHeight: 1.05, maxWidth: 720, marginBottom: 24 }}>{C.brand.tagline}</h1></Reveal>
           <Reveal delay={0.2}><p style={{ fontSize: 19, lineHeight: 1.6, color: cl.primary, maxWidth: 540, marginBottom: 36, fontWeight: 300 }}>{C.seo.description}</p></Reveal>
           <Reveal delay={0.3}>
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -159,7 +160,8 @@ export default function App() {
         </div>
       </header>
 
-      <section id="layanan" style={{ padding: "100px 24px", maxWidth: 1180, margin: "0 auto" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="layanan" style={{ padding: "100px 24px", maxWidth: 1180, margin: "0 auto", scrollMarginTop: 90 }}>
         <Reveal><div style={{ textAlign: "center", marginBottom: 60 }}><span style={{ color: cl.accent, fontWeight: 600, fontSize: 14, letterSpacing: 2 }}>LAYANAN KAMI</span><h2 className="display" style={{ fontSize: "clamp(30px,4vw,44px)", fontWeight: 700, marginTop: 12 }}>Apa yang kami tawarkan</h2></div></Reveal>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 26 }}>
           {C.services.map((s, i) => (
@@ -174,14 +176,16 @@ export default function App() {
         </div>
       </section>
 
-      <section id="tentang" style={{ background: cl.secondary, color: "#fff", padding: "100px 24px" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="tentang" style={{ background: cl.secondary, color: "#fff", padding: "100px 24px", scrollMarginTop: 90 }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 60, alignItems: "center" }}>
           <Reveal><div><span style={{ color: cl.accent, fontWeight: 600, fontSize: 14, letterSpacing: 2 }}>TENTANG KAMI</span><h2 className="display" style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: 700, margin: "14px 0 24px", lineHeight: 1.15 }}>{C.about.title}</h2><p style={{ fontSize: 16, lineHeight: 1.7, opacity: .8, fontWeight: 300 }}>{C.about.desc}</p></div></Reveal>
           <Reveal delay={0.2}><div style={{ display: "grid", gap: 18 }}>{C.about.highlights.map((h, i) => (<div key={i} style={{ display: "flex", gap: 16, background: "rgba(255,255,255,.05)", padding: "20px 22px", borderRadius: r.card }}><div style={{ color: cl.accent, fontSize: 22 }}>✓</div><div><div style={{ fontWeight: 600, fontSize: 16, marginBottom: 4 }}>{h.title}</div><div style={{ fontSize: 14, opacity: .65, fontWeight: 300 }}>{h.desc}</div></div></div>))}</div></Reveal>
         </div>
       </section>
 
-      <section id="kontak" style={{ background: cl.mist, padding: "100px 24px" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="kontak" style={{ background: cl.mist, padding: "100px 24px", scrollMarginTop: 90 }}>
         <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
           <Reveal><span style={{ color: cl.accent, fontWeight: 600, fontSize: 14, letterSpacing: 2 }}>KONTAK</span><h2 className="display" style={{ fontSize: "clamp(28px,4.5vw,46px)", fontWeight: 700, margin: "14px 0 18px" }}>{C.seo.description}</h2></Reveal>
           <Reveal delay={0.15}><ContactForm theme={T} /></Reveal>

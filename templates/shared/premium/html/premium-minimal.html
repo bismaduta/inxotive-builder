@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal — Minimal Design</title>
+    <meta name="description" content="Minimal — Premium landing page with modern design">
+    <meta property="og:title" content="Minimal — Minimal Design">
+    <meta property="og:description" content="Minimal — Premium landing page with modern design, dark mode, and responsive layout.">
+    <meta property="og:image" content="https://placehold.co/1200x630/1A1A1A/white?text=Minimal">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>MIN</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* ════════════════════════════════════════ */
+
+/*  Design System: Minimal */
+
+/* ════════════════════════════════════════ */
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body { font-family: var(--font-body); font-size: var(--text-body); line-height: var(--line-height); background: var(--canvas); color: var(--ink); transition: background var(--anim-duration-normal), color var(--anim-duration-normal); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+img, video, canvas, svg { max-width: 100%; height: auto; display: block; }
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; font-size: inherit; border: none; background: none; }
+input, textarea, select { font-family: inherit; font-size: inherit; }
+ul, ol { list-style: none; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); line-height: var(--line-height-heading); }
+p { margin-bottom: var(--space-md); }
+p:last-child { margin-bottom: 0; }
+
+:root {
+  --brand-primary: #1A1A1A;
+  --brand-secondary: #555555;
+  --brand-accent: #888888;
+  --brand-success: #22C55E;
+  --brand-warning: #F59E0B;
+  --brand-danger: #EF4444;
+  --brand-info: #3B82F6;
+  --brand-bg: #FAFAFA;
+  --brand-surface: #F5F5F5;
+  --brand-text: #171717;
+  --brand-text-secondary: #737373;
+  --brand-border: #E5E5E5;
+  --brand-overlay: rgba(0,0,0,0.5);
+  --brand-glow: 0 0 20px rgba(0,0,0,0.1);
+  --brand-gradient: linear-gradient(135deg, #1A1A1A, #555555);
+
+  /* getdesign.md inspired */
+  --canvas: #FAFAFA;
+  --canvas-soft: #F5F5F5;
+  --ink: #171717;
+  --ink-muted: #737373;
+  --ink-subtle: #A3A3A3;
+  --body: #171717;
+  --hairline: #E5E5E5;
+  --hairline-strong: #D4D4D4;
+  --surface-1: #FFFFFF;
+  --surface-2: #FAFAFA;
+  --surface-3: #F5F5F5;
+  --surface-4: #E5E5E5;
+}
+
+.dark {
+  --brand-bg: #0A0A0A;
+  --brand-surface: #171717;
+  --brand-text: #E5E5E5;
+  --brand-border: #262626;
+  --canvas: #0A0A0A;
+  --canvas-soft: #171717;
+  --ink: #E5E5E5;
+  --ink-muted: #E5E5E5;
+  --ink-subtle: #262626;
+  --hairline: #262626;
+  --hairline-strong: #262626;
+  --surface-1: #171717;
+  --surface-2: #171717;
+  --surface-3: #262626;
+  --surface-4: #404040;
+}
+
+:root {
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --text-h1: 3.5rem;
+  --text-h2: 2.5rem;
+  --text-h3: 1.75rem;
+  --text-h4: 1.25rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-xs: 0.75rem;
+  --text-tiny: 0.625rem;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --line-height: 1.6;
+  --line-height-heading: 1.2;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-wide: 0.025em;
+}
+
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+  --space-xxxl: 64px;
+  --space-section: 96px;
+  --space-section-sm: 64px;
+  --space-section-lg: 128px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+}
+
+:root {
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 50px rgba(0,0,0,0.12);
+  --shadow-2xl: 0 25px 60px rgba(0,0,0,0.15);
+  --shadow-glow: 0 0 30px var(--brand-glow, rgba(0,0,0,0.1));
+  --shadow-inner: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+:root {
+  --anim-duration-fast: 0.2s;
+  --anim-duration-normal: 0.3s;
+  --anim-duration-slow: 0.6s;
+  --anim-duration-xl: 1s;
+  --anim-easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --anim-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --anim-easing-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --anim-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-scale-hover: 1.05;
+  --anim-scale-active: 0.98;
+  --anim-translate-hover: -4px;
+}
+
+@keyframes vfx-fade-in-up { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes vfx-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes vfx-float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
+@keyframes vfx-float-reverse { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(12px); } }
+@keyframes vfx-gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes vfx-count-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-scale-in { 0% { opacity: 0; transform: scale(0.8); } 70% { transform: scale(1.02); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes vfx-slide-up { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes vfx-spin-slow { 0% { transform: rotate(0); } 100% { transform: rotate(360deg); } }
+@keyframes vfx-pulse-glow { 0%,100% { box-shadow: 0 0 5px var(--glow, rgba(0,0,0,0.2)); } 50% { box-shadow: 0 0 30px var(--glow, rgba(0,0,0,0.5)); } }
+@keyframes vfx-wave { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(0.5); } }
+@keyframes vfx-kenburns { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+
+.vfx-fade-in-up { animation: vfx-fade-in-up var(--anim-duration-slow) var(--anim-easing-smooth) forwards; }
+.vfx-fade-in { animation: vfx-fade-in var(--anim-duration-normal) var(--anim-easing-default) forwards; }
+.vfx-float { animation: vfx-float 3s ease-in-out infinite; }
+.vfx-float-2 { animation: vfx-float-reverse 4s ease-in-out infinite; }
+.vfx-gradient-shift { background-size: 200% 200%; animation: vfx-gradient-shift 4s ease infinite; }
+.vfx-scale-in { animation: vfx-scale-in 0.4s var(--anim-easing-bounce) forwards; }
+.vfx-slide-up { animation: vfx-slide-up 0.6s var(--anim-easing-smooth) forwards; }
+.vfx-spin-slow { animation: vfx-spin-slow 8s linear infinite; }
+.vfx-pulse-glow { animation: vfx-pulse-glow 2s ease-in-out infinite; }
+.vfx-shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); background-size: 200% 100%; animation: vfx-shimmer 2s infinite; }
+
+/* ── Layout ── */
+.container { max-width: 1280px; margin: 0 auto; padding: 0 var(--space-md); }
+.container--narrow { max-width: 800px; }
+.container--wide { max-width: 1400px; }
+.section { padding: var(--space-section) 0; }
+.section-sm { padding: var(--space-section-sm) 0; }
+.section-lg { padding: var(--space-section-lg) 0; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.grid-center { display: grid; place-items: center; }
+.stack { display: flex; flex-direction: column; }
+.stack-sm { gap: var(--space-sm); }
+.stack-md { gap: var(--space-md); }
+.stack-lg { gap: var(--space-lg); }
+.stack-xl { gap: var(--space-xl); }
+.inline-flex-center { display: inline-flex; align-items: center; justify-content: center; }
+
+/* ── Typography ── */
+.heading-1 { font-family: var(--font-display); font-size: var(--text-h1); font-weight: var(--font-weight-bold); line-height: var(--line-height-heading); letter-spacing: var(--letter-spacing-tight); }
+.heading-2 { font-family: var(--font-display); font-size: var(--text-h2); font-weight: var(--font-weight-bold); line-height: var(--line-height-heading); letter-spacing: var(--letter-spacing-tight); }
+.heading-3 { font-family: var(--font-display); font-size: var(--text-h3); font-weight: var(--font-weight-semibold); line-height: var(--line-height-heading); }
+.heading-4 { font-family: var(--font-display); font-size: var(--text-h4); font-weight: var(--font-weight-semibold); }
+.body-text { font-family: var(--font-body); font-size: var(--text-body); line-height: var(--line-height); }
+.text-small { font-size: var(--text-small); }
+.text-xs { font-size: var(--text-xs); }
+.text-gradient { background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.text-muted { color: var(--brand-text-secondary); }
+
+/* ── Glass Effects ── */
+.glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+.glass-dark { background: rgba(0,0,0,0.3); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
+.glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+.glass-card-light { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.8); }
+.dark .glass-card-light { background: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.08); }
+.glass-card-solid { background: var(--surface-1); border: 1px solid var(--hairline); }
+
+/* ── Glow Orbs ── */
+.glow-orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+.glow-orb-sm { width: 150px; height: 150px; }
+.glow-orb-md { width: 300px; height: 300px; }
+.glow-orb-lg { width: 500px; height: 500px; }
+.glow-orb-xl { width: 700px; height: 700px; }
+
+/* ── Hover Effects ── */
+.hover-lift { transition: all var(--anim-duration-normal) var(--anim-easing-default); }
+.hover-lift:hover { transform: translateY(var(--anim-translate-hover)); box-shadow: var(--shadow-lg); }
+.hover-glow { transition: all var(--anim-duration-normal) var(--anim-easing-default); }
+.hover-glow:hover { box-shadow: var(--shadow-glow); transform: scale(var(--anim-scale-hover)); }
+.hover-scale { transition: transform var(--anim-duration-normal) var(--anim-easing-default); }
+.hover-scale:hover { transform: scale(var(--anim-scale-hover)); }
+.hover-bright { transition: all var(--anim-duration-normal) var(--anim-easing-default); }
+.hover-bright:hover { filter: brightness(1.1); }
+
+/* ── Premium Shadows ── */
+.shadow-premium { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.08), 0 20px 40px -4px rgba(0,0,0,0.06); }
+.shadow-card { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+.shadow-elevated { box-shadow: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04); }
+.shadow-deep { box-shadow: 0 20px 50px rgba(0,0,0,0.12), 0 8px 20px rgba(0,0,0,0.06); }
+
+/* ── Misc ── */
+.gradient-bg { background: var(--brand-gradient); }
+.gradient-text-only { background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+.hidden-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.hidden-scrollbar::-webkit-scrollbar { display: none; }
+.aspect-video { aspect-ratio: 16/9; }
+.aspect-square { aspect-ratio: 1/1; }
+.aspect-portrait { aspect-ratio: 3/4; }
+.object-cover { object-fit: cover; }
+.object-contain { object-fit: contain; }
+
+/* ── Section Backgrounds ── */
+.section--light { background: var(--canvas); }
+.section--surface { background: var(--surface-1); }
+.section--accent { background: var(--brand-primary); color: #fff; }
+.section--accent .section__heading { color: #fff; }
+.section--accent .section__subheading { color: rgba(255,255,255,0.9); }
+.section--accent .text-muted { color: rgba(255,255,255,0.7); }
+.section--dark { background: var(--brand-text); color: #fff; }
+.section--dark .section__heading { color: #fff; }
+.section--dark .section__subheading { color: rgba(255,255,255,0.7); }
+.section--dark .text-muted { color: rgba(255,255,255,0.6); }
+
+/* Auto-alternating */
+.section--alternate { background: var(--surface-2); }
+.template-sections > .section:nth-child(even):not(.section--hero):not(.section--accent):not(.section--dark):not(.section--light) { background: var(--surface-2); }
+
+/* Heading styles in sections */
+.section__heading { font-family: var(--font-display); font-size: var(--text-h2); font-weight: var(--font-weight-bold); line-height: var(--line-height-heading); margin-bottom: var(--space-sm); }
+.section__subheading { font-family: var(--font-body); font-size: var(--text-body); color: var(--brand-text-secondary); max-width: 600px; margin: 0 auto; }
+
+/* Section reveal */
+.section--reveal { opacity: 0; transform: translateY(30px); transition: opacity var(--anim-duration-slow) var(--anim-easing-smooth), transform var(--anim-duration-slow) var(--anim-easing-smooth); }
+.section--reveal.visible { opacity: 1; transform: translateY(0); }
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.3s; }
+.stagger-4 { transition-delay: 0.4s; }
+.stagger-5 { transition-delay: 0.5s; }
+
+/* ── Responsive Breakpoints ── */
+/* Mobile-first: base = 375px+ */
+
+/* sm: 640px */
+@media (min-width: 640px) {
+  .container { padding: 0 var(--space-lg); }
+  .heading-1 { font-size: 4rem; }
+  .heading-2 { font-size: 3rem; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-xl); }
+  .grid-3 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
+}
+
+/* md: 768px */
+@media (min-width: 768px) {
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
+  .section { padding: 120px 0; }
+  :root { --text-h1: 4.5rem; --text-h2: 3.5rem; }
+}
+
+/* lg: 1024px */
+@media (min-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-lg); }
+  .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-md); }
+  .section { padding: 140px 0; }
+  :root { --text-h1: 5rem; --text-h2: 4rem; --text-h3: 2rem; }
+}
+
+/* xl: 1280px */
+@media (min-width: 1280px) {
+  :root { --text-h1: 5.5rem; --text-h2: 4.5rem; }
+}
+
+/* ── Accessibility ── */
+:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .vfx-float, .vfx-float-2 { animation: none !important; }
+}
+::selection { background: var(--brand-primary); color: #fff; }
+.skip-link { position: absolute; top: -100%; left: var(--space-md); padding: var(--space-sm) var(--space-md); background: var(--brand-primary); color: #fff; z-index: 10000; border-radius: var(--radius-md); }
+.skip-link:focus { top: var(--space-sm); }
+    </style>
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="glass" role="navigation" style="position:fixed;top:0;left:0;right:0;z-index:50;border-bottom:1px solid var(--hairline)">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;height:64px">
+    <a href="#" class="heading-4" style="background:var(--brand-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Minimal</a>
+    <div class="nav-links" style="display:flex;gap:var(--space-xl)">
+      <a href="#features" class="text-small" style="color:var(--ink-muted);transition:color var(--anim-duration-fast)">Fitur</a>
+      <a href="#pricing" class="text-small" style="color:var(--ink-muted);transition:color var(--anim-duration-fast)">Harga</a>
+      <a href="#about" class="text-small" style="color:var(--ink-muted);transition:color var(--anim-duration-fast)">Tentang</a>
+      <a href="#contact" class="text-small" style="color:var(--ink-muted);transition:color var(--anim-duration-fast)">Kontak</a>
+    </div>
+    <a href="#cta" class="btn-primary" style="padding:10px 24px;background:var(--brand-gradient);color:#fff;border-radius:var(--radius-full);font-size:var(--text-small);font-weight:var(--font-weight-semibold);transition:all var(--anim-duration-normal) var(--anim-easing-default)">Hubungi Kami</a>
+  </div>
+</nav>
+
+    <main id="main">
+        <div class="template-sections">
+<section class="section section--hero section--light" role="region" aria-label="Hero" style="text-align:center;position:relative;overflow:hidden">
+  <div class="glow-orb glow-orb-lg" style="background:radial-gradient(circle, #1A1A1A15 0%, transparent 70%);top:-20%;left:50%;transform:translateX(-50%)"></div>
+  <div class="container container--narrow" style="position:relative;z-index:1">
+    <div class="vfx-slide-up">
+      <span class="badge" style="display:inline-block;padding:8px 20px;background:rgba(26,26,26,0.1);color:var(--brand-primary);border-radius:var(--radius-full);font-size:var(--text-small);font-weight:var(--font-weight-semibold);margin-bottom:var(--space-lg)">Minimal Design</span>
+      <h1 class="heading-1" style="margin-bottom:var(--space-lg)">Minimal</h1>
+      <p class="body-text text-muted" style="font-size:1.125rem;max-width:600px;margin:0 auto var(--space-xl)">Solusi lengkap untuk transformasi digital bisnis Anda. Cepat, modern, dan terpercaya.</p>
+      <div class="flex" style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
+        <a href="#cta" class="btn-primary" style="display:inline-flex;align-items:center;gap:var(--space-sm);padding:16px 36px;background:var(--brand-gradient);color:#fff;border-radius:var(--radius-full);font-weight:var(--font-weight-semibold);transition:all var(--anim-duration-normal) var(--anim-easing-default);box-shadow:var(--shadow-lg)">Mulai Sekarang</a>
+        <a href="#features" class="btn-secondary" style="display:inline-flex;align-items:center;gap:var(--space-sm);padding:16px 36px;border:1px solid var(--hairline);border-radius:var(--radius-full);font-weight:var(--font-weight-medium);transition:all var(--anim-duration-normal) var(--anim-easing-default)">Pelajari Lebih Lanjut</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section section--surface section--reveal" role="region" aria-label="Fitur" id="features">
+  <div class="container">
+    <div class="section__header" style="text-align:center;margin-bottom:var(--space-xxl)">
+      <span class="text-small" style="color:var(--brand-primary);font-weight:var(--font-weight-semibold);text-transform:uppercase;letter-spacing:var(--letter-spacing-wide)">FITUR</span>
+      <h2 class="section__heading">Semua yang Anda Butuhkan</h2>
+      <p class="section__subheading">Platform lengkap dengan fitur-fitur canggih untuk mengembangkan bisnis Anda.</p>
+    </div>
+    <div class="grid-3" style="gap:var(--space-lg)"><div class="glass-card-solid card-feature hover-lift stagger-1" style="padding:var(--space-xl);border-radius:var(--radius-lg);text-align:center;transition:all var(--anim-duration-normal) var(--anim-easing-default)"><div style="font-size:2.5rem;margin-bottom:var(--space-md)">🚀</div><h3 class="heading-4" style="margin-bottom:var(--space-sm)">Kilat Cepat</h3><p class="body-text text-muted text-small">Optimasi performa terbaik dengan teknologi terkini untuk kecepatan maksimal.</p></div>
+<div class="glass-card-solid card-feature hover-lift stagger-2" style="padding:var(--space-xl);border-radius:var(--radius-lg);text-align:center;transition:all var(--anim-duration-normal) var(--anim-easing-default)"><div style="font-size:2.5rem;margin-bottom:var(--space-md)">🔒</div><h3 class="heading-4" style="margin-bottom:var(--space-sm)">Aman & Terpercaya</h3><p class="body-text text-muted text-small">Enkripsi end-to-end dan keamanan berlapis untuk data Anda.</p></div>
+<div class="glass-card-solid card-feature hover-lift stagger-3" style="padding:var(--space-xl);border-radius:var(--radius-lg);text-align:center;transition:all var(--anim-duration-normal) var(--anim-easing-default)"><div style="font-size:2.5rem;margin-bottom:var(--space-md)">🎨</div><h3 class="heading-4" style="margin-bottom:var(--space-sm)">Desain Modern</h3><p class="body-text text-muted text-small">Tampilan premium dengan UI/UX terkini yang memukau pengunjung.</p></div>
+<div class="glass-card-solid card-feature hover-lift stagger-4" style="padding:var(--space-xl);border-radius:var(--radius-lg);text-align:center;transition:all var(--anim-duration-normal) var(--anim-easing-default)"><div style="font-size:2.5rem;margin-bottom:var(--space-md)">📊</div><h3 class="heading-4" style="margin-bottom:var(--space-sm)">Analitik Real-time</h3><p class="body-text text-muted text-small">Pantau performa bisnis Anda dengan dashboard analitik langsung.</p></div>
+<div class="glass-card-solid card-feature hover-lift stagger-5" style="padding:var(--space-xl);border-radius:var(--radius-lg);text-align:center;transition:all var(--anim-duration-normal) var(--anim-easing-default)"><div style="font-size:2.5rem;margin-bottom:var(--space-md)">🤖</div><h3 class="heading-4" style="margin-bottom:var(--space-sm)">AI-Powered</h3><p class="body-text text-muted text-small">Otomatisasi cerdas dengan teknologi AI untuk efisiensi maksimal.</p></div>
+<div class="glass-card-solid card-feature hover-lift stagger-1" style="padding:var(--space-xl);border-radius:var(--radius-lg);text-align:center;transition:all var(--anim-duration-normal) var(--anim-easing-default)"><div style="font-size:2.5rem;margin-bottom:var(--space-md)">📱</div><h3 class="heading-4" style="margin-bottom:var(--space-sm)">Mobile First</h3><p class="body-text text-muted text-small">Responsive sempurna di semua perangkat dari desktop hingga mobile.</p></div></div>
+  </div>
+</section>
+<section class="section section--accent section--reveal" role="region" aria-label="Statistik" style="text-align:center">
+  <div class="container">
+    <div class="grid-4" style="gap:var(--space-xl)">
+      <div class="stat-item vfx-fade-in-up stagger-1">
+        <div class="heading-1" style="color:#fff;font-weight:var(--font-weight-extrabold)">500+</div>
+        <p style="color:rgba(255,255,255,0.8);font-size:var(--text-body)">Klien Puas</p>
+      </div>
+      <div class="stat-item vfx-fade-in-up stagger-2">
+        <div class="heading-1" style="color:#fff;font-weight:var(--font-weight-extrabold)">99.9%</div>
+        <p style="color:rgba(255,255,255,0.8);font-size:var(--text-body)">Uptime Garansi</p>
+      </div>
+      <div class="stat-item vfx-fade-in-up stagger-3">
+        <div class="heading-1" style="color:#fff;font-weight:var(--font-weight-extrabold)">50K+</div>
+        <p style="color:rgba(255,255,255,0.8);font-size:var(--text-body)">Jam Koding</p>
+      </div>
+      <div class="stat-item vfx-fade-in-up stagger-4">
+        <div class="heading-1" style="color:#fff;font-weight:var(--font-weight-extrabold)">15+</div>
+        <p style="color:rgba(255,255,255,0.8);font-size:var(--text-body)">Tahun Pengalaman</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section section--surface section--reveal" role="region" aria-label="Tentang" id="about">
+  <div class="container">
+    <div class="about-split" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-xxl);align-items:center">
+      <div class="vfx-slide-up">
+        <span class="text-small" style="color:var(--brand-primary);font-weight:var(--font-weight-semibold);text-transform:uppercase;letter-spacing:var(--letter-spacing-wide)">TENTANG KAMI</span>
+        <h2 class="heading-2" style="margin-bottom:var(--space-lg);margin-top:var(--space-sm)">Kisah Kami dalam Membangun Masa Depan Digital</h2>
+        <p class="body-text" style="margin-bottom:var(--space-md)">Bermula dari sebuah visi kecil di tahun 2020, INXOTIVE OFFICE hadir untuk membantu bisnis lokal bertransformasi digital. Kami percaya bahwa teknologi hebat harus terjangkau untuk semua.</p>
+        <p class="body-text text-muted" style="margin-bottom:var(--space-xl)">Dengan tim yang terdiri dari developer, desainer, dan strategis digital berpengalaman, kami telah membantu 500+ bisnis di Indonesia membangun kehadiran online mereka.</p>
+        <div class="flex" style="display:flex;gap:var(--space-xl);flex-wrap:wrap">
+          <div><strong class="heading-3" style="color:var(--brand-primary)">5+</strong><p class="text-small text-muted">Tahun</p></div>
+          <div><strong class="heading-3" style="color:var(--brand-primary)">500+</strong><p class="text-small text-muted">Project</p></div>
+          <div><strong class="heading-3" style="color:var(--brand-primary)">50+</strong><p class="text-small text-muted">Tim Ahli</p></div>
+        </div>
+      </div>
+      <div class="about-image vfx-float" style="background:var(--surface-3);border-radius:var(--radius-lg);height:400px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:var(--shadow-lg)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:24px;width:100%">
+          <div style="height:120px;background:var(--brand-primary);opacity:0.15;border-radius:var(--radius-md)"></div>
+          <div style="height:120px;background:var(--brand-accent);opacity:0.15;border-radius:var(--radius-md);margin-top:30px"></div>
+          <div style="height:80px;background:var(--brand-secondary);opacity:0.12;border-radius:var(--radius-md);grid-column:1/-1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section section--light section--reveal" role="region" aria-label="Testimoni">
+  <div class="container">
+    <div class="section__header" style="text-align:center;margin-bottom:var(--space-xxl)">
+      <h2 class="section__heading">Apa Kata Mereka</h2>
+      <p class="section__subheading">Testimoni dari klien yang sudah merasakan manfaat platform kami.</p>
+    </div>
+    <div class="grid-3" style="gap:var(--space-lg)"><div class="glass-card-solid hover-lift stagger-1" style="padding:var(--space-xl);border-radius:var(--radius-lg);position:relative"><div style="font-size:3rem;color:var(--brand-primary);opacity:0.2;position:absolute;top:16px;right:20px;font-family:serif;line-height:1">"</div><p class="body-text" style="margin-bottom:var(--space-lg);font-style:italic;position:relative;z-index:1">"Platform ini benar-benar mengubah cara kami bekerja. Produktivitas tim meningkat 300% dalam 3 bulan pertama."</p><div class="flex" style="display:flex;align-items:center;gap:var(--space-md)"><div style="width:44px;height:44px;border-radius:50%;background:var(--brand-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:var(--font-weight-bold)">B</div><div><strong style="font-size:var(--text-small)">Bisma</strong><p class="text-xs text-muted">CEO INXOTIVE</p></div></div></div>
+<div class="glass-card-solid hover-lift stagger-2" style="padding:var(--space-xl);border-radius:var(--radius-lg);position:relative"><div style="font-size:3rem;color:var(--brand-primary);opacity:0.2;position:absolute;top:16px;right:20px;font-family:serif;line-height:1">"</div><p class="body-text" style="margin-bottom:var(--space-lg);font-style:italic;position:relative;z-index:1">"Dashboard yang intuitif dan fitur yang lengkap. Sangat recommended untuk bisnis di era digital."</p><div class="flex" style="display:flex;align-items:center;gap:var(--space-md)"><div style="width:44px;height:44px;border-radius:50%;background:var(--brand-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:var(--font-weight-bold)">S</div><div><strong style="font-size:var(--text-small)">Sava Y.</strong><p class="text-xs text-muted">Founder Yoga Studio</p></div></div></div>
+<div class="glass-card-solid hover-lift stagger-3" style="padding:var(--space-xl);border-radius:var(--radius-lg);position:relative"><div style="font-size:3rem;color:var(--brand-primary);opacity:0.2;position:absolute;top:16px;right:20px;font-family:serif;line-height:1">"</div><p class="body-text" style="margin-bottom:var(--space-lg);font-style:italic;position:relative;z-index:1">"Pelayanan cepat, hasil maksimal. Tim INXOTIVE sangat profesional dan responsif terhadap kebutuhan kami."</p><div class="flex" style="display:flex;align-items:center;gap:var(--space-md)"><div style="width:44px;height:44px;border-radius:50%;background:var(--brand-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:var(--font-weight-bold)">M</div><div><strong style="font-size:var(--text-small)">M. Place</strong><p class="text-xs text-muted">Owner Restaurant</p></div></div></div></div>
+  </div>
+</section>
+<section class="section section--light section--reveal" role="region" aria-label="Pricing" id="pricing">
+  <div class="container">
+    <div class="section__header" style="text-align:center;margin-bottom:var(--space-xxl)">
+      <span class="text-small" style="color:var(--brand-primary);font-weight:var(--font-weight-semibold);text-transform:uppercase;letter-spacing:var(--letter-spacing-wide)">PRICING</span>
+      <h2 class="section__heading">Harga Transparan</h2>
+      <p class="section__subheading">Pilih paket yang sesuai dengan kebutuhan bisnis Anda.</p>
+    </div>
+    <div class="grid-3" style="gap:var(--space-lg);align-items:start"><div class="glass-card-solid hover-lift stagger-1" style="padding:var(--space-xxl);border-radius:var(--radius-lg);text-align:center;"><h3 class="heading-3" style="margin-bottom:var(--space-sm)">Starter</h3><p class="text-small text-muted" style="margin-bottom:var(--space-lg)">Perfect untuk pemula</p><div class="heading-2" style="margin-bottom:var(--space-lg)">Rp 1.5jt<span class="text-small text-muted" style="font-family:var(--font-body)">/project</span></div><ul style="text-align:left;margin-bottom:var(--space-xl)"><li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>1 Website</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>5 Halaman</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>SSL Gratis</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Support Email</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Mobile Friendly</li></ul><a href="#cta" style="display:block;padding:14px 0;border-radius:var(--radius-full);font-weight:var(--font-weight-semibold);border:1px solid var(--hairline);transition:all var(--anim-duration-normal)">Pilih Paket</a></div><div class="glass-card-solid hover-lift stagger-2" style="padding:var(--space-xxl);border-radius:var(--radius-lg);text-align:center;transform:scale(1.05);border:2px solid var(--brand-primary);position:relative"><div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--brand-primary);color:#fff;padding:4px 16px;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:var(--font-weight-semibold)">POPULER</div><h3 class="heading-3" style="margin-bottom:var(--space-sm)">Professional</h3><p class="text-small text-muted" style="margin-bottom:var(--space-lg)">Untuk bisnis berkembang</p><div class="heading-2" style="margin-bottom:var(--space-lg)">Rp 3.5jt<span class="text-small text-muted" style="font-family:var(--font-body)">/project</span></div><ul style="text-align:left;margin-bottom:var(--space-xl)"><li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>10 Website</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Unlimited Halaman</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>SSL + CDN</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Support Prioritas</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>SEO Optimasi</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Analitik</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>AI Chatbot</li></ul><a href="#cta" style="display:block;padding:14px 0;border-radius:var(--radius-full);font-weight:var(--font-weight-semibold);background:var(--brand-gradient);color:#fff;transition:all var(--anim-duration-normal)">Pilih Paket</a></div><div class="glass-card-solid hover-lift stagger-3" style="padding:var(--space-xxl);border-radius:var(--radius-lg);text-align:center;"><h3 class="heading-3" style="margin-bottom:var(--space-sm)">Enterprise</h3><p class="text-small text-muted" style="margin-bottom:var(--space-lg)">Solusi lengkap korporat</p><div class="heading-2" style="margin-bottom:var(--space-lg)">Rp 7.5jt<span class="text-small text-muted" style="font-family:var(--font-body)">/project</span></div><ul style="text-align:left;margin-bottom:var(--space-xl)"><li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Unlimited Website</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Custom Fitur</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Dedicated Server</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>24/7 Support</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Full SEO Suite</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>API Integration</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Tim Khusus</li>
+<li style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-primary)" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>SLA 99.9%</li></ul><a href="#cta" style="display:block;padding:14px 0;border-radius:var(--radius-full);font-weight:var(--font-weight-semibold);border:1px solid var(--hairline);transition:all var(--anim-duration-normal)">Pilih Paket</a></div></div>
+  </div>
+</section>
+<section class="section section--light section--reveal" role="region" aria-label="FAQ" id="faq">
+  <div class="container container--narrow">
+    <div class="section__header" style="text-align:center;margin-bottom:var(--space-xxl)">
+      <h2 class="section__heading">Pertanyaan Umum</h2>
+      <p class="section__subheading">Jawaban cepat untuk pertanyaan yang sering diajukan.</p>
+    </div>
+    <div style="border-top:1px solid var(--hairline);border-radius:var(--radius-lg);overflow:hidden;background:var(--surface-1)"><details class="faq-item" style="padding:var(--space-lg);border-bottom:1px solid var(--hairline);cursor:pointer"><summary style="font-weight:var(--font-weight-semibold);display:flex;align-items:center;justify-content:space-between;list-style:none">Berapa lama proses pembuatan website?<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform var(--anim-duration-normal)"><path d="M6 9l6 6 6-6"/></svg></summary><p class="body-text text-muted" style="margin-top:var(--space-md);padding-right:var(--space-xxl)">Untuk landing page, proses pengerjaan 2-4 jam setelah brief clear. Company profile 1-2 hari. Project kompleks 3-7 hari tergantung scope.</p></details>
+<details class="faq-item" style="padding:var(--space-lg);border-bottom:1px solid var(--hairline);cursor:pointer"><summary style="font-weight:var(--font-weight-semibold);display:flex;align-items:center;justify-content:space-between;list-style:none">Apakah saya bisa request revisi?<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform var(--anim-duration-normal)"><path d="M6 9l6 6 6-6"/></svg></summary><p class="body-text text-muted" style="margin-top:var(--space-md);padding-right:var(--space-xxl)">Tentu! Setiap paket termasuk 2x revisi. Revisi tambahan dikenakan biaya sesuai kompleksitas.</p></details>
+<details class="faq-item" style="padding:var(--space-lg);border-bottom:1px solid var(--hairline);cursor:pointer"><summary style="font-weight:var(--font-weight-semibold);display:flex;align-items:center;justify-content:space-between;list-style:none">Teknologi apa yang digunakan?<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform var(--anim-duration-normal)"><path d="M6 9l6 6 6-6"/></svg></summary><p class="body-text text-muted" style="margin-top:var(--space-md);padding-right:var(--space-xxl)">Kami menggunakan React/Vite/Tailwind untuk frontend, FastAPI untuk backend. Deploy ke Vercel atau Cloudflare Pages dengan performa tinggi.</p></details>
+<details class="faq-item" style="padding:var(--space-lg);border-bottom:1px solid var(--hairline);cursor:pointer"><summary style="font-weight:var(--font-weight-semibold);display:flex;align-items:center;justify-content:space-between;list-style:none">Apakah termasuk maintenance?<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform var(--anim-duration-normal)"><path d="M6 9l6 6 6-6"/></svg></summary><p class="body-text text-muted" style="margin-top:var(--space-md);padding-right:var(--space-xxl)">Paket Professional dan Enterprise termasuk maintenance bulanan. Paket Starter bisa add-on maintenance terpisah.</p></details></div>
+  </div>
+</section>
+<section class="section section--reveal" role="region" aria-label="Call to Action" id="cta" style="background:linear-gradient(135deg, var(--brand-primary), color-mix(in srgb, var(--brand-primary) 70%, var(--brand-accent)));text-align:center;position:relative;overflow:hidden">
+  <div class="glow-orb glow-orb-lg" style="background:radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);top:-30%;left:20%"></div>
+  <div class="container container--narrow" style="position:relative;z-index:1">
+    <div class="vfx-scale-in">
+      <h2 class="heading-2" style="color:#fff;margin-bottom:var(--space-md)">Siap Memulai?</h2>
+      <p class="body-text" style="color:rgba(255,255,255,0.85);margin-bottom:var(--space-xl);font-size:1.125rem">Gabung dengan ratusan bisnis lain yang sudah bertransformasi digital bersama INXOTIVE.</p>
+      <div class="flex" style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
+        <a href="#contact" style="display:inline-flex;align-items:center;gap:var(--space-sm);padding:16px 36px;background:#fff;color:var(--brand-primary);border-radius:var(--radius-full);font-weight:var(--font-weight-semibold);transition:all var(--anim-duration-normal) var(--anim-easing-default);box-shadow:var(--shadow-lg)">Hubungi Kami</a>
+        <a href="#pricing" style="display:inline-flex;align-items:center;gap:var(--space-sm);padding:16px 36px;border:2px solid rgba(255,255,255,0.3);color:#fff;border-radius:var(--radius-full);font-weight:var(--font-weight-medium);transition:all var(--anim-duration-normal) var(--anim-easing-default)">Lihat Pricing</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section section--surface section--reveal" role="region" aria-label="Kontak" id="contact">
+  <div class="container">
+    <div class="contact-split" style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-xxl)">
+      <div>
+        <span class="text-small" style="color:var(--brand-primary);font-weight:var(--font-weight-semibold);text-transform:uppercase;letter-spacing:var(--letter-spacing-wide)">KONTAK</span>
+        <h2 class="heading-2" style="margin-bottom:var(--space-lg);margin-top:var(--space-sm)">Mari Diskusi</h2>
+        <p class="body-text text-muted" style="margin-bottom:var(--space-xl)">Tim kami siap membantu Anda. Hubungi kami untuk konsultasi gratis.</p>
+        <div class="contact-info" style="display:flex;flex-direction:column;gap:var(--space-lg)">
+          <div class="flex" style="display:flex;align-items:center;gap:var(--space-md)"><div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--brand-primary)">📧</div><div><strong style="font-size:var(--text-small)">Email</strong><p class="text-small text-muted">hello@inxotive.com</p></div></div>
+          <div class="flex" style="display:flex;align-items:center;gap:var(--space-md)"><div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--brand-primary)">📍</div><div><strong style="font-size:var(--text-small)">Lokasi</strong><p class="text-small text-muted">Bali, Indonesia</p></div></div>
+          <div class="flex" style="display:flex;align-items:center;gap:var(--space-md)"><div style="width:48px;height:48px;border-radius:var(--radius-md);background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--brand-primary)">📱</div><div><strong style="font-size:var(--text-small)">WhatsApp</strong><p class="text-small text-muted">+62 811-9988-7766</p></div></div>
+        </div>
+      </div>
+      <div class="contact-form glass-card-solid" style="padding:var(--space-xxl);border-radius:var(--radius-lg)">
+        <form onsubmit="event.preventDefault();alert('Terima kasih! Kami akan menghubungi Anda segera.')">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md)">
+            <input type="text" placeholder="Nama" required style="padding:12px 16px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-2);color:var(--ink);width:100%">
+            <input type="email" placeholder="Email" required style="padding:12px 16px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-2);color:var(--ink);width:100%">
+          </div>
+          <input type="text" placeholder="Subjek" style="padding:12px 16px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-2);color:var(--ink);width:100%;margin-bottom:var(--space-md)">
+          <textarea placeholder="Pesan" rows="4" required style="padding:12px 16px;border:1px solid var(--hairline);border-radius:var(--radius-md);background:var(--surface-2);color:var(--ink);width:100%;margin-bottom:var(--space-md);resize:vertical;font-family:inherit"></textarea>
+          <button type="submit" style="width:100%;padding:14px;background:var(--brand-gradient);color:#fff;border-radius:var(--radius-full);font-weight:var(--font-weight-semibold);transition:all var(--anim-duration-normal) var(--anim-easing-default)">Kirim Pesan</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+        </div>
+    </main>
+
+<footer class="section section--dark" role="contentinfo" style="padding:var(--space-xxl) 0 var(--space-lg)">
+  <div class="container">
+    <div class="footer-grid" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:var(--space-xxl);margin-bottom:var(--space-xxl)">
+      <div>
+        <h3 class="heading-4" style="color:#fff;margin-bottom:var(--space-md)">Minimal</h3>
+        <p class="text-small" style="color:rgba(255,255,255,0.6);max-width:300px">Platform all-in-one untuk transformasi digital bisnis Anda. Cepat, modern, dan terpercaya.</p>
+      </div>
+      <div>
+        <h4 style="color:#fff;font-size:var(--text-small);font-weight:var(--font-weight-semibold);margin-bottom:var(--space-md);text-transform:uppercase;letter-spacing:var(--letter-spacing-wide)">Layanan</h4>
+        <ul style="display:flex;flex-direction:column;gap:var(--space-sm)"><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">Website</a></li><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">SEO</a></li><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">Maintenance</a></li></ul>
+      </div>
+      <div>
+        <h4 style="color:#fff;font-size:var(--text-small);font-weight:var(--font-weight-semibold);margin-bottom:var(--space-md);text-transform:uppercase;letter-spacing:var(--letter-spacing-wide)">Perusahaan</h4>
+        <ul style="display:flex;flex-direction:column;gap:var(--space-sm)"><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">Tentang</a></li><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">Karir</a></li><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">Blog</a></li></ul>
+      </div>
+      <div>
+        <h4 style="color:#fff;font-size:var(--text-small);font-weight:var(--font-weight-semibold);margin-bottom:var(--space-md);text-transform:uppercase;letter-spacing:var(--letter-spacing-wide)">Kontak</h4>
+        <ul style="display:flex;flex-direction:column;gap:var(--space-sm)"><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">hello@inxotive.com</a></li><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">+62 811-9988-7766</a></li><li><a href="#" class="text-small" style="color:rgba(255,255,255,0.6);transition:color var(--anim-duration-fast)">Bali, Indonesia</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom" style="padding-top:var(--space-lg);border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-md)">
+      <p class="text-xs" style="color:rgba(255,255,255,0.4)">© 2026 Minimal. All rights reserved.</p>
+      <div class="flex" style="display:flex;gap:var(--space-md)"><a href="#" class="text-xs" style="color:rgba(255,255,255,0.4);transition:color var(--anim-duration-fast)">Privacy</a><a href="#" class="text-xs" style="color:rgba(255,255,255,0.4);transition:color var(--anim-duration-fast)">Terms</a></div>
+    </div>
+  </div>
+</section>
+<script>
+(function(){
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('visible')}
+    })
+  },{threshold:0.1});
+  document.addEventListener('DOMContentLoaded',function(){
+    document.querySelectorAll('.section--reveal').forEach(function(el){observer.observe(el)});
+  });
+})();
+</script>
+</body>
+</html>

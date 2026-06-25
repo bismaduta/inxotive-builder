@@ -155,7 +155,8 @@ export default function App() {
         <div style={{ position: "absolute", bottom: "8%", left: "-4%", width: 300, height: 300, borderRadius: "50%", background: `radial-gradient(circle,${cl.accent}22,transparent 70%)`, animation: "floaty 9s ease-in-out infinite" }} />
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "120px 24px 60px", position: "relative", zIndex: 2 }}>
           <Reveal><span style={{ display: "inline-block", padding: "8px 18px", borderRadius: r.pill, background: "#fff", color: cl.primary, fontSize: 13, fontWeight: 600, letterSpacing: 1, marginBottom: 28, boxShadow: T.shadow }}>{C.brand.badge}</span></Reveal>
-          <Reveal delay={0.1}><h1 className="display" style={{ fontSize: "clamp(38px,6vw,66px)", fontWeight: 700, lineHeight: 1.05, maxWidth: 720, marginBottom: 24, color: cl.text }}>{C.brand.tagline}</h1></Reveal>
+          {/* FIX: Siklus 3 -- H1=800 heading hierarchy */}
+          <Reveal delay={0.1}><h1 className="display" style={{ fontSize: "clamp(38px,6vw,66px)", fontWeight: 800, lineHeight: 1.05, maxWidth: 720, marginBottom: 24, color: cl.text }}>{C.brand.tagline}</h1></Reveal>
           <Reveal delay={0.2}><p style={{ fontSize: 19, lineHeight: 1.6, color: cl.primary, maxWidth: 540, marginBottom: 36, fontWeight: 300 }}>{C.seo.description}</p></Reveal>
           <Reveal delay={0.3}>
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -177,7 +178,8 @@ export default function App() {
       </header>
 
       {/* PEMERIKSAAN */}
-      <section id="pemeriksaan" style={{ padding: "100px 24px", maxWidth: 1180, margin: "0 auto" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="pemeriksaan" style={{ padding: "100px 24px", maxWidth: 1180, margin: "0 auto", scrollMarginTop: 90 }}>
         <Reveal>
           <div style={{ textAlign: "center", marginBottom: 60 }}>
             <span style={{ color: cl.accent, fontWeight: 600, fontSize: 14, letterSpacing: 2 }}>LAYANAN PEMERIKSAAN</span>
@@ -199,7 +201,8 @@ export default function App() {
       </section>
 
       {/* ALUR PEMERIKSAAN */}
-      <section id="alur" style={{ background: cl.secondary, color: "#fff", padding: "100px 24px" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="alur" style={{ background: cl.secondary, color: "#fff", padding: "100px 24px", scrollMarginTop: 90 }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
           <Reveal>
             <div style={{ textAlign: "center", marginBottom: 60 }}>
@@ -224,7 +227,8 @@ export default function App() {
       </section>
 
       {/* TENTANG */}
-      <section id="tentang" style={{ padding: "100px 24px", maxWidth: 1180, margin: "0 auto" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="tentang" style={{ padding: "100px 24px", maxWidth: 1180, margin: "0 auto", scrollMarginTop: 90 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 60, alignItems: "start" }}>
           <Reveal>
             <div>
@@ -265,7 +269,8 @@ export default function App() {
       </section>
 
       {/* HASIL ONLINE */}
-      <section id="hasil" style={{ background: cl.mist, padding: "100px 24px" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="hasil" style={{ background: cl.mist, padding: "100px 24px", scrollMarginTop: 90 }}>
         <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
           <Reveal>
             <span style={{ color: cl.accent, fontWeight: 600, fontSize: 14, letterSpacing: 2 }}>HASIL ONLINE</span>
@@ -287,7 +292,8 @@ export default function App() {
       </section>
 
       {/* JADWAL & KONTAK */}
-      <section id="kontak" style={{ padding: "100px 24px", maxWidth: 1180, margin: "0 auto" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="kontak" style={{ padding: "100px 24px", maxWidth: 1180, margin: "0 auto", scrollMarginTop: 90 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 40, alignItems: "start" }}>
           <Reveal>
             <div>

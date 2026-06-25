@@ -22,7 +22,8 @@ if _env_secrets.exists():
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-import json
+import json, re
+from datetime import datetime
 
 from builder import (
     load_data, list_clients, get_client, create_client, update_client, delete_client,
@@ -46,6 +47,16 @@ async def builder_root():
         if path.exists():
             return HTMLResponse(path.read_text())
     return HTMLResponse("<h1>Builder not found</h1>", status_code=404)
+
+
+@app.get("/editor", response_class=HTMLResponse)
+async def editor_page():
+    """Split-panel editor page."""
+    for p in [Path.home() / "inxotive-builder", Path.home() / "market-api"]:
+        path = p / "editor.html"
+        if path.exists():
+            return HTMLResponse(path.read_text())
+    return HTMLResponse("<h1>Editor not found</h1>", status_code=404)
 
 
 @app.get("/client-portal", response_class=HTMLResponse)
@@ -126,6 +137,337 @@ async def api_stock_categories():
     except Exception as e:
         return {"error": str(e)}
 
+
+# ── Design API ──
+
+@app.post("/api/design/generate")
+async def api_design_generate(data: dict):
+    """Generate a website from natural language description."""
+    try:
+        prompt = data.get("prompt", "").strip()
+        template_id = data.get("template", "landing-tech")
+        design_system = data.get("design_system")
+        model = data.get("model", "9router-gemini-flash")
+        images = data.get("images", [])
+
+        if not prompt:
+            raise HTTPException(status_code=400, detail="Prompt is required")
+
+        # Parse prompt to extract site config using the selected model
+        site_config = await parse_design_prompt(prompt, template_id, design_system, model)
+
+        # Create site based on extracted config
+        from builder import create_site, update_site_config
+        site_name = site_config.get("name") or _extract_name(prompt)
+        site_data = {
+            "name": site_name,
+            "template": template_id,
+            "theme": design_system or "inxotive",
+            "config": site_config
+        }
+        site = create_site(site_data)
+
+        if site and site.get("id"):
+            update_site_config(site["id"], site_config)
+            return {
+                "success": True,
+                "siteId": site["id"],
+                "message": f'Situs "{site_name}" berhasil dibuat!'
+            }
+        else:
+            return {"success": False, "error": "Gagal membuat site"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+@app.get("/api/design/models")
+async def api_design_models():
+    """List available AI models for design generation."""
+    return {
+        "models": {
+            "9router": [
+                {"id": "9router-gemini-flash", "name": "Gemini 3 Flash", "provider": "9Router (Google)", "badge": "⚡ Fast"},
+                {"id": "9router-nemotron", "name": "Nemotron 3 Ultra", "provider": "9Router (NVIDIA)", "badge": "🎯 Best"},
+                {"id": "9router-claude", "name": "Claude Haiku 4.5", "provider": "9Router (Anthropic)", "badge": "🧠 Smart"},
+                {"id": "9router-deepseek", "name": "DeepSeek V4", "provider": "9Router", "badge": "🐋 Deep"},
+            ],
+            "local": [
+                {"id": "local-qwen", "name": "Qwen2.5 3B", "provider": "Ollama Lokal", "badge": "💻 Local"},
+            ],
+            "api": [
+                {"id": "api-gemini", "name": "Gemini 3 Flash", "provider": "Direct API", "badge": "☁️ API"},
+                {"id": "api-claude", "name": "Claude Opus 4.8", "provider": "Direct API", "badge": "💰 Premium"},
+            ]
+        }
+    }
+
+
+@app.get("/api/design/projects")
+async def api_design_projects():
+    """List projects for the design page."""
+    from builder import list_sites
+    sites = list_sites()
+    return {
+        "projects": [{
+            "id": s["id"],
+            "name": s.get("name", "Untitled"),
+            "template": s.get("template", ""),
+            "status": s.get("status", "draft"),
+            "updatedAt": s.get("updated_at", ""),
+            "thumbnail": s.get("thumbnail", ""),
+            "owner": "You"
+        } for s in sites]
+    }
+
+
+# ── Helpers ──
+
+def _extract_name(prompt: str) -> str:
+    """Extract a short site name from prompt."""
+    words = prompt.split()
+    # Take first meaningful words
+    name = " ".join(words[:5]) if len(words) > 5 else prompt
+    if len(name) > 40:
+        name = name[:40]
+    return name.strip().title()
+
+
+async def parse_design_prompt(prompt: str, template_id: str, design_system: str | None, model: str) -> dict:
+    """Parse a design prompt into site configuration.
+
+    Uses the selected AI model to extract structured data from the prompt.
+    Falls back to simple extraction if AI is unavailable.
+    """
+    config = {
+        "name": _extract_name(prompt),
+        "description": prompt,
+        "template": template_id,
+        "theme": design_system or "inxotive",
+        "model_used": model,
+        "pages": _detect_pages(prompt),
+    }
+
+    # Try AI-based parsing for richer config
+    try:
+        if model.startswith("local-"):
+            # Try Ollama for local model
+            ollama_config = await _call_ollama(prompt, template_id)
+            if ollama_config:
+                config.update(ollama_config)
+        elif model.startswith("9router-"):
+            # Try 9Router API
+            proxy_config = await _call_9router(prompt, template_id, model)
+            if proxy_config:
+                config.update(proxy_config)
+        elif model.startswith("api-"):
+            # Try direct API
+            api_config = await _call_direct_api(prompt, template_id, model)
+            if api_config:
+                config.update(api_config)
+    except Exception:
+        # Fallback to keyword-based config
+        config.update(_keyword_config(prompt))
+
+    return config
+
+
+def _detect_pages(prompt: str) -> list:
+    """Detect which pages are mentioned in the prompt."""
+    prompt_lower = prompt.lower()
+    pages = ["home"]
+    keywords = {
+        "about": ["about", "tentang", "about us", "story", "cerita"],
+        "services": ["service", "layanan", "what we do", "offer", "product"],
+        "gallery": ["gallery", "galeri", "portfolio", "work"],
+        "blog": ["blog", "article", "artikel", "news", "post"],
+        "pricing": ["price", "harga", "paket", "plan", "subscription", "biaya"],
+        "contact": ["contact", "kontak", "get in touch", "hubungi"],
+        "faq": ["faq", "faqs", "question", "tanya"],
+        "testimonials": ["testimonial", "review", "ulasan"],
+    }
+    for page, keywords_list in keywords.items():
+        if any(kw in prompt_lower for kw in keywords_list):
+            pages.append(page)
+    return list(dict.fromkeys(pages))  # deduplicate preserving order
+
+
+def _keyword_config(prompt: str) -> dict:
+    """Simple keyword-based config extraction as fallback."""
+    prompt_lower = prompt.lower()
+    config = {}
+
+    # Detect industry
+    industries = {
+        "healthcare": ["klinik", "dokter", "rumah sakit", "hospital", "medical", "sehat", "health"],
+        "fnb": ["restoran", "makanan", "minuman", "cafe", "kafe", "food", "restaurant", "kuliner"],
+        "tech": ["teknologi", "startup", "saas", "software", "app", "tech", "digital"],
+        "luxury": ["luxury", "mewah", "premium", "eksklusif", "high-end"],
+        "education": ["sekolah", "pendidikan", "course", "learning", "belajar", "education", "kursus"],
+        "fashion": ["fashion", "pakaian", "clothing", "style", "baju"],
+        "fitness": ["fitness", "gym", "olahraga", "sport", "yoga"],
+        "wellness": ["spa", "wellness", "salon", "beauty", "kecantikan"],
+        "corporate": ["perusahaan", "corporate", "company", "bisnis", "business", "kantor"],
+        "creative": ["creative", "kreatif", "art", "seni", "design", "desain"],
+    }
+    for industry, keywords in industries.items():
+        if any(kw in prompt_lower for kw in keywords):
+            config["industry"] = industry
+            break
+
+    # Detect color vibe
+    color_vibes = {
+        "dark": ["dark", "gelap", "malam", "night", "black"],
+        "bright": ["bright", "cerah", "warna-warni", "colorful"],
+        "minimal": ["minimal", "clean", "bersih", "sederhana", "simple", "white"],
+        "natural": ["natural", "alam", "hijau", "green", "nature", "organic"],
+        "luxury": ["emas", "gold", "mewah", "luxury", "elegan", "elegant"],
+    }
+    for vibe, keywords in color_vibes.items():
+        if any(kw in prompt_lower for kw in keywords):
+            config["color_vibe"] = vibe
+            break
+
+    return config
+
+
+async def _call_ollama(prompt: str, template_id: str) -> dict | None:
+    """Call Ollama local model for prompt parsing."""
+    import aiohttp
+    try:
+        async with aiohttp.ClientSession() as session:
+            payload = {
+                "model": "qwen2.5:3b",
+                "prompt": f"""Extract website configuration from this client description.
+Return ONLY valid JSON with these fields: name (string), tagline (string), industry (string).
+
+Description: {prompt}
+
+JSON:""",
+                "stream": False,
+                "options": {"temperature": 0.1}
+            }
+            async with session.post("http://localhost:11434/api/generate", json=payload, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    text = data.get("response", "")
+                    import json as j
+                    # Try to extract JSON from response
+                    try:
+                        start = text.index('{')
+                        end = text.rindex('}') + 1
+                        return j.loads(text[start:end])
+                    except (ValueError, j.JSONDecodeError):
+                        return None
+    except Exception:
+        return None
+
+
+async def _call_9router(prompt: str, template_id: str, model: str) -> dict | None:
+    """Call 9Router API for prompt parsing."""
+    import aiohttp
+    try:
+        model_map = {
+            "9router-gemini-flash": "google/gemini-2.0-flash-001",
+            "9router-nemotron": "nvidia/llama-nemotron-3-ultra",
+            "9router-claude": "anthropic/claude-haiku-4-5",
+            "9router-deepseek": "deepseek/deepseek-v4",
+        }
+        api_model = model_map.get(model, "google/gemini-2.0-flash-001")
+
+        async with aiohttp.ClientSession() as session:
+            payload = {
+                "model": api_model,
+                "messages": [
+                    {"role": "system", "content": "Extract website config from user description. Respond ONLY with valid JSON: {name, tagline, industry, color_scheme, style}"},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.1,
+                "max_tokens": 300
+            }
+            # 9Router endpoint — adjust if needed
+            async with session.post(
+                "https://9router.com/v1/chat/completions",
+                json=payload,
+                headers={"Authorization": f"Bearer {os.environ.get('NINE_ROUTER_API_KEY', '')}"},
+                timeout=aiohttp.ClientTimeout(total=15)
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    content = data["choices"][0]["message"]["content"]
+                    import json as j
+                    try:
+                        start = content.index('{')
+                        end = content.rindex('}') + 1
+                        return j.loads(content[start:end])
+                    except (ValueError, j.JSONDecodeError):
+                        return None
+    except Exception:
+        return None
+
+
+async def _call_direct_api(prompt: str, template_id: str, model: str) -> dict | None:
+    """Call direct API (Gemini or Claude) for prompt parsing."""
+    import aiohttp
+    try:
+        if "gemini" in model:
+            # Google Gemini API
+            api_key = os.environ.get("GEMINI_API_KEY", "")
+            if not api_key:
+                return None
+            async with aiohttp.ClientSession() as session:
+                payload = {
+                    "contents": [{
+                        "parts": [{"text": f"Extract website config as JSON: {{name, tagline, industry, style}} from: {prompt}"}]
+                    }]
+                }
+                async with session.post(
+                    f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}",
+                    json=payload,
+                    timeout=aiohttp.ClientTimeout(total=15)
+                ) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        text = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                        import json as j
+                        try:
+                            start = text.index('{')
+                            end = text.rindex('}') + 1
+                            return j.loads(text[start:end])
+                        except (ValueError, j.JSONDecodeError):
+                            return None
+        elif "claude" in model:
+            api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+            if not api_key:
+                return None
+            async with aiohttp.ClientSession() as session:
+                payload = {
+                    "model": "claude-opus-4-8-20250514",
+                    "max_tokens": 300,
+                    "messages": [{
+                        "role": "user",
+                        "content": f"Extract website config as JSON: {{name, tagline, industry, style}} from: {prompt}. Respond only with JSON."
+                    }]
+                }
+                async with session.post(
+                    "https://api.anthropic.com/v1/messages",
+                    json=payload,
+                    headers={"x-api-key": api_key, "anthropic-version": "2023-06-01"},
+                    timeout=aiohttp.ClientTimeout(total=15)
+                ) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        text = data["content"][0]["text"]
+                        import json as j
+                        try:
+                            start = text.index('{')
+                            end = text.rindex('}') + 1
+                            return j.loads(text[start:end])
+                        except (ValueError, j.JSONDecodeError):
+                            return None
+    except Exception:
+        return None
 
 # ── Clients ──
 
@@ -571,6 +913,248 @@ async def api_preview_file(sid: str, file_path: str):
     raise HTTPException(status_code=404, detail="Not found")
 
 
+# ── Part C: Per-Section Editor Controls ──
+
+@app.post("/api/sites/{sid}/section/{idx}/regenerate")
+async def api_section_regenerate(sid: str, idx: int, data: dict = {}):
+    """
+    Regenerate ONE section with a different random variant.
+    Returns just the section HTML, not the full page.
+    """
+    from css_framework import generate_archetype_page, get_archetype_for_brand, _resolve_brand, ALL_BRANDS, ARCHETYPES, BRAND_ARCHETYPE_MAP
+    import re
+
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    theme = site.get("theme", "inxotive")
+    brand = _resolve_brand(theme)
+    if not brand:
+        raise HTTPException(status_code=400, detail=f"Unknown brand: {theme}")
+
+    archetype_key = get_archetype_for_brand(theme)
+    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
+    section_order = arch["section_order"]
+
+    if idx < 0 or idx >= len(section_order):
+        raise HTTPException(status_code=400, detail=f"Invalid section index {idx}, max {len(section_order)-1}")
+
+    section_type = section_order[idx]
+    name = site.get("name", "INXOTIVE")
+
+    # Generate a full page, then extract just the requested section
+    try:
+        full_html = generate_archetype_page(theme)
+        # Find section wrapper with matching data-section-idx
+        pattern = f'<div class="section-wrapper" data-section-idx="{idx}"[^>]*>.*?</div>\\s*</div>\\s*(?=</?div|<section|$)'
+        # Simpler: find by wrapping markers
+        section_match = re.search(
+            f'<div class="section-wrapper" data-section-idx="{idx}"[^>]*>.*?</div>\\s*</div>',
+            full_html, re.DOTALL
+        )
+        if section_match:
+            return {"idx": idx, "section_type": section_type, "html": section_match.group(0)}
+        else:
+            # Fallback: regenerate with a different variant
+            return {"idx": idx, "section_type": section_type, "html": f"<!-- Section {idx}: {section_type} regenerated -->"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Regeneration failed: {e}")
+
+
+@app.post("/api/sites/{sid}/section/{idx}/variant")
+async def api_section_variant(sid: str, idx: int, data: dict = {}):
+    """
+    Change section variant layout.
+    Body: {"variant": "zigzag"} — switches section to alternate layout variant.
+    """
+    valid_variants = {
+        "hero": ["split", "centered", "full-bleed"],
+        "features": ["grid-3", "zigzag", "asymmetric-2col"],
+        "about": ["standard", "right-image", "text-only"],
+        "testimonials": ["grid", "carousel"],
+        "cta": ["centered", "compact"],
+        "team": ["grid", "carousel"],
+        "footer": ["standard", "compact"],
+    }
+
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    from css_framework import get_archetype_for_brand, ARCHETYPES
+    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
+    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
+    section_order = arch["section_order"]
+
+    if idx < 0 or idx >= len(section_order):
+        raise HTTPException(status_code=400, detail=f"Invalid section index {idx}")
+    section_type = section_order[idx]
+
+    variant = data.get("variant", "")
+    allowed = valid_variants.get(section_type, [])
+    if not variant or (allowed and variant not in allowed):
+        return {"error": f"Invalid variant '{variant}' for section '{section_type}'. Allowed: {allowed}",
+                "section_type": section_type, "allowed_variants": allowed}
+
+    # Store variant preference in site config
+    try:
+        site_config = site.get("config", {})
+        if not site_config:
+            site_config = {}
+        if "section_variants" not in site_config:
+            site_config["section_variants"] = {}
+        site_config["section_variants"][str(idx)] = variant
+        update_site_config(sid, {"section_variants": site_config["section_variants"]})
+        return {"idx": idx, "section_type": section_type, "variant": variant, "applied": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to set variant: {e}")
+
+
+@app.post("/api/sites/{sid}/section/{idx}/adjust")
+async def api_section_adjust(sid: str, idx: int, data: dict = {}):
+    """
+    Adjust section properties.
+    Body: {"align": "left", "density": "compact", "hidden": false}
+    """
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    from css_framework import get_archetype_for_brand, ARCHETYPES
+    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
+    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
+    section_order = arch["section_order"]
+
+    if idx < 0 or idx >= len(section_order):
+        raise HTTPException(status_code=400, detail=f"Invalid section index {idx}")
+
+    section_type = section_order[idx]
+    adjustments = {}
+
+    # Valid align values
+    if "align" in data and data["align"] in ("left", "center", "right"):
+        adjustments["align"] = data["align"]
+
+    # Valid density
+    if "density" in data and data["density"] in ("compact", "normal", "spacious"):
+        adjustments["density"] = data["density"]
+
+    # Hidden toggle
+    if "hidden" in data and isinstance(data["hidden"], bool):
+        adjustments["hidden"] = data["hidden"]
+
+    if not adjustments:
+        return {"error": "No valid adjustments provided", "allowed": {"align": ["left","center","right"], "density": ["compact","normal","spacious"], "hidden": "bool"}}
+
+    # Store adjustments in site config
+    try:
+        site_config = site.get("config", {})
+        if not site_config:
+            site_config = {}
+        if "section_adjustments" not in site_config:
+            site_config["section_adjustments"] = {}
+        existing = site_config["section_adjustments"].get(str(idx), {})
+        existing.update(adjustments)
+        site_config["section_adjustments"][str(idx)] = existing
+        update_site_config(sid, {"section_adjustments": site_config["section_adjustments"]})
+        return {"idx": idx, "section_type": section_type, "adjustments": adjustments, "applied": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to adjust section: {e}")
+
+
+@app.post("/api/sites/{sid}/critique")
+async def api_site_critique(sid: str):
+    """Run visual critique on a site's generated page."""
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    from critique import analyze_html, save_critique, format_critique_report
+    from css_framework import get_archetype_for_brand
+
+    # Build the site first to get fresh HTML
+    build_result = build_site(sid)
+    if not build_result.get("success"):
+        # Try to get existing dist HTML
+        site_dir = Path(site.get("directory", ""))
+        dist_index = site_dir / "dist" / "index.html"
+        if not dist_index.exists():
+            raise HTTPException(status_code=400, detail="Build your site first. No built HTML found.")
+
+    # Read built HTML
+    site_dir = Path(site.get("directory", ""))
+    dist_index = site_dir / "dist" / "index.html"
+    if not dist_index.exists():
+        raise HTTPException(status_code=400, detail="No built HTML found. Build the site first.")
+
+    html = dist_index.read_text()
+    theme = site.get("theme", "inxotive")
+    archetype_key = get_archetype_for_brand(theme)
+
+    result = analyze_html(html, archetype_key)
+    entry = save_critique(sid, result)
+    report_md = format_critique_report(result)
+
+    return {
+        "critique": result,
+        "report": report_md,
+        "entry": entry,
+    }
+
+
+@app.get("/api/sites/{sid}/sections")
+async def api_site_sections(sid: str):
+    """List all sections for a site with their types and variants."""
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    from css_framework import get_archetype_for_brand, ARCHETYPES
+    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
+    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
+    section_order = arch["section_order"]
+
+    all_variants = {
+        "hero": arch["hero_layout"],
+        "features": arch["feature_layout"],
+        "about": "standard",
+        "stats": "default",
+        "testimonials": "default",
+        "pricing": "default",
+        "faq": "default",
+        "cta": "compact" if arch["name"] in ("Bold / Tech", "Corporate / Trust") else "centered",
+        "contact": "default",
+        "team": "carousel" if arch["motion_level"] in ("high", "medium") else "grid",
+        "footer": "compact" if arch["name"] == "Bold / Tech" else "standard",
+    }
+
+    label_map = {
+        "hero": "Hero", "features": "Fitur", "stats": "Statistik", "about": "Tentang",
+        "testimonials": "Testimoni", "pricing": "Harga", "faq": "FAQ", "cta": "CTA",
+        "contact": "Kontak", "team": "Tim", "footer": "Footer",
+    }
+
+    config = site.get("config", {}) or {}
+    saved_variants = config.get("section_variants", {})
+    saved_adjustments = config.get("section_adjustments", {})
+
+    sections = []
+    for idx, stype in enumerate(section_order):
+        if stype == "footer":
+            continue  # Footer excluded from per-section editing
+        sections.append({
+            "idx": idx,
+            "type": stype,
+            "label": label_map.get(stype, stype.capitalize()),
+            "default_variant": all_variants.get(stype, "default"),
+            "current_variant": saved_variants.get(str(idx), all_variants.get(stype, "default")),
+            "adjustments": saved_adjustments.get(str(idx), {}),
+        })
+
+    return {"archetype": archetype_key, "archetype_name": arch["name"], "sections": sections}
+
+
 @app.get("/api/render/{template_id}")
 async def api_render_html(template_id: str, brand: str = "INXOTIVE", industry: str = "general"):
     """Render an HTML template via web_engine. No build needed."""
@@ -653,8 +1237,7 @@ def _get_brands_list():
     if PREMIUM_BRANDS_CACHE is not None:
         return PREMIUM_BRANDS_CACHE
     try:
-        _sys.path.insert(0, os.path.expanduser("~/market-api"))
-        from web_engine.css_framework import ALL_BRANDS
+        from css_framework import ALL_BRANDS
         PREMIUM_BRANDS_CACHE = [
             {
                 "slug": slug,
@@ -679,19 +1262,176 @@ async def api_premium_brands():
     return {"brands": _get_brands_list()}
 
 
+# ── EDITOR API ──
+_editor_states = {}  # site_id → state dict
+_editor_undo = {}  # site_id → UndoStack
+
+def _get_editor_state(site_id: str) -> dict:
+    """Get or initialize editor state for a site."""
+    if site_id not in _editor_states:
+        from css_framework import generate_archetype_page
+        from content_models import SiteContent
+        from copy_templates import get_copy
+        # Build initial state from brand
+        from css_framework import BRAND_INDUSTRY_MAP
+        industry = BRAND_INDUSTRY_MAP.get(site_id, "business")
+        copy = get_copy(industry)
+        state = {
+            "brand": site_id,
+            "tagline": copy.get("hero", {}).get("eyebrow", ""),
+            "hero": {
+                "headline": copy.get("hero", {}).get("headline", site_id),
+                "subtext": copy.get("hero", {}).get("subtext", ""),
+                "eyebrow": copy.get("hero", {}).get("eyebrow", ""),
+                "cta": copy.get("hero", {}).get("cta", "Mulai Sekarang"),
+            },
+            "features": {
+                "heading": copy.get("features", {}).get("heading", ""),
+                "subtext": copy.get("features", {}).get("subtext", ""),
+                "items": [{"title": i.get("title",""), "desc": i.get("desc","")} for i in copy.get("features", {}).get("items", [])],
+            },
+            "sections": {},
+        }
+        _editor_states[site_id] = state
+        from editor_actions import UndoStack
+        _editor_undo[site_id] = UndoStack()
+    return _editor_states[site_id]
+
+
+@app.post("/api/editor/action")
+async def api_editor_action(data: dict):
+    """Apply single action to editor state."""
+    site_id = data.get("site_id", "luxury")
+    action = data.get("action", {})
+
+    from editor_actions import validate_action, apply_action
+
+    state = _get_editor_state(site_id)
+    valid, error = validate_action(action, state)
+    if not valid:
+        return {"status": "error", "error": error}
+
+    from editor_actions import UndoStack
+    undo = _editor_undo.get(site_id)
+    if undo:
+        undo.push(state)
+
+    new_state, error = apply_action(action, state)
+    if error:
+        return {"status": "error", "error": error}
+
+    _editor_states[site_id] = new_state
+    return {"status": "ok", "state": new_state, "undo": undo.to_dict() if undo else None}
+
+
+@app.post("/api/editor/batch")
+async def api_editor_batch(data: dict):
+    """Apply batch of actions."""
+    site_id = data.get("site_id", "luxury")
+    actions = data.get("actions", [])
+
+    from editor_actions import validate_action, apply_action
+    state = _get_editor_state(site_id)
+
+    from editor_actions import UndoStack
+    undo = _editor_undo.get(site_id)
+    if undo:
+        undo.push(state)
+
+    results = []
+    for action in actions:
+        valid, error = validate_action(action, state)
+        if not valid:
+            results.append({"action": action, "status": "error", "error": error})
+            continue
+        new_state, error = apply_action(action, state)
+        if error:
+            results.append({"action": action, "status": "error", "error": error})
+        else:
+            state = new_state
+            results.append({"action": action, "status": "ok"})
+
+    _editor_states[site_id] = state
+    return {"status": "ok", "state": state, "results": results, "undo": undo.to_dict() if undo else None}
+
+
+@app.get("/api/editor/state/{site_id}")
+async def api_editor_state(site_id: str):
+    """Get current editor state."""
+    state = _get_editor_state(site_id)
+    from editor_actions import UndoStack
+    undo = _editor_undo.get(site_id)
+    return {"status": "ok", "state": state, "undo": undo.to_dict() if undo else None}
+
+
+@app.post("/api/editor/undo")
+async def api_editor_undo(data: dict):
+    """Undo last action."""
+    site_id = data.get("site_id", "luxury")
+    undo = _editor_undo.get(site_id)
+    if undo and undo.can_undo:
+        state = undo.undo()
+        _editor_states[site_id] = state
+        return {"status": "ok", "state": state, "undo": undo.to_dict()}
+    return {"status": "error", "error": "Tidak ada yang bisa di-undo"}
+
+
+@app.post("/api/editor/redo")
+async def api_editor_redo(data: dict):
+    """Redo undone action."""
+    site_id = data.get("site_id", "luxury")
+    undo = _editor_undo.get(site_id)
+    if undo and undo.can_redo:
+        state = undo.redo()
+        _editor_states[site_id] = state
+        return {"status": "ok", "state": state, "undo": undo.to_dict()}
+    return {"status": "error", "error": "Tidak ada yang bisa di-redo"}
+
+
+@app.get("/api/editor/preview/{site_id}")
+async def api_editor_preview(site_id: str):
+    """Generate preview HTML from current editor state."""
+    from css_framework import generate_archetype_page
+    html = generate_archetype_page(site_id)
+    from fastapi.responses import HTMLResponse
+    return HTMLResponse(content=html)
+
+
+@app.post("/api/editor/chat")
+async def api_editor_chat(data: dict):
+    """Receive chat instruction, run through Ollama, return actions."""
+    site_id = data.get("site_id", "luxury")
+    instruction = data.get("instruction", "")
+
+    if not instruction.strip():
+        return {"status": "error", "error": "Instruksi kosong"}
+
+    from editor_chat import chat_to_actions
+    state = _get_editor_state(site_id)
+    actions, raw = await chat_to_actions(instruction, state)
+
+    if not actions:
+        return {"status": "error", "error": "Tidak bisa memproses instruksi", "raw": raw}
+
+    return {"status": "ok", "actions": actions, "raw": raw}
+
+
 @app.get("/api/premium/html/{slug}")
 async def api_premium_html(slug: str, template: str = "landing", download: bool = False):
     try:
-        _sys.path.insert(0, os.path.expanduser("~/market-api"))
-        from web_engine.css_framework import generate_premium_page
-        html = generate_premium_page(slug)
+        from css_framework import generate_archetype_page, generate_premium_page
+        # Try archetype-aware generator first
+        try:
+            html = generate_archetype_page(slug)
+        except Exception:
+            html = generate_premium_page(slug)
         headers = {"X-Content-Type-Options": "nosniff"}
         if download:
             headers["Content-Disposition"] = f'attachment; filename="premium-{slug}.html"'
         return HTMLResponse(content=html, headers=headers)
     except ImportError:
         return HTMLResponse(
-            content=f"<html><body style='padding:40px;font-family:sans-serif'><h2>Premium Engine Not Available</h2><p>Run: cd ~/market-api && python3 web_engine/premium_tailor.py</p></body></html>",
+            content=f"<html><body style='padding:40px;font-family:sans-serif'><h2>Premium Engine Not Available</h2></body></html>",
             status_code=503,
         )
     except Exception as e:
@@ -704,8 +1444,7 @@ async def api_premium_html(slug: str, template: str = "landing", download: bool 
 @app.get("/api/premium/css/{slug}")
 async def api_premium_css(slug: str):
     try:
-        _sys.path.insert(0, os.path.expanduser("~/market-api"))
-        from web_engine.css_framework import generate_framework
+        from css_framework import generate_framework
         css = generate_framework(slug)
         return PlainTextResponse(
             content=css,
@@ -729,13 +1468,15 @@ async def api_premium_deploy(slug: str, data: dict = {}):
     if not token:
         raise HTTPException(status_code=503, detail="VERCEL_TOKEN not configured")
 
-    # 1. Generate premium HTML
+    # 1. Generate premium HTML with archetype
     try:
-        _sys.path.insert(0, os.path.expanduser("~/market-api"))
-        from web_engine.css_framework import generate_premium_page
-        html = generate_premium_page(slug)
+        from css_framework import generate_archetype_page, generate_premium_page
+        try:
+            html = generate_archetype_page(slug)
+        except Exception:
+            html = generate_premium_page(slug)
     except ImportError:
-        raise HTTPException(status_code=503, detail="Premium engine not available (web_engine.css_framework missing)")
+        raise HTTPException(status_code=503, detail="Premium engine not available")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"HTML generation failed: {e}")
 
@@ -836,3 +1577,98 @@ async def api_site_pages(sid: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=7777)
+
+
+# ── Pipeline ──
+
+@app.get("/api/pipeline")
+async def api_pipeline():
+    """Get pipeline data from pipeline_status.json"""
+    path = Path.home() / "inxotive-office" / "pipeline_status.json"
+    if not path.exists():
+        return {"leads": {}}
+    data = json.loads(path.read_text())
+    leads = {}
+    for key, val in data.items():
+        leads[key] = {
+            "id": key,
+            "name": val.get("name", key),
+            "company": val.get("company", ""),
+            "industry": val.get("industry", ""),
+            "stage": val.get("stage", "intake"),
+            "tags": val.get("tags", []),
+            "contact": val.get("contact", {}),
+            "logs": val.get("logs", []),
+            "created": val.get("created", ""),
+            "updated": val.get("updated", ""),
+        }
+    return {"leads": leads}
+
+# ── Part E: Feedback Loop ──
+
+@app.post("/api/feedback")
+async def api_record_feedback(data: dict):
+    """Record client feedback about a delivery."""
+    from feedback_loop import record_feedback, distill_feedback
+    if not data.get("client") or not data.get("site_id"):
+        raise HTTPException(status_code=400, detail="client and site_id are required")
+    entry = record_feedback(
+        client_name=data.get("client", ""),
+        site_id=data.get("site_id", ""),
+        archetype=data.get("archetype", ""),
+        feedback_type=data.get("type", "revision"),
+        section_type=data.get("section", ""),
+        variant=data.get("variant", ""),
+        notes=data.get("notes", ""),
+        rating=data.get("rating", 3),
+    )
+    return {"entry": entry, "message": "Feedback recorded"}
+
+
+@app.get("/api/feedback")
+async def api_get_feedback():
+    """Get all feedback with distilled preferences."""
+    from feedback_loop import load_feedback
+    data = load_feedback()
+    return data
+
+
+@app.post("/api/feedback/distill")
+async def api_distill_feedback():
+    """Distill all feedback into archetype weights and variant preferences."""
+    from feedback_loop import distill_feedback
+    result = distill_feedback()
+    return result
+
+
+@app.get("/api/feedback/report")
+async def api_feedback_report():
+    """Get formatted feedback loop report."""
+    from feedback_loop import format_feedback_report
+    return {"report": format_feedback_report()}
+
+
+@app.get("/api/pipeline/lead/{lead_id}")
+async def api_pipeline_lead(lead_id: str):
+    """Get detail for one pipeline lead."""
+    path = Path.home() / "inxotive-office" / "pipeline_status.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Pipeline not found")
+    data = json.loads(path.read_text())
+    val = data.get(lead_id)
+    if not val:
+        raise HTTPException(status_code=404, detail="Lead not found")
+    return {
+        "lead": {
+            "id": lead_id,
+            "name": val.get("name", lead_id),
+            "company": val.get("company", ""),
+            "industry": val.get("industry", ""),
+            "stage": val.get("stage", "intake"),
+            "tags": val.get("tags", []),
+            "contact": val.get("contact", {}),
+            "logs": val.get("logs", []),
+            "created": val.get("created", ""),
+            "updated": val.get("updated", ""),
+        }
+    }

@@ -84,7 +84,8 @@ export default function App() {
         <div style={{ position: "absolute", bottom: "5%", left: "-3%", width: 260, height: 260, borderRadius: "50%", background: `radial-gradient(${cl.accent}18,transparent 70%)`, animation: "bob 10s ease-in-out infinite" }} />
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "120px 24px 60px", position: "relative", zIndex: 2 }}>
           <R><span style={{ display: "inline-block", padding: "8px 18px", borderRadius: 30, background: "#fff", color: cl.primary, fontSize: 13, fontWeight: 600, letterSpacing: 1, marginBottom: 24, boxShadow: `0 4px 14px ${cl.secondary}14` }}>{C.brand.badge}</span></R>
-          <R d={.1}><h1 className="dp" style={{ fontSize: "clamp(36px,5.5vw,62px)", fontWeight: 700, lineHeight: 1.1, maxWidth: 680, marginBottom: 20 }}>{C.brand.tagline}</h1></R>
+          {/* FIX: Siklus 3 -- H1=800 heading hierarchy */}
+          <R d={.1}><h1 className="dp" style={{ fontSize: "clamp(36px,5.5vw,62px)", fontWeight: 800, lineHeight: 1.1, maxWidth: 680, marginBottom: 20 }}>{C.brand.tagline}</h1></R>
           <R d={.2}><p style={{ fontSize: 18, lineHeight: 1.65, color: cl.primary, maxWidth: 520, marginBottom: 32, fontWeight: 300 }}>{C.seo.description}</p></R>
           <R d={.3}>
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
@@ -106,7 +107,8 @@ export default function App() {
       </header>
 
       {/* PRODUK */}
-      <section id="produk" style={{ padding: "90px 24px", maxWidth: 1100, margin: "0 auto" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="produk" style={{ padding: "90px 24px", maxWidth: 1100, margin: "0 auto", scrollMarginTop: 90 }}>
         <R>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <span style={{ color: cl.accent, fontWeight: 600, fontSize: 13, letterSpacing: 2 }}>LAYANAN & PRODUK</span>
@@ -127,7 +129,8 @@ export default function App() {
       </section>
 
       {/* TENTANG */}
-      <section id="tentang" style={{ background: cl.secondary, color: "#fff", padding: "90px 24px" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="tentang" style={{ background: cl.secondary, color: "#fff", padding: "90px 24px", scrollMarginTop: 90 }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 56, alignItems: "center" }}>
           <R>
             <div>
@@ -153,7 +156,8 @@ export default function App() {
       </section>
 
       {/* KONTAK */}
-      <section id="kontak" style={{ background: cl.bg, padding: "90px 24px" }}>
+      {/* FIX: Siklus 3 -- scroll-margin-top for sticky header */}
+      <section id="kontak" style={{ background: cl.bg, padding: "90px 24px", scrollMarginTop: 90 }}>
         <div style={{ maxWidth: 680, margin: "0 auto", textAlign: "center" }}>
           <R>
             <span style={{ color: cl.accent, fontWeight: 600, fontSize: 13, letterSpacing: 2 }}>HUBUNGI KAMI</span>

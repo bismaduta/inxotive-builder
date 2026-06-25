@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INXOTIVE Editor</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0F172A; color: #E2E8F0; overflow: hidden; height: 100vh; }
+.editor-container { display: flex; height: 100vh; }
+.left-panel { width: 420px; min-width: 320px; background: #1E293B; display: flex; flex-direction: column; border-right: 1px solid #334155; }
+.right-panel { flex: 1; display: flex; flex-direction: column; background: #0F172A; }
+.preview-header { padding: 8px 16px; background: #1E293B; border-bottom: 1px solid #334155; display: flex; align-items: center; justify-content: space-between; }
+.preview-header h2 { font-size: 14px; font-weight: 600; color: #94A3B8; }
+.preview-frame { flex: 1; background: #fff; margin: 0; }
+.preview-frame iframe { width: 100%; height: 100%; border: none; }
+.tab-bar { display: flex; background: #1E293B; border-bottom: 1px solid #334155; overflow-x: auto; }
+.tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 500; color: #64748B; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+.tab-btn.active { color: #818CF8; border-bottom-color: #818CF8; background: rgba(129,140,248,0.08); }
+.tab-btn:hover { color: #E2E8F0; }
+.panel-content { flex: 1; overflow-y: auto; padding: 16px; }
+.panel-content::-webkit-scrollbar { width: 4px; }
+.panel-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+/* Form controls */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: #94A3B8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input, .form-select { width: 100%; padding: 8px 12px; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: #E2E8F0; font-size: 13px; transition: border 0.2s; }
+.form-input:focus, .form-select:focus { outline: none; border-color: #818CF8; }
+.form-textarea { resize: vertical; min-height: 60px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: #818CF8; color: #fff; }
+.btn-primary:hover { background: #6366F1; }
+.btn-secondary { background: #334155; color: #E2E8F0; }
+.btn-secondary:hover { background: #475569; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-danger { background: #EF4444; color: #fff; }
+.btn-danger:hover { background: #DC2626; }
+.color-picker { width: 36px; height: 36px; padding: 2px; border: 1px solid #334155; border-radius: 6px; cursor: pointer; background: none; }
+.color-picker::-webkit-color-swatch-wrapper { padding: 2px; }
+.color-picker::-webkit-color-swatch { border-radius: 4px; border: none; }
+.flex-row { display: flex; gap: 8px; align-items: center; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.gap-2 { gap: 8px; }
+.mt-2 { margin-top: 8px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-4 { margin-bottom: 16px; }
+.text-xs { font-size: 11px; }
+.text-muted { color: #64748B; }
+.section-card { padding: 10px 12px; background: #0F172A; border: 1px solid #334155; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.section-card:hover { border-color: #475569; }
+.section-card .name { font-size: 13px; font-weight: 500; }
+.section-card .status { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.section-card .status.on { background: #22C55E; }
+.section-card .status.off { background: #64748B; }
+.toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 999; animation: fadeInUp 0.3s; }
+.toast.success { background: #065F46; color: #A7F3D0; border: 1px solid #059669; }
+.toast.error { background: #7F1D1D; color: #FECACA; border: 1px solid #DC2626; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="editor-container">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <div style="padding:12px 16px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center">
+            <div>
+                <strong style="font-size:14px">INXOTIVE Editor</strong>
+                <span class="text-xs text-muted" style="display:block" id="stateBrand">luxury</span>
+            </div>
+            <div class="flex-row">
+                <button class="btn btn-secondary btn-sm" onclick="undoAction()" id="undoBtn" disabled>↩</button>
+                <button class="btn btn-secondary btn-sm" onclick="redoAction()" id="redoBtn" disabled>↪</button>
+                <button class="btn btn-secondary btn-sm" onclick="preview()">🔄</button>
+            </div>
+        </div>
+
+        <div class="tab-bar" id="tabBar">
+            <div class="tab-btn active" data-tab="content" onclick="switchTab('content')">Content</div>
+            <div class="tab-btn" data-tab="design" onclick="switchTab('design')">Design</div>
+            <div class="tab-btn" data-tab="sections" onclick="switchTab('sections')">Sections</div>
+            <div class="tab-btn" data-tab="chat" onclick="switchTab('chat')">Chat ✨</div>
+        </div>
+
+        <div class="panel-content" id="panelContent">
+            <!-- Content Tab -->
+            <div id="tabContent" class="tab-panel">
+                <div class="form-group">
+                    <label class="form-label">Brand / Site ID</label>
+                    <select class="form-select" id="siteSelect" onchange="switchSite(this.value)">
+                        <option value="luxury">Luxury</option>
+                        <option value="cyberpunk">Cyberpunk</option>
+                        <option value="fnb">F&B / Restoran</option>
+                        <option value="corporate">Corporate</option>
+                        <option value="gimora">Gimora Garden</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Hero Headline</label>
+                    <input class="form-input" id="heroHeadline" onchange="sendAction('set_text','hero.headline',this.value)" placeholder="Headline utama">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Hero Subtext</label>
+                    <textarea class="form-input form-textarea" id="heroSubtext" onchange="sendAction('set_text','hero.subtext',this.value)" placeholder="Deskripsi hero"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CTA Button</label>
+                    <input class="form-input" id="heroCta" onchange="sendAction('set_text','hero.cta',this.value)" placeholder="Tombol utama">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Features Heading</label>
+                    <input class="form-input" id="featuresHeading" onchange="sendAction('set_text','features.heading',this.value)" placeholder="Judul fitur">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">About Heading</label>
+                    <input class="form-input" id="aboutHeading" onchange="sendAction('set_text','about.heading',this.value)" placeholder="Tentang kami">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CTA Heading</label>
+                    <input class="form-input" id="ctaHeading" onchange="sendAction('set_text','cta.heading',this.value)" placeholder="Judul CTA">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CTA Subtext</label>
+                    <textarea class="form-input form-textarea" id="ctaSubtext" onchange="sendAction('set_text','cta.subtext',this.value)" placeholder="Subtext CTA"></textarea>
+                </div>
+            </div>
+
+            <!-- Design Tab -->
+            <div id="tabDesign" class="tab-panel" style="display:none">
+                <div class="form-group">
+                    <label class="form-label">Features Variant</label>
+                    <select class="form-select" id="featVariant" onchange="sendAction('swap_variant','features',this.value)">
+                        <option value="grid">Grid</option>
+                        <option value="zigzag">Zigzag</option>
+                        <option value="asymmetric-2col">Asymmetric</option>
+                        <option value="showcase">Showcase</option>
+                        <option value="icon-grid">Icon Grid</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Hero Variant</label>
+                    <select class="form-select" id="heroVariant" onchange="sendAction('swap_variant','hero',this.value)">
+                        <option value="split">Split</option>
+                        <option value="centered">Centered</option>
+                        <option value="full-bleed">Full Bleed</option>
+                        <option value="video">Video</option>
+                        <option value="showcase">Showcase</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">About Variant</label>
+                    <select class="form-select" id="aboutVariant" onchange="sendAction('swap_variant','about',this.value)">
+                        <option value="standard">Standard</option>
+                        <option value="right-image">Right Image</option>
+                        <option value="split">Split</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Pricing Variant</label>
+                    <select class="form-select" id="pricingVariant" onchange="sendAction('swap_variant','pricing',this.value)">
+                        <option value="default">3 Column Cards</option>
+                        <option value="compact">Compact Row</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Brand Primary Color</label>
+                    <div class="flex-row">
+                        <input type="color" class="color-picker" id="brandPrimary" onchange="sendAction('set_color','design.brand_primary',this.value)">
+                        <input class="form-input" style="flex:1" id="brandPrimaryHex" onchange="document.getElementById('brandPrimary').value=this.value;sendAction('set_color','design.brand_primary',this.value)" placeholder="#4F46E5">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Section Density</label>
+                    <div class="flex-row">
+                        <button class="btn btn-secondary btn-sm" onclick="sendAction('set_density','density','xl')">XL</button>
+                        <button class="btn btn-secondary btn-sm" onclick="sendAction('set_density','density','lg')">LG</button>
+                        <button class="btn btn-secondary btn-sm" onclick="sendAction('set_density','density','md')">MD</button>
+                        <button class="btn btn-secondary btn-sm" onclick="sendAction('set_density','density','sm')">SM</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sections Tab -->
+            <div id="tabSections" class="tab-panel" style="display:none">
+                <div style="margin-bottom:12px;font-size:12px;color:#94A3B8">Toggle sections on/off</div>
+                <div id="sectionList"></div>
+            </div>
+
+            <!-- Chat Tab -->
+            <div id="tabChat" class="tab-panel" style="display:none">
+                <div style="margin-bottom:12px;font-size:12px;color:#94A3B8">Natural language editing ✨</div>
+                <div id="chatMessages" style="margin-bottom:12px;max-height:300px;overflow-y:auto"></div>
+                <div class="flex-row">
+                    <input class="form-input" id="chatInput" placeholder="'buat hero lebih hijau'..." onkeydown="if(event.key=='Enter')sendChat()" style="flex:1">
+                    <button class="btn btn-primary" onclick="sendChat()">Kirim</button>
+                </div>
+                <div class="flex-row mt-2">
+                    <button class="btn btn-secondary btn-sm" onclick="addChatSuggestion('buat lebih hijau alami')">🌿 Hijau</button>
+                    <button class="btn btn-secondary btn-sm" onclick="addChatSuggestion('ganti hero jadi split, judulnya Garden Dining')">📐 Split Hero</button>
+                    <button class="btn btn-secondary btn-sm" onclick="addChatSuggestion('buat lebih hangat dan ubah fitur jadi zigzag')">🔥 Hangat</button>
+                </div>
+                <div style="margin-top:16px;padding:12px;background:#0F172A;border-radius:8px;font-size:12px;color:#94A3B8">
+                    ✨ <strong>Live!</strong> Chat menggunakan Ollama lokal (gratis, pribadi). Coba "buat lebih hijau" atau "ganti hero jadi split".
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL (Preview) -->
+    <div class="right-panel">
+        <div class="preview-header">
+            <h2>Preview</h2>
+            <div class="flex-row">
+                <button class="btn btn-secondary btn-sm" onclick="preview()">🔄 Refresh</button>
+                <select class="form-select" style="width:auto;padding:4px 8px;font-size:12px" id="viewportSelect" onchange="updateViewport()">
+                    <option value="1440">Desktop (1440)</option>
+                    <option value="768">Tablet (768)</option>
+                    <option value="390">Mobile (390)</option>
+                </select>
+            </div>
+        </div>
+        <div class="preview-frame" id="previewFrame">
+            <iframe id="previewIframe" srcdoc="<div style='display:flex;align-items:center;justify-content:center;height:100vh;color:#94A3B8;font-family:sans-serif'>Loading preview...</div>"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentSite = 'luxury';
+let currentState = null;
+
+// ═══ API ═══
+async function api(path, data = {}) {
+    const res = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ site_id: currentSite, ...data }),
+    });
+    return await res.json();
+}
+
+async function getState() {
+    const res = await fetch(`/api/editor/state/${currentSite}`);
+    const data = await res.json();
+    if (data.status === 'ok') {
+        currentState = data.state;
+        updateForm(data.state);
+        updateUndo(data.undo);
+    }
+}
+
+async function preview() {
+    const res = await fetch(`/api/editor/preview/${currentSite}`);
+    const html = await res.text();
+    const iframe = document.getElementById('previewIframe');
+    const vp = document.getElementById('viewportSelect').value;
+    iframe.style.width = vp + 'px';
+    iframe.style.margin = '0 auto';
+    iframe.srcdoc = html;
+}
+
+async function sendAction(action, target, value) {
+    const result = await api('/api/editor/action', { action: { action, target, value } });
+    if (result.status === 'ok') {
+        currentState = result.state;
+        updateForm(result.state);
+        updateUndo(result.undo);
+        preview();
+    } else {
+        showToast(result.error || 'Error', 'error');
+    }
+}
+
+async function sendBatch(actions) {
+    const result = await api('/api/editor/batch', { actions });
+    if (result.status === 'ok') {
+        currentState = result.state;
+        updateForm(result.state);
+        updateUndo(result.undo);
+        preview();
+    }
+    return result;
+}
+
+async function undoAction() {
+    const result = await api('/api/editor/undo');
+    if (result.status === 'ok') {
+        currentState = result.state;
+        updateForm(result.state);
+        updateUndo(result.undo);
+        preview();
+    }
+}
+
+async function redoAction() {
+    const result = await api('/api/editor/redo');
+    if (result.status === 'ok') {
+        currentState = result.state;
+        updateForm(result.state);
+        updateUndo(result.undo);
+        preview();
+    }
+}
+
+// ═══ UI ═══
+function updateForm(state) {
+    if (!state) return;
+    const setVal = (id, path, fallback = '') => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const keys = path.split('.');
+        let v = state;
+        for (const k of keys) v = v?.[k];
+        if (v !== undefined && v !== null) {
+            el.value = typeof v === 'string' ? v.replace(/\{br\}/g, ' ') : v;
+        }
+    };
+    setVal('heroHeadline', 'hero.headline');
+    setVal('heroSubtext', 'hero.subtext');
+    setVal('heroCta', 'hero.cta');
+    setVal('featuresHeading', 'features.heading');
+    setVal('aboutHeading', 'about.heading');
+    setVal('ctaHeading', 'cta.heading');
+    setVal('ctaSubtext', 'cta.subtext');
+    setVal('brandPrimaryHex', 'brand_primary', '');
+    const colorVal = document.getElementById('brandPrimaryHex')?.value;
+    if (colorVal && document.getElementById('brandPrimary')) {
+        document.getElementById('brandPrimary').value = colorVal;
+    }
+    document.getElementById('stateBrand').textContent = currentSite + (state.hero?.headline ? ' — ' + state.hero.headline.substring(0, 40) : '');
+}
+
+function updateUndo(undo) {
+    document.getElementById('undoBtn').disabled = !undo?.can_undo;
+    document.getElementById('redoBtn').disabled = !undo?.can_redo;
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-panel').forEach(el => el.style.display = 'none');
+    document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = '';
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+}
+
+async function switchSite(site) {
+    currentSite = site;
+    await getState();
+    preview();
+}
+
+async function sendChat() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addChatMessage('you', text);
+    addChatMessage('ai', '⏳ Memproses via AI...');
+
+    try {
+        const res = await fetch('/api/editor/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ site_id: currentSite, instruction: text }),
+        });
+        const data = await res.json();
+
+        if (data.status === 'ok' && data.actions?.length > 0) {
+            addChatMessage('ai', '✅ Menemukan ' + data.actions.length + ' perubahan. Menerapkan...');
+
+            const result = await sendBatch(data.actions);
+            const errs = result.results?.filter(r => r.status === 'error');
+            if (errs?.length) {
+                addChatMessage('ai', '❌ ' + errs.map(e => e.error).join(', '));
+            } else {
+                const msg = data.actions.map(a => '  • ' + a.action.replace(/_/g, ' ') + ' → ' + (typeof a.value === 'string' && a.value.length > 25 ? a.value.substring(0, 25) + '...' : a.value)).join('\n');
+                addChatMessage('ai', '✅ Selesai! Perubahan:\n' + msg);
+            }
+        } else {
+            addChatMessage('ai', '🤔 Belum bisa memproses "' + text + '"');
+            addChatMessage('ai', 'Coba: "buat lebih hijau", "ganti hero jadi split", "ganti judul jadi X"');
+        }
+    } catch (e) {
+        addChatMessage('ai', '❌ Error: ' + e.message);
+    }
+
+    // Remove loading
+    const msgs = document.getElementById('chatMessages');
+    const lastMsg = msgs.lastElementChild;
+    if (lastMsg?.textContent === '⏳ Memproses via AI...') lastMsg.remove();
+}
+    if (loading?.textContent === '⏳ Memproses...') loading.remove();
+}
+
+function addChatMessage(role, text) {
+    const div = document.createElement('div');
+    div.style.cssText = 'margin-bottom:8px;padding:8px 12px;border-radius:8px;font-size:13px';
+    if (role === 'you') {
+        div.style.cssText += 'background:#818CF8;color:#fff;margin-left:20px';
+        div.textContent = '🧑 ' + text;
+    } else {
+        div.style.cssText += 'background:#0F172A;color:#E2E8F0;margin-right:20px';
+        div.textContent = '🤖 ' + text;
+    }
+    document.getElementById('chatMessages').appendChild(div);
+    div.scrollIntoView({ behavior: 'smooth' });
+}
+
+function addChatSuggestion(text) {
+    document.getElementById('chatInput').value = text;
+    sendChat();
+}
+
+function updateViewport() {
+    const vp = document.getElementById('viewportSelect').value;
+    const iframe = document.getElementById('previewIframe');
+    iframe.style.width = vp + 'px';
+    iframe.style.margin = '0 auto';
+}
+
+function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+// ═══ INIT ═══
+getState();
+preview();
+</script>
+</body>
+</html>
