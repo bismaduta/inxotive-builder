@@ -308,6 +308,106 @@ async def api_design_edit(data: dict):
         return {"success": False, "error": str(e)}
 
 
+@app.post("/api/design/clone")
+async def api_design_clone(data: dict):
+    """Clone an existing website and adapt to brand.
+    Body: {"url": "https://example.com", "brand": "inxotive", "name": "My Clone"}
+    Pipeline: capture → extract styles → analyze layout → map to SectionSpec → render via SectionAssembler.
+    """
+    url = data.get("url", "").strip()
+    brand_name = data.get("brand", "inxotive").strip()
+    site_name = data.get("name", "").strip() or "Cloned Site"
+
+    if not url:
+        raise HTTPException(status_code=400, detail="URL is required")
+
+    try:
+        # Import CloneEngine from market-api
+        import sys as _sys
+        from pathlib import Path as _Path
+        _sys.path.insert(0, str(_Path.home() / "market-api"))
+        from web_engine.clone_engine import CloneEngine
+
+        # Run clone pipeline (steps 1-3: capture, extract styles, analyze)
+        engine = CloneEngine(brand_name=brand_name)
+        reference = await engine.capture_reference(url)
+        if not reference or not reference.get("success"):
+            return {"success": False, "error": reference.get("error", "Failed to capture website")}
+
+        styles = await engine.extract_styles(url)
+        analysis = await engine.analyze_layout(
+            reference.get("screenshot_b64", ""),
+            reference.get("page_info", {}),
+        )
+
+        page_info = reference.get("page_info", {})
+        page_title = page_info.get("title", site_name)
+
+        # Map analysis to SectionSpec format for SectionAssembler
+        from ai_orchestrator import AIOrchestrator
+        orchestrator = AIOrchestrator()
+
+        # Use fallback spec (generates sections with default content)
+        # Then override colors and brand from clone analysis
+        analysis_sections = analysis.get("sections", []) if isinstance(analysis, dict) else []
+        section_types = [s.get("type", "hero") for s in analysis_sections if isinstance(s, dict)]
+        if not section_types:
+            section_types = ["hero", "features", "testimonials", "cta", "contact"]
+
+        spec = orchestrator._fallback_spec(page_title, "general", section_types)
+        spec["brand"] = brand_name
+
+        # Override colors from extracted styles
+        if isinstance(analysis, dict):
+            color_palette = analysis.get("color_palette", {})
+            if color_palette and isinstance(color_palette, dict):
+                spec["colors"] = {
+                    "primary": color_palette.get("primary", "#6366f1"),
+                    "secondary": color_palette.get("secondary", "#8b5cf6"),
+                    "accent": color_palette.get("accent", "#f59e0b"),
+                }
+
+        # Render via SectionAssembler
+        from ai_assembler import SectionAssembler
+        assembler = SectionAssembler()
+        html = assembler.assemble(spec, brand_name)
+
+        # Create builder site
+        from builder import create_site, update_site_config
+        site_data = {
+            "name": page_title[:40] or site_name,
+            "template": "landing-tech",
+            "theme": brand_name,
+            "config": {
+                "name": page_title[:40] or site_name,
+                "brand": brand_name,
+                "sections": spec.get("sections", []),
+                "ai_generated": True,
+                "model": "clone-engine",
+                "source_url": url,
+                "clone_analysis": analysis if isinstance(analysis, dict) else {},
+            }
+        }
+        site = create_site(site_data)
+
+        if site and site.get("id"):
+            update_site_config(site["id"], site_data["config"])
+            return {
+                "success": True,
+                "siteId": site["id"],
+                "name": page_title[:40] or site_name,
+                "html": html[:500] + "..." if len(html) > 500 else html,
+                "message": f'✅ Site cloned as "{page_title[:40] or site_name}"!'
+            }
+        else:
+            return {"success": False, "error": "Failed to create builder site"}
+
+    except ImportError as e:
+        return {"success": False, "error": f"Clone engine not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 @app.get("/api/design/models")
 async def api_design_models():
     """List available AI models for design generation."""
