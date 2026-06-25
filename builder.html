@@ -3098,6 +3098,8 @@ async function generateDesignFromChat(prompt) {
       if (!STATE.currentSiteId) {
         STATE.currentSiteId = data.siteId;
       }
+      // Log prompt
+      fetch('/api/design/prompt-log', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt:prompt.substring(0,200), model:DESIGN_STATE?.selectedModel||'9router-gemini-flash', siteId:data.siteId, success:true}) });
       return { success: true, siteId: data.siteId, message: data.message || 'Site created!' };
     }
     return simulateAIPreview(prompt);
@@ -3230,7 +3232,7 @@ const DESIGN_STATE = {selectedDS:null,selectedTemplate:null,selectedModel:'9rout
 };
 
 // ── Init Design Page ──
-function initDesignPage(){loadDesignBrands();loadDesignProjects();updateDesignSubmitState();setupPromptAutoResize();setupDesignKeyboard();startPlaceholderTyping();}
+function initDesignPage(){loadDesignBrands();loadDesignProjects();updateDesignSubmitState();setupPromptAutoResize();setupDesignKeyboard();startPlaceholderTyping();setTimeout(loadRecommendedModel,500);}
 
 // ── Typing animation ──
 const TYPING_PHRASES=['Buat website restoran italian modern...','Landing page startup teknologi AI...','Toko online fashion minimalis...','Company profile klinik gigi...','Portfolio agency kreatif...','E-commerce makanan sehat...','Website booking salon & spa...','Blog perjalanan travelling...','Halaman landing event musik...'];
@@ -3342,6 +3344,16 @@ async function generateDesign() {
 
     if (data.success && data.siteId) {
       toast('✅ ' + (data.message || 'Website berhasil dibuat!'), 'success');
+      // Log prompt
+      fetch('/api/design/prompt-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt.substring(0,200), model: DESIGN_STATE.selectedModel, siteId: data.siteId, success: true })
+      });
+      // Show feedback toast after 3s
+      setTimeout(function() {
+        showFeedbackPrompt(data.siteId, prompt, DESIGN_STATE.selectedModel);
+      }, 3000);
       // Navigate to editor with new site
       STATE.currentSiteId = data.siteId;
       switchPage('editor');
@@ -3560,6 +3572,35 @@ function refreshDesignPage() {
   loadDesignBrands();
   loadDesignProjects();
   toast('🔄 Design page refreshed', 'info');
+}
+
+// ═══ Feedback + Prompt Log ═══
+function showFeedbackPrompt(siteId, prompt, model) {
+  var div = document.createElement('div');
+  div.style.cssText = 'position:fixed;bottom:80px;right:20px;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;box-shadow:0 8px 30px rgba(0,0,0,0.12);max-width:320px;font-size:13px;animation:slideIn .3s ease';
+  div.innerHTML = '<div style="font-weight:600;margin-bottom:8px">Puaskan dengan hasilnya?</div>' +
+    '<div style="display:flex;gap:6px;margin-bottom:8px">' +
+    [1,2,3,4,5].map(function(i) { return '<button class="btn btn-sm ' + (i > 3 ? 'btn-primary' : 'btn-secondary') + '" onclick="sendFeedback(\'' + siteId + '\',' + i + ');this.parentElement.parentElement.remove()" style="padding:4px 10px;font-size:13px;min-width:36px">' + (i===1?'😞':i===2?'😐':i===3?'🙂':i===4?'😊':'🤩') + '</button>'; }).join('') +
+    '</div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer">Lewati</button>';
+  document.body.appendChild(div);
+  setTimeout(function() { div.remove(); }, 15000);
+}
+
+function sendFeedback(siteId, rating) {
+  fetch('/api/design/feedback', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({siteId:siteId,rating:rating}) });
+  toast('Terima kasih! Feedback dicatat.', 'success');
+}
+
+function loadRecommendedModel() {
+  fetch('/api/design/feedback/summary').then(function(r){return r.json();}).then(function(data){
+    if (data.recommended_model) {
+      var el = document.getElementById('design-model-value');
+      if (el && el.textContent === '9Router Gemini 3 Flash') {
+        var rec = data.recommended_model.replace('9router-','').replace('api-','').replace('local-','');
+        if (rec) el.textContent = rec + ' (recommended)';
+      }
+    }
+  }).catch(function(){});
 }
 
 // ═══ TimeAgo Helper ═══

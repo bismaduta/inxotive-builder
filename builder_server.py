@@ -206,6 +206,17 @@ async def api_design_generate(data: dict):
                     (site_dir / "index.html").write_text(html)
 
                     update_site_config(site["id"], site_data["config"])
+
+                    # Log prompt
+                    try:
+                        import httpx as _httpx
+                        _ = _httpx.post("http://localhost:7777/api/design/prompt-log", json={
+                            "prompt": prompt[:200], "model": model,
+                            "siteId": site["id"], "success": True
+                        }, timeout=2)
+                    except Exception:
+                        pass
+
                     return {
                         "success": True,
                         "siteId": site["id"],
@@ -594,6 +605,112 @@ async def _call_direct_api(prompt: str, template_id: str, model: str) -> dict | 
                             return None
     except Exception:
         return None
+
+
+# ── PHASE 3c: AI LEARNING LOOP ──
+PROMPT_LOG = []       # In-memory prompt history (persist to file in production)
+FEEDBACK_LOG = []     # In-memory feedback
+MODEL_SCORES = {}     # model_id → { wins: N, total: N, avg_score: float }
+
+PROMPT_LOG_FILE = Path.home() / ".ai_prompt_log.json"
+
+
+def _load_prompt_log():
+    global PROMPT_LOG
+    try:
+        if PROMPT_LOG_FILE.exists():
+            with open(PROMPT_LOG_FILE) as f:
+                PROMPT_LOG = json.load(f)
+    except Exception:
+        PROMPT_LOG = []
+
+
+def _save_prompt_log():
+    try:
+        PROMPT_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(PROMPT_LOG_FILE, 'w') as f:
+            json.dump(PROMPT_LOG[-500:], f, indent=2)  # Keep last 500
+    except Exception:
+        pass
+
+
+@app.post("/api/design/feedback")
+async def api_design_feedback(data: dict):
+    """Record user feedback on AI-generated design.
+    Body: {"siteId": "...", "rating": 1-5, "feedback": "optional text", "prompt": "original prompt", "model": "model used"}
+    """
+    site_id = data.get("siteId", "").strip()
+    rating = data.get("rating", 3)
+    feedback_text = data.get("feedback", "").strip()
+    prompt = data.get("prompt", "").strip()
+    model = data.get("model", "").strip()
+
+    entry = {
+        "siteId": site_id,
+        "rating": max(1, min(5, rating)),
+        "feedback": feedback_text,
+        "prompt": prompt,
+        "model": model,
+        "timestamp": datetime.now().isoformat(),
+    }
+    FEEDBACK_LOG.append(entry)
+
+    # Update model scores
+    if model:
+        if model not in MODEL_SCORES:
+            MODEL_SCORES[model] = {"wins": 0, "total": 0, "avg_score": 0.0}
+        MODEL_SCORES[model]["total"] += 1
+        if rating >= 4:
+            MODEL_SCORES[model]["wins"] += 1
+        MODEL_SCORES[model]["avg_score"] = (
+            MODEL_SCORES[model]["wins"] / MODEL_SCORES[model]["total"]
+        )
+
+    return {"success": True, "entry": entry}
+
+
+@app.get("/api/design/feedback/summary")
+async def api_design_feedback_summary():
+    """Get feedback summary and model performance."""
+    return {
+        "total_feedback": len(FEEDBACK_LOG),
+        "total_prompts": len(PROMPT_LOG),
+        "model_scores": MODEL_SCORES,
+        "recommended_model": _get_recommended_model(),
+    }
+
+
+def _get_recommended_model() -> str:
+    """Return model with best avg_score (min 3 samples)."""
+    best = "9router-gemini-flash"
+    best_score = 0.5
+    for model_id, stats in MODEL_SCORES.items():
+        if stats["total"] >= 3 and stats["avg_score"] > best_score:
+            best = model_id
+            best_score = stats["avg_score"]
+    return best
+
+
+@app.post("/api/design/prompt-log")
+async def api_design_prompt_log(data: dict):
+    """Log a prompt → model → output mapping for analysis."""
+    entry = {
+        "prompt": data.get("prompt", "").strip(),
+        "model": data.get("model", "").strip(),
+        "siteId": data.get("siteId", "").strip(),
+        "success": data.get("success", False),
+        "timestamp": datetime.now().isoformat(),
+    }
+    PROMPT_LOG.append(entry)
+    _save_prompt_log()
+    return {"success": True}
+
+
+@app.get("/api/design/prompt-log")
+async def api_design_prompt_log_list(limit: int = 20):
+    """Get recent prompt log entries."""
+    return {"entries": PROMPT_LOG[-limit:]}
+
 
 # ── Clients ──
 
