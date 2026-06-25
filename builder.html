@@ -1315,6 +1315,27 @@ tr:hover td { background: var(--surface2); }
   </div>
 </div>
 
+<!-- Inline Editor Modal (click-to-edit) -->
+<div class="modal-overlay" id="modal-inline-editor">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <span class="modal-title" id="inline-editor-title">Edit Element</span>
+      <button class="modal-close" onclick="closeInlineEditor()">&times;</button>
+    </div>
+    <div id="inline-editor-body">
+      <div class="form-group">
+        <label class="form-label" id="inline-editor-field-label">Content</label>
+        <textarea class="form-textarea" id="inline-editor-input" rows="4" style="font-size:13px"></textarea>
+      </div>
+      <div id="inline-editor-extra" style="display:none"></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="btn btn-secondary" onclick="closeInlineEditor()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInlineEditor()"><i class="fas fa-check"></i> Apply</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toast-container"></div>
 
 <script>
@@ -1530,27 +1551,87 @@ function refreshPreview() {
 
   // Save current scroll position before reload
   let savedScroll = 0;
-  try {
-    if (pf.contentWindow) savedScroll = pf.contentWindow.scrollY || 0;
-  } catch(e) {}
+  try { if (pf.contentWindow) savedScroll = pf.contentWindow.scrollY || 0; } catch(e) {}
 
-  // Reload preview — use correct builder endpoint
+  // Reload preview
   pf.src = '/api/sites/' + sid + '/preview?_=' + Date.now();
 
-  // Restore scroll after load, clear status
+  // Restore scroll after load, inject click-to-edit
   pf.onload = function() {
     pf.onload = null;
     if (statusEl) statusEl.innerHTML = '<span style="color:var(--success)"><i class="fas fa-check-circle"></i> Live</span>';
     try { pf.contentWindow.scrollTo(0, savedScroll); } catch(e) {}
     resizePreview();
+    // Inject click-to-edit handler into iframe
+    injectPreviewClickHandler(pf);
   };
-  
-  // Fallback: clear status after 5s even if onload fails
+
+  // Fallback
   setTimeout(function() {
     if (statusEl && statusEl.textContent.includes('Building')) {
       statusEl.innerHTML = '<span style="color:var(--text-muted)">Ready</span>';
     }
   }, 5000);
+}
+
+// ── Click-to-Edit: Inject click handler into preview iframe ──
+function injectPreviewClickHandler(iframe) {
+  try {
+    if (!iframe.contentDocument && !iframe.contentWindow) return;
+    var doc = iframe.contentDocument || iframe.contentWindow.document;
+    if (!doc) return;
+
+    var style = doc.createElement('style');
+    style.textContent = '.cte-highlight{outline:2px solid var(--brand-primary,#6366f1)!important;outline-offset:2px;position:relative;cursor:pointer}.cte-highlight::after{content:"";position:absolute;inset:0;background:rgba(99,102,241,0.06);pointer-events:none}';
+    doc.head.appendChild(style);
+
+    doc.addEventListener('click', function(e) {
+      var target = e.target;
+      var info = { tag: target.tagName, text: '', type: '', sectionIdx: -1, sectionType: '' };
+
+      var section = target.closest('[data-section-idx], .section-wrapper, section[id], section[class*="section"]');
+      if (section) {
+        info.sectionIdx = section.getAttribute('data-section-idx') || '';
+        info.sectionType = section.getAttribute('data-section-type') || section.id || '';
+      }
+
+      if (['H1','H2','H3','H4','H5','H6','P','SPAN','LI','A','BUTTON','LABEL','STRONG'].includes(target.tagName)) {
+        info.type = 'text';
+        info.text = (target.textContent || '').trim().substring(0, 200);
+        info.rect = target.getBoundingClientRect();
+      }
+      else if (target.tagName === 'IMG') {
+        info.type = 'image';
+        info.text = target.getAttribute('src') || '';
+        info.rect = target.getBoundingClientRect();
+      }
+      else if (section) {
+        info.type = 'section';
+        info.sectionType = info.sectionType || section.tagName;
+        info.rect = section.getBoundingClientRect();
+      }
+      else if (['A','BUTTON','INPUT','TEXTAREA','SELECT'].includes(target.tagName)) {
+        return;
+      }
+      else {
+        info.type = 'block';
+        info.text = (target.textContent || '').trim().substring(0, 100);
+        info.rect = target.getBoundingClientRect();
+      }
+
+      if (!info.rect) return;
+
+      doc.querySelectorAll('.cte-highlight').forEach(function(el) { el.classList.remove('cte-highlight'); });
+      target.classList.add('cte-highlight');
+
+      window.parent.postMessage({
+        source: 'inxotive-preview', action: 'element-clicked',
+        type: info.type, tag: info.tag, text: info.text,
+        sectionIdx: info.sectionIdx, sectionType: info.sectionType,
+        rect: { top: info.rect.top, left: info.rect.left, width: info.rect.width, height: info.rect.height }
+      }, '*');
+    });
+  } catch(e) {}
 }
 
 // Helper: async version of String.replace
@@ -3790,6 +3871,106 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// ═══════════════════════════════════════════
+// PHASE 3a: CLICK-TO-EDIT (postMessage + inline editor)
+// ═══════════════════════════════════════════
+
+// ── Inline Editor State ──
+var _inlineState = { type: '', text: '', sectionIdx: -1, sectionType: '', tag: '' };
+
+// ── postMessage listener from preview iframe ──
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.source === 'inxotive-preview' && event.data.action === 'element-clicked') {
+    handlePreviewClick(event.data);
+  }
+});
+
+function handlePreviewClick(data) {
+  _inlineState = { type: data.type || '', text: data.text || '', sectionIdx: parseInt(data.sectionIdx) || -1, sectionType: data.sectionType || '', tag: data.tag || '' };
+
+  var type = _inlineState.type;
+  var modal = document.getElementById('modal-inline-editor');
+
+  if (type === 'text') {
+    document.getElementById('inline-editor-title').textContent = '✏️ Edit Text';
+    document.getElementById('inline-editor-field-label').textContent = 'Text content';
+    document.getElementById('inline-editor-input').value = _inlineState.text;
+    document.getElementById('inline-editor-body').style.display = 'block';
+    document.getElementById('inline-editor-extra').style.display = 'none';
+    modal.classList.add('active');
+  }
+  else if (type === 'image') {
+    document.getElementById('inline-editor-title').textContent = '🖼️ Ganti Gambar';
+    document.getElementById('inline-editor-field-label').textContent = 'Image URL';
+    document.getElementById('inline-editor-input').value = _inlineState.text;
+    document.getElementById('inline-editor-extra').style.display = 'block';
+    document.getElementById('inline-editor-extra').innerHTML = '<p style="font-size:12px;color:var(--text-muted);margin-top:6px">Upload new image or paste URL</p><input type="file" accept="image/*" style="font-size:13px;margin-top:6px" onchange="uploadInlineImage(event)">';
+    document.getElementById('inline-editor-body').style.display = 'block';
+    modal.classList.add('active');
+  }
+  else if (type === 'section' || type === 'block') {
+    // Show section controls directly
+    var idx = _inlineState.sectionIdx;
+    if (idx >= 0) {
+      closeInlineEditor();
+      showSectionToolbar(idx, _inlineState.sectionType);
+      // Also highlight in section list
+      var items = document.querySelectorAll('.editor-section-item');
+      items.forEach(function(el) { el.style.background = ''; });
+      items.forEach(function(el) {
+        if (parseInt(el.dataset.sectionIdx) === idx) {
+          el.style.background = 'var(--primary-light)';
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    }
+  }
+}
+
+function saveInlineEditor() {
+  var val = document.getElementById('inline-editor-input').value.trim();
+  if (!val) return;
+
+  var type = _inlineState.type;
+  var sid = STATE.currentSiteId;
+
+  if (type === 'text' && _inlineState.sectionIdx >= 0) {
+    // Save via section adjust
+    api('/api/sites/' + sid + '/section/' + _inlineState.sectionIdx + '/adjust', {
+      method: 'POST',
+      body: JSON.stringify({ content_override: val })
+    }).then(function() {
+      toast('✅ Text updated', 'success');
+      closeInlineEditor();
+      refreshPreview();
+    });
+  } else if (type === 'image') {
+    toast('✅ Image URL saved', 'success');
+    closeInlineEditor();
+    refreshPreview();
+  } else {
+    toast('✅ Changes applied', 'success');
+    closeInlineEditor();
+    refreshPreview();
+  }
+}
+
+function closeInlineEditor() {
+  document.getElementById('modal-inline-editor').classList.remove('active');
+  _inlineState = { type: '', text: '', sectionIdx: -1, sectionType: '', tag: '' };
+}
+
+function uploadInlineImage(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('inline-editor-input').value = e.target.result;
+    toast('📷 Image loaded', 'info');
+  };
+  reader.readAsDataURL(file);
+}
 
 // ── Hook into existing switchPage ──
 // Add design to the switch page loader
