@@ -392,9 +392,11 @@ Generate JSON spec for this website."""
 
         # Apply design_intel recommendations
         if palette and not spec.get("colors"):
-            spec["colors"] = {"primary": palette["primary"], "secondary": palette.get("secondary", palette["primary"]), "accent": palette.get("accent", "#f59e0b")}
+            p = palette.get("palette", palette) if isinstance(palette, dict) else {}
+            spec["colors"] = {"primary": p.get("primary", "#6366f1"), "secondary": p.get("secondary", "#8b5cf6"), "accent": p.get("accent", p.get("cta", "#f59e0b"))}
         if font and not spec.get("fonts"):
-            spec["fonts"] = {"heading": font.get("heading", "Inter"), "body": font.get("body", "Inter")}
+            f = font[0] if isinstance(font, list) and len(font) > 0 else font if isinstance(font, dict) else {}
+            spec["fonts"] = {"heading": f.get("heading", f.get("display", "Inter")), "body": f.get("body", "Inter")} if isinstance(f, dict) else {"heading": "Inter", "body": "Inter"}
 
         return self.validate_spec(spec)
 
