@@ -224,11 +224,12 @@ async def api_design_generate(data: dict):
                         "message": f'✅ Situs "{site_name}" berhasil dibuat dengan AI!'
                     }
         except ImportError:
-            # Fallback to old method if orchestrator not available
+            # ai_orchestrator/assembler not available — use fallback
             pass
         except Exception as e:
-            # Fallback on error
-            pass
+            # Log error but still fallback gracefully
+            import logging
+            logging.warning(f"AI Orchestrator failed (fallback to old method): {e}")
 
         # ── Fallback: Original parsing method ──
         site_config = await parse_design_prompt(prompt, template_id, design_system, model)

@@ -663,22 +663,33 @@ def get_site(site_id: str) -> dict:
     assets = [a for a in data["assets"].values() if a.get("site_id") == site_id]
     # Read current config from disk (if available)
     config = None
+    site_dir = Path(s.get("directory", ""))
     config_path_str = s.get("config_path", "")
     if config_path_str:
         cp = Path(config_path_str)
+        if not cp.is_absolute():
+            cp = site_dir / config_path_str
         if not cp.exists():
-            cp = Path(s.get("directory", "")) / "site.config.js"
+            cp = site_dir / "site-config.json"
         if not cp.exists():
-            cp = Path(s.get("directory", "")) / "src" / "config" / "site.config.js"
+            cp = site_dir / "site.config.js"
+        if not cp.exists():
+            cp = site_dir / "src" / "config" / "site.config.js"
         if cp.exists():
-            import re
-            raw = cp.read_text()
-            m = re.search(r"export\s+const\s+siteConfig\s*=\s*(\{.*\})\s*;?\s*$", raw, re.DOTALL)
-            if m:
+            if cp.suffix == ".json":
                 try:
-                    config = json.loads(m.group(1))
+                    config = json.loads(cp.read_text())
                 except:
                     pass
+            else:
+                import re
+                raw = cp.read_text()
+                m = re.search(r"export\s+const\s+siteConfig\s*=\s*(\{.*\})\s*;?\s*$", raw, re.DOTALL)
+                if m:
+                    try:
+                        config = json.loads(m.group(1))
+                    except:
+                        pass
     return {**s, "id": site_id, "config": config, "deployments": deployments, "assets": assets}
 
 
@@ -698,7 +709,11 @@ def create_site(data_in: dict) -> dict:
     # Parse config
     config = data_in.get("config", {})
     theme = config.get("theme", data_in.get("theme", tpl["default_theme"]))
-    brand_name = config.get("brand", {}).get("name", data_in.get("name", "Nama Bisnis"))
+    brand_raw = config.get("brand", data_in.get("name", "Nama Bisnis"))
+    if isinstance(brand_raw, str):
+        brand_name = brand_raw
+    else:
+        brand_name = brand_raw.get("name", data_in.get("name", "Nama Bisnis"))
 
     is_html = tpl.get("type") == "html"
 
@@ -712,14 +727,15 @@ def create_site(data_in: dict) -> dict:
         shutil.copytree(tpl_dir, site_dir, ignore=shutil.ignore_patterns("node_modules", "dist", ".git"))
 
     # Build full site config
+    brand_info = brand_raw if isinstance(brand_raw, dict) else {}
     site_config = {
         "theme": theme,
         "brand": {
             "name": brand_name,
-            "tagline": config.get("brand", {}).get("tagline", ""),
+            "tagline": brand_info.get("tagline", ""),
             "logo": None,
-            "badge": config.get("brand", {}).get("badge", f"✦ {brand_name.upper()}"),
-            "colors": config.get("brand", {}).get("colors", {}),
+            "badge": brand_info.get("badge", f"✦ {brand_name.upper()}"),
+            "colors": brand_info.get("colors", {}),
         },
         "contact": {
             "whatsapp": config.get("contact", {}).get("whatsapp", ""),
@@ -759,6 +775,11 @@ def create_site(data_in: dict) -> dict:
             "ogImage": "/og.png",
         },
     }
+
+    # Copy extra config fields (sections, ai_generated, model, prompt, etc.)
+    for extra_key in ("sections", "ai_generated", "model", "prompt", "source_url", "clone_analysis", "section_types", "section_variants", "section_order", "section_adjustments"):
+        if extra_key in config:
+            site_config[extra_key] = config[extra_key]
 
     # ── Determine config path & write ──
     if is_html:
@@ -878,6 +899,9 @@ def update_site_config(site_id: str, config_updates: dict) -> dict:
         s["theme"] = config_updates["theme"]
     if "brand" in config_updates and "name" in config_updates["brand"]:
         s["name"] = config_updates["brand"]["name"]
+
+    # Sync merged config back to agency_data
+    s["config"] = current
     s["updated"] = _now()
     data["sites"][site_id] = s
 
