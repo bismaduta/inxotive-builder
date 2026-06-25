@@ -41,11 +41,19 @@ app = FastAPI(title="INXOTIVE Builder", version="1.0")
 
 @app.get("/", response_class=HTMLResponse)
 async def builder_root():
-    # Check inxotive-builder first, fallback to market-api
-    for p in [Path.home() / "inxotive-builder", Path.home() / "market-api"]:
+    # Check possible locations — laptop + VPS paths
+    for p in [
+        Path.home() / "inxotive-builder",       # laptop: ~/inxotive-builder/
+        Path.home() / "market-api",              # laptop fallback
+        Path("/opt/inxotive/builder"),           # VPS: /opt/inxotive/builder/
+        Path("/opt/market-api"),                 # VPS fallback
+        Path("/root/inxotive-builder"),          # VPS root home
+        Path("/root/market-api"),                # VPS root fallback
+        Path.cwd(),                               # current working directory
+    ]:
         path = p / "builder.html"
         if path.exists():
-            return HTMLResponse(path.read_text())
+            return HTMLResponse(path.read_text(encoding="utf-8"))
     return HTMLResponse("<h1>Builder not found</h1>", status_code=404)
 
 
