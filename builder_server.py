@@ -1189,6 +1189,72 @@ async def api_section_adjust(sid: str, idx: int, data: dict = {}):
         raise HTTPException(status_code=500, detail=f"Failed to adjust section: {e}")
 
 
+
+@app.post("/api/sites/{sid}/section/reorder")
+async def api_section_reorder(sid: str, data: dict = {}):
+    """Reorder sections. Body: {"order": ["hero", "features", "cta", ...]}"""
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    new_order = data.get("order", [])
+    if not new_order:
+        raise HTTPException(status_code=400, detail="Order array required")
+
+    from css_framework import get_archetype_for_brand, ARCHETYPES
+    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
+    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
+    valid_sections = arch["section_order"]
+
+    # Validate all sections exist
+    for sec in new_order:
+        if sec not in valid_sections:
+            raise HTTPException(status_code=400, detail=f"Invalid section: {sec}")
+
+    # Store in site config
+    site_config = site.get("config", {})
+    if not site_config:
+        site_config = {}
+    site_config["section_order"] = new_order
+    update_site_config(sid, {"section_order": new_order})
+
+    return {"success": True, "order": new_order}
+
+
+@app.get("/api/sites/{sid}/sections")
+async def api_site_sections(sid: str):
+    """Get section info for a site. Returns available types, current order, variants."""
+    site = get_site(sid)
+    if not site:
+        raise HTTPException(status_code=404, detail="Site not found")
+
+    from css_framework import get_archetype_for_brand, ARCHETYPES
+    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
+    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
+    section_order = arch["section_order"]
+    site_config = site.get("config", {})
+    section_types = arch.get("section_types", {})
+    hidden = site_config.get("section_adjustments", {})
+
+    sections = []
+    for idx, sec_type in enumerate(section_order):
+        info = section_types.get(sec_type, {"name": sec_type, "variants": ["default"]})
+        sections.append({
+            "index": idx,
+            "type": sec_type,
+            "name": info.get("name", sec_type.title()),
+            "variants": info.get("variants", ["default"]),
+            "hidden": hidden.get(str(idx), {}).get("hidden", False),
+        })
+
+    return {
+        "theme": site.get("theme", "inxotive"),
+        "order": section_order,
+        "sections": sections,
+        "archetype": archetype_key,
+    }
+
+
 @app.post("/api/sites/{sid}/critique")
 async def api_site_critique(sid: str):
     """Run visual critique on a site's generated page."""

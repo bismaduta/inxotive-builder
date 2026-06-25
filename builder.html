@@ -311,6 +311,44 @@ tr:hover td { background: var(--surface2); }
 .ai-loading i { animation:spin 0.8s linear infinite }
 @keyframes spin { to { transform:rotate(360deg) } }
 
+
+/* ── PHASE 2: LIVE EDITOR (Drag-drop, toolbar, section panel) ── */
+
+/* Section Order Panel */
+.editor-section-panel { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--surface); margin-bottom:12px }
+.editor-section-panel-header { display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;font-weight:600 }
+.editor-section-list { padding:6px;max-height:280px;overflow-y:auto;min-height:60px }
+.editor-section-item { display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;margin-bottom:3px;cursor:grab;font-size:12px;border:1px solid transparent;transition:all .12s;background:var(--surface);user-select:none }
+.editor-section-item:hover { border-color:var(--border);background:var(--surface2) }
+.editor-section-item.dragging { opacity:0.5;border:1px dashed var(--primary) }
+.editor-section-item.drag-over { border:1px dashed var(--primary);background:var(--primary-light);transform:scale(1.02) }
+.editor-section-item .section-drag-handle { color:var(--text-muted);font-size:12px;cursor:grab;flex-shrink:0 }
+.editor-section-item .section-name { flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.editor-section-item .section-badge { font-size:9px;padding:1px 6px;border-radius:4px;background:var(--surface2);color:var(--text-muted) }
+.editor-section-item .section-vis-toggle { width:22px;height:22px;border:none;background:none;border-radius:4px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0 }
+.editor-section-item .section-vis-toggle:hover { background:var(--surface2);color:var(--text) }
+.editor-section-item.hidden { opacity:0.45 }
+
+/* Section Toolbar (floating) */
+.section-toolbar { display:none;position:fixed;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.15);padding:4px 6px;gap:2px;align-items:center;font-size:12px }
+.section-toolbar.active { display:inline-flex }
+.section-toolbar .tb-sep { width:1px;height:20px;background:var(--border);margin:0 4px }
+.section-toolbar button { display:flex;align-items:center;gap:4px;padding:5px 10px;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;background:transparent;color:var(--text-secondary);white-space:nowrap;transition:all .12s }
+.section-toolbar button:hover { background:var(--surface2);color:var(--text) }
+.section-toolbar .tb-primary { background:var(--primary);color:#fff }
+.section-toolbar .tb-primary:hover { opacity:0.9 }
+.section-toolbar select { padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--surface);color:var(--text);outline:none }
+
+/* Image drop zone */
+.editor-drop-zone { display:none;position:absolute;inset:0;z-index:100;background:rgba(79,70,229,0.08);border:3px dashed var(--primary);border-radius:14px;align-items:center;justify-content:center;pointer-events:none;transition:all .15s }
+.editor-drop-zone.active { display:flex }
+.editor-drop-zone.drag-over { background:rgba(79,70,229,0.15);border-color:#4338ca }
+.editor-drop-zone-inner { text-align:center;background:var(--surface);padding:24px 36px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);pointer-events:auto }
+.editor-drop-zone-inner i { font-size:32px;color:var(--primary);margin-bottom:8px }
+
+/* Section select highlight */
+.ai-canvas-frame .section-highlight { outline:2px solid var(--primary) !important;outline-offset:-2px;position:relative }
+
 /* ── Design Page (claude.ai/design style) ── */
 .design-page { max-width: 1064px; margin: 0 auto; width: 100%; padding: 0; }
 .design-header { text-align: center; margin-bottom: 18px; }
@@ -600,6 +638,34 @@ tr:hover td { background: var(--surface2); }
                 </select>
                 <button class="btn btn-secondary btn-sm" onclick="applyAIToManual()" title="Apply to manual editor" style="padding:4px 10px;font-size:11px"><i class="fas fa-arrow-right"></i> → Editor</button>
               </div>
+              <!-- Floating Section Toolbar -->
+              <div class="section-toolbar" id="section-toolbar">
+                <span style="font-weight:600;margin-right:4px;min-width:60px" id="tb-section-name">Section</span>
+                <div class="tb-sep"></div>
+                <button onclick="tbEditText()" title="Edit text"><i class="fas fa-pen"></i></button>
+                <select id="tb-variant-select" onchange="tbChangeVariant(this.value)" style="max-width:110px">
+                  <option value="">Variant</option>
+                </select>
+                <div class="tb-sep"></div>
+                <button onclick="tbToggleVisibility()" title="Show/Hide"><i class="fas fa-eye"></i></button>
+                <button onclick="tbMoveUp()" title="Move up"><i class="fas fa-chevron-up"></i></button>
+                <button onclick="tbMoveDown()" title="Move down"><i class="fas fa-chevron-down"></i></button>
+                <div class="tb-sep"></div>
+                <button onclick="tbDelete()" title="Delete" style="color:var(--danger)"><i class="fas fa-trash"></i></button>
+                <button class="tb-primary" onclick="tbDone()" style="padding:5px 12px">Done</button>
+              </div>
+
+              <!-- Drop Zone -->
+              <div class="editor-drop-zone" id="editor-drop-zone"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="handleEditorImageDrop(event)">
+                <div class="editor-drop-zone-inner">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p style="margin:4px 0 0;font-size:13px;color:var(--text-muted)">Drop image here</p>
+                </div>
+              </div>
+
               <div class="ai-canvas-frame" id="ai-canvas-frame">
                 <div class="ai-empty-state" id="ai-empty-state">
                   <i class="fas fa-image" style="font-size:40px;opacity:0.15"></i>
@@ -623,6 +689,20 @@ tr:hover td { background: var(--surface2); }
                 <button class="ed-tab" data-tab="advanced" onclick="switchEditorTab('advanced')" style="flex:1;padding:7px 8px;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;background:transparent;color:var(--text-secondary);transition:all .15s">Advanced</button>
               </div>
               <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;text-align:center" id="ed-tab-hint">👆 Klik tab di atas untuk ganti grup field</div>
+
+              <!-- Section Order Panel -->
+              <div class="editor-section-panel" id="editor-section-panel" style="display:none">
+                <div class="editor-section-panel-header">
+                  <span><i class="fas fa-layer-group" style="margin-right:6px"></i>Section Order</span>
+                  <button class="btn btn-secondary btn-sm" onclick="refreshSectionList()" style="padding:2px 8px;font-size:10px"><i class="fas fa-sync-alt"></i></button>
+                </div>
+                <div class="editor-section-list" id="editor-section-list"
+                  ondragover="event.preventDefault()"
+                  ondrop="handleSectionDrop(event)">
+                  <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">Loading sections...</div>
+                </div>
+              </div>
+
 
               <!-- TAB: BASIC -->
               <div class="ed-tab-content" data-tab="basic">
@@ -3024,7 +3104,7 @@ async function openEditor(siteId) {
   const ct = data.theme||'inxotive';
   const badge = document.getElementById('theme-current-badge');
   if (badge){badge.textContent=ct;badge.style.background='#6366f1';badge.style.color='#fff';}
-  refreshPreview(); resizePreview(); switchEditorMode('ai');
+  refreshPreview(); resizePreview(); switchEditorMode('ai'); setTimeout(refreshSectionList, 300);
   const msgs = document.getElementById('ai-chat-msgs');
   if (msgs&&msgs.children.length<=1) addAIMessage('Welcome back! What would you like to change?','bot');
   toast('Site loaded. Use AI chat or switch to Manual.','info');
@@ -3416,6 +3496,300 @@ function getTimeAgo(dateStr) {
   if (days < 7) return days + 'd ago';
   return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 }
+
+// ═══════════════════════════════════════════
+// PHASE 2: LIVE EDITOR (Drag-drop, toolbar, section panel)
+// ═══════════════════════════════════════════
+
+// ── Section Order Panel ──
+async function refreshSectionList() {
+  const list = document.getElementById('editor-section-list');
+  if (!list) return;
+  const sid = STATE.currentSiteId;
+  if (!sid) { list.innerHTML = '<div style="text-align:center;padding:14px;color:var(--text-muted);font-size:12px">No site selected</div>'; return; }
+
+  try {
+    const data = await api('/api/sites/' + sid + '/sections');
+    if (!data || !data.sections) {
+      list.innerHTML = '<div style="text-align:center;padding:14px;color:var(--text-muted);font-size:12px">No sections available</div>';
+      return;
+    }
+    const panel = document.getElementById('editor-section-panel');
+    if (panel) panel.style.display = 'block';
+
+    list.innerHTML = data.sections.map(function(s, i) {
+      var hidden = s.hidden ? 'hidden' : '';
+      var eyeIcon = s.hidden ? 'fa-eye-slash' : 'fa-eye';
+      return '<div class="editor-section-item ' + hidden + '" draggable="true" data-section-idx="' + s.index + '" data-section-type="' + s.type + '" ' +
+        'ondragstart="handleSectionDragStart(event)" ondragover="handleSectionDragOver(event)" ondrop="handleSectionDrop(event)" ' +
+        'ondragend="handleSectionDragEnd(event)" onclick="onSectionItemClick(' + s.index + ',\'' + s.type + '\')">' +
+        '<span class="section-drag-handle"><i class="fas fa-grip-vertical"></i></span>' +
+        '<span class="section-name">' + (s.name || s.type) + '</span>' +
+        '<span class="section-badge">' + (s.variants ? s.variants[0] || 'default' : 'default') + '</span>' +
+        '<button class="section-vis-toggle" onclick="event.stopPropagation();toggleSectionVisibility(' + s.index + ')" title="Toggle visibility">' +
+        '<i class="fas ' + eyeIcon + '"></i></button></div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;padding:14px;color:var(--text-muted);font-size:12px">Error loading sections</div>';
+  }
+}
+
+// ── Section Drag & Drop ──
+var _dragSrcIdx = null;
+
+function handleSectionDragStart(e) {
+  _dragSrcIdx = e.target.closest('.editor-section-item');
+  if (_dragSrcIdx) {
+    _dragSrcIdx.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', _dragSrcIdx.dataset.sectionIdx);
+  }
+}
+
+function handleSectionDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  var target = e.target.closest('.editor-section-item');
+  if (target && target !== _dragSrcIdx) {
+    document.querySelectorAll('.editor-section-item').forEach(function(el) { el.classList.remove('drag-over'); });
+    target.classList.add('drag-over');
+  }
+}
+
+function handleSectionDrop(e) {
+  e.preventDefault();
+  document.querySelectorAll('.editor-section-item').forEach(function(el) { el.classList.remove('dragging', 'drag-over'); });
+
+  var fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+  var toItem = e.target.closest('.editor-section-item');
+  if (!toItem || isNaN(fromIdx)) return;
+  var toIdx = parseInt(toItem.dataset.sectionIdx);
+
+  if (fromIdx === toIdx) return;
+
+  // Reorder via API
+  var items = document.querySelectorAll('.editor-section-item');
+  var order = [];
+  items.forEach(function(el) { order.push(el.dataset.sectionType); });
+
+  // Swap in array
+  var fromType = order[fromIdx];
+  order.splice(fromIdx, 1);
+  order.splice(toIdx, 0, fromType);
+
+  api('/api/sites/' + STATE.currentSiteId + '/section/reorder', {
+    method: 'POST',
+    body: JSON.stringify({ order: order })
+  }).then(function(res) {
+    if (res && res.success) {
+      toast('✅ Sections reordered', 'success');
+      refreshSectionList();
+      refreshPreview();
+    } else {
+      toast('❌ Reorder failed', 'error');
+    }
+  });
+}
+
+function handleSectionDragEnd(e) {
+  e.target.closest('.editor-section-item')?.classList.remove('dragging');
+  document.querySelectorAll('.editor-section-item').forEach(function(el) { el.classList.remove('drag-over'); });
+  _dragSrcIdx = null;
+}
+
+function toggleSectionVisibility(idx) {
+  api('/api/sites/' + STATE.currentSiteId + '/section/' + idx + '/adjust', {
+    method: 'POST',
+    body: JSON.stringify({ hidden: null })  // Will toggle
+  }).then(function() {
+    refreshSectionList();
+    refreshPreview();
+    toast('🧹 Section visibility toggled', 'info');
+  });
+}
+
+function onSectionItemClick(idx, type) {
+  // Highlight in preview and show toolbar
+  showSectionToolbar(idx, type);
+}
+
+// ── Floating Section Toolbar ──
+var _tbSectionIdx = -1;
+
+function showSectionToolbar(idx, type) {
+  _tbSectionIdx = idx;
+  var tb = document.getElementById('section-toolbar');
+  if (!tb) return;
+
+  document.getElementById('tb-section-name').textContent = type || 'Section';
+
+  // Load variants
+  var sel = document.getElementById('tb-variant-select');
+  if (sel) {
+    // Get variants from the section list item badge
+    var items = document.querySelectorAll('.editor-section-item');
+    var variants = ['default'];
+    items.forEach(function(el) {
+      if (parseInt(el.dataset.sectionIdx) === idx) {
+        var badge = el.querySelector('.section-badge');
+        // Could expand this
+      }
+    });
+    sel.innerHTML = '<option value="">Variant...</option>' +
+      variants.map(function(v) { return '<option value="' + v + '">' + v + '</option>'; }).join('');
+  }
+
+  // Position near the preview
+  var frame = document.getElementById('ai-canvas-frame') || document.getElementById('preview-container');
+  if (frame) {
+    var rect = frame.getBoundingClientRect();
+    tb.style.top = (rect.top + 10) + 'px';
+    tb.style.left = (rect.left + 10) + 'px';
+  }
+
+  tb.classList.add('active');
+}
+
+function tbEditText() {
+  if (_tbSectionIdx < 0) return;
+  toast('✏️ Click on text in the preview to edit directly (coming soon)', 'info');
+}
+
+function tbChangeVariant(variant) {
+  if (!variant || _tbSectionIdx < 0) return;
+  api('/api/sites/' + STATE.currentSiteId + '/section/' + _tbSectionIdx + '/variant', {
+    method: 'POST',
+    body: JSON.stringify({ variant: variant })
+  }).then(function(res) {
+    if (res && res.html) {
+      toast('🎨 Variant changed to ' + variant, 'success');
+      refreshPreview();
+    }
+  });
+}
+
+function tbToggleVisibility() {
+  if (_tbSectionIdx < 0) return;
+  api('/api/sites/' + STATE.currentSiteId + '/section/' + _tbSectionIdx + '/adjust', {
+    method: 'POST',
+    body: JSON.stringify({ hidden: null })
+  }).then(function() {
+    refreshSectionList();
+    refreshPreview();
+    toast('👁️ Visibility toggled', 'info');
+  });
+}
+
+function tbMoveUp() {
+  if (_tbSectionIdx <= 0) return;
+  var items = document.querySelectorAll('.editor-section-item');
+  var order = [];
+  items.forEach(function(el) { order.push(el.dataset.sectionType); });
+  if (_tbSectionIdx > 0) {
+    var tmp = order[_tbSectionIdx - 1];
+    order[_tbSectionIdx - 1] = order[_tbSectionIdx];
+    order[_tbSectionIdx] = tmp;
+  }
+  api('/api/sites/' + STATE.currentSiteId + '/section/reorder', {
+    method: 'POST',
+    body: JSON.stringify({ order: order })
+  }).then(function(res) {
+    if (res && res.success) { refreshSectionList(); refreshPreview(); _tbSectionIdx--; }
+  });
+}
+
+function tbMoveDown() {
+  var items = document.querySelectorAll('.editor-section-item');
+  var count = items.length;
+  if (_tbSectionIdx >= count - 1) return;
+  var order = [];
+  items.forEach(function(el) { order.push(el.dataset.sectionType); });
+  if (_tbSectionIdx < count - 1) {
+    var tmp = order[_tbSectionIdx + 1];
+    order[_tbSectionIdx + 1] = order[_tbSectionIdx];
+    order[_tbSectionIdx] = tmp;
+  }
+  api('/api/sites/' + STATE.currentSiteId + '/section/reorder', {
+    method: 'POST',
+    body: JSON.stringify({ order: order })
+  }).then(function(res) {
+    if (res && res.success) { refreshSectionList(); refreshPreview(); _tbSectionIdx++; }
+  });
+}
+
+function tbDelete() {
+  if (_tbSectionIdx < 0) return;
+  if (!confirm('Delete this section?')) return;
+  api('/api/sites/' + STATE.currentSiteId + '/section/' + _tbSectionIdx + '/adjust', {
+    method: 'POST',
+    body: JSON.stringify({ hidden: true })
+  }).then(function() {
+    refreshSectionList();
+    refreshPreview();
+    tbDone();
+    toast('🗑️ Section hidden', 'info');
+  });
+}
+
+function tbDone() {
+  var tb = document.getElementById('section-toolbar');
+  if (tb) tb.classList.remove('active');
+  _tbSectionIdx = -1;
+}
+
+// ── Image Drop Zone ──
+function handleEditorImageDrop(e) {
+  e.preventDefault();
+  document.getElementById('editor-drop-zone').classList.remove('active', 'drag-over');
+
+  var files = e.dataTransfer.files;
+  if (files.length > 0) {
+    uploadEditorImage(files[0]);
+  }
+}
+
+function uploadEditorImage(file) {
+  if (!file.type.startsWith('image/')) {
+    toast('❌ Only images allowed', 'error');
+    return;
+  }
+
+  // Show upload progress
+  toast('📤 Uploading ' + file.name + '...', 'info');
+
+  var formData = new FormData();
+  formData.append('file', file);
+
+  fetch('/upload', {
+    method: 'POST',
+    body: formData
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data && data.url) {
+      toast('✅ Image uploaded: ' + data.url, 'success');
+      refreshPreview();
+    } else {
+      toast('❌ Upload failed', 'error');
+    }
+  }).catch(function() {
+    toast('❌ Upload failed', 'error');
+  });
+}
+
+// Enable drag-over on AI canvas
+document.addEventListener('DOMContentLoaded', function() {
+  var canvas = document.getElementById('ai-canvas-frame');
+  if (canvas) {
+    canvas.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      var dz = document.getElementById('editor-drop-zone');
+      if (dz) dz.classList.add('active');
+    });
+    canvas.addEventListener('dragleave', function() {
+      var dz = document.getElementById('editor-drop-zone');
+      if (dz) dz.classList.remove('active');
+    });
+  }
+});
 
 // ── Hook into existing switchPage ──
 // Add design to the switch page loader
