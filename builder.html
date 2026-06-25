@@ -1553,8 +1553,18 @@ function refreshPreview() {
   let savedScroll = 0;
   try { if (pf.contentWindow) savedScroll = pf.contentWindow.scrollY || 0; } catch(e) {}
 
-  // Reload preview
-  pf.src = '/api/sites/' + sid + '/preview?_=' + Date.now();
+  // Reload both iframes simultaneously
+  const previewUrl = '/api/sites/' + sid + '/preview?_=' + Date.now();
+  pf.src = previewUrl;
+
+  // Also load AI preview iframe so AI mode also shows the site
+  const aiPf = document.getElementById('ai-preview-iframe');
+  const aiEmpty = document.getElementById('ai-empty-state');
+  if (aiPf) {
+    aiPf.src = previewUrl;
+    aiPf.style.display = 'block';
+    if (aiEmpty) aiEmpty.style.display = 'none';
+  }
 
   // Restore scroll after load, inject click-to-edit
   pf.onload = function() {
