@@ -1047,7 +1047,8 @@ async def api_section_regenerate(sid: str, idx: int, data: dict = {}):
     Regenerate ONE section with a different random variant.
     Returns just the section HTML, not the full page.
     """
-    from css_framework import generate_archetype_page, get_archetype_for_brand, _resolve_brand, ALL_BRANDS, ARCHETYPES, BRAND_ARCHETYPE_MAP
+    from css_framework import generate_archetype_page
+    from brand_registry import get_registry
     import re
 
     site = get_site(sid)
@@ -1055,13 +1056,13 @@ async def api_section_regenerate(sid: str, idx: int, data: dict = {}):
         raise HTTPException(status_code=404, detail="Site not found")
 
     theme = site.get("theme", "inxotive")
-    brand = _resolve_brand(theme)
+    registry = get_registry()
+    brand = registry.get(theme)
     if not brand:
         raise HTTPException(status_code=400, detail=f"Unknown brand: {theme}")
 
-    archetype_key = get_archetype_for_brand(theme)
-    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
-    section_order = arch["section_order"]
+    arch_config = registry.get_archetype_config(theme)
+    section_order = arch_config["section_order"]
 
     if idx < 0 or idx >= len(section_order):
         raise HTTPException(status_code=400, detail=f"Invalid section index {idx}, max {len(section_order)-1}")
@@ -1108,14 +1109,24 @@ async def api_section_variant(sid: str, idx: int, data: dict = {}):
     if not site:
         raise HTTPException(status_code=404, detail="Site not found")
 
-    from css_framework import get_archetype_for_brand, ARCHETYPES
-    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
-    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
-    section_order = arch["section_order"]
+    from brand_registry import get_registry
+    registry = get_registry()
+    arch_config = registry.get_archetype_config(site.get("theme", "inxotive"))
+    section_order = arch_config["section_order"]
 
     if idx < 0 or idx >= len(section_order):
         raise HTTPException(status_code=400, detail=f"Invalid section index {idx}")
     section_type = section_order[idx]
+
+    valid_variants = {
+        "hero": ["split", "centered", "full-bleed"],
+        "features": ["grid-3", "zigzag", "asymmetric-2col"],
+        "about": ["standard", "right-image", "text-only"],
+        "testimonials": ["grid", "carousel"],
+        "cta": ["centered", "compact"],
+        "team": ["grid", "carousel"],
+        "footer": ["standard", "compact"],
+    }
 
     variant = data.get("variant", "")
     allowed = valid_variants.get(section_type, [])
@@ -1147,10 +1158,10 @@ async def api_section_adjust(sid: str, idx: int, data: dict = {}):
     if not site:
         raise HTTPException(status_code=404, detail="Site not found")
 
-    from css_framework import get_archetype_for_brand, ARCHETYPES
-    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
-    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
-    section_order = arch["section_order"]
+    from brand_registry import get_registry
+    registry = get_registry()
+    arch_config = registry.get_archetype_config(site.get("theme", "inxotive"))
+    section_order = arch_config["section_order"]
 
     if idx < 0 or idx >= len(section_order):
         raise HTTPException(status_code=400, detail=f"Invalid section index {idx}")
@@ -1201,10 +1212,10 @@ async def api_section_reorder(sid: str, data: dict = {}):
     if not new_order:
         raise HTTPException(status_code=400, detail="Order array required")
 
-    from css_framework import get_archetype_for_brand, ARCHETYPES
-    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
-    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
-    valid_sections = arch["section_order"]
+    from brand_registry import get_registry
+    registry = get_registry()
+    arch_config = registry.get_archetype_config(site.get("theme", "inxotive"))
+    valid_sections = arch_config["section_order"]
 
     # Validate all sections exist
     for sec in new_order:
@@ -1228,46 +1239,30 @@ async def api_site_sections(sid: str):
     if not site:
         raise HTTPException(status_code=404, detail="Site not found")
 
-    from css_framework import get_archetype_for_brand, ARCHETYPES
-    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
-    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
-    section_order = arch["section_order"]
+    # Use brand_registry as single source of truth
+    from brand_registry import get_registry, get_section_variants
+    registry = get_registry()
+    theme = site.get("theme", "inxotive")
+    arch_config = registry.get_archetype_config(theme)
+    section_order = arch_config["section_order"]
     site_config = site.get("config", {}) or {}
     hidden = site_config.get("section_adjustments", {})
 
-    section_types = site_config.get("section_types", {}) if isinstance(site_config, dict) else {}
-    SECTION_VARIANTS = {
-        "hero": ["split", "centered", "full-bleed", "gradient", "video"],
-        "features": ["grid-3", "grid-4", "zigzag", "showcase", "icon-grid"],
-        "stats": ["default", "grid-4"],
-        "testimonials": ["default", "carousel", "grid"],
-        "pricing": ["default", "compact", "side-by-side"],
-        "about": ["standard", "right-image", "split"],
-        "team": ["default", "grid"],
-        "faq": ["default"],
-        "cta": ["default", "compact", "newsletter"],
-        "contact": ["default"],
-        "gallery": ["default", "masonry", "grid"],
-        "footer": ["default", "compact"],
-        "divider": ["wave", "default"],
-    }
-
     sections = []
     for idx, sec_type in enumerate(section_order):
-        info = section_types.get(sec_type, {}) if isinstance(section_types, dict) else {}
         sections.append({
             "index": idx,
             "type": sec_type,
-            "name": info.get("name", sec_type.title()),
-            "variants": info.get("variants", SECTION_VARIANTS.get(sec_type, ["default"])),
+            "name": sec_type.title(),
+            "variants": get_section_variants(sec_type),
             "hidden": hidden.get(str(idx), {}).get("hidden", False),
         })
 
     return {
-        "theme": site.get("theme", "inxotive"),
+        "theme": theme,
         "order": section_order,
         "sections": sections,
-        "archetype": archetype_key,
+        "archetype": arch_config["name"],
     }
 
 
@@ -1279,7 +1274,7 @@ async def api_site_critique(sid: str):
         raise HTTPException(status_code=404, detail="Site not found")
 
     from critique import analyze_html, save_critique, format_critique_report
-    from css_framework import get_archetype_for_brand
+    from brand_registry import get_registry
 
     # Build the site first to get fresh HTML
     build_result = build_site(sid)
@@ -1298,7 +1293,7 @@ async def api_site_critique(sid: str):
 
     html = dist_index.read_text()
     theme = site.get("theme", "inxotive")
-    archetype_key = get_archetype_for_brand(theme)
+    archetype_key = registry.get_archetype(theme)
 
     result = analyze_html(html, archetype_key)
     entry = save_critique(sid, result)
