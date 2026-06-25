@@ -1233,17 +1233,33 @@ async def api_site_sections(sid: str):
     arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
     section_order = arch["section_order"]
     site_config = site.get("config", {})
-    section_types = arch.get("section_types", {})
     hidden = site_config.get("section_adjustments", {})
+
+    section_types = site_config.get("section_types", {})
+    SECTION_VARIANTS = {
+        "hero": ["split", "centered", "full-bleed", "gradient", "video"],
+        "features": ["grid-3", "grid-4", "zigzag", "showcase", "icon-grid"],
+        "stats": ["default", "grid-4"],
+        "testimonials": ["default", "carousel", "grid"],
+        "pricing": ["default", "compact", "side-by-side"],
+        "about": ["standard", "right-image", "split"],
+        "team": ["default", "grid"],
+        "faq": ["default"],
+        "cta": ["default", "compact", "newsletter"],
+        "contact": ["default"],
+        "gallery": ["default", "masonry", "grid"],
+        "footer": ["default", "compact"],
+        "divider": ["wave", "default"],
+    }
 
     sections = []
     for idx, sec_type in enumerate(section_order):
-        info = section_types.get(sec_type, {"name": sec_type, "variants": ["default"]})
+        info = section_types.get(sec_type, {}) if isinstance(section_types, dict) else {}
         sections.append({
             "index": idx,
             "type": sec_type,
             "name": info.get("name", sec_type.title()),
-            "variants": info.get("variants", ["default"]),
+            "variants": info.get("variants", SECTION_VARIANTS.get(sec_type, ["default"])),
             "hidden": hidden.get(str(idx), {}).get("hidden", False),
         })
 
