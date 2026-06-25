@@ -704,8 +704,8 @@ async def api_delete_site(sid: str):
 @app.get("/api/sites/{sid}/preview")
 async def api_preview_site(sid: str, page: str = "home"):
     """Render live preview of site. Returns full HTML page.
-    For React templates, reads from dev server or dist.
-    For HTML templates, renders via web_engine on-the-fly.
+    AI-generated sites use SectionAssembler (unified CSS vars framework).
+    Existing templates use web_engine or dist/.
     """
     from builder import get_site, render_html_site, generate_multi_page_site, load_data
 
@@ -714,15 +714,42 @@ async def api_preview_site(sid: str, page: str = "home"):
         raise HTTPException(status_code=404, detail="Site not found")
 
     template_id = site.get("template", "landing")
+    config = site.get("config", {}) or {}
 
-    # Check if HTML template (web_engine rendered)
-    # We check by looking up the template registry
+    # ── AI-generated sites: use SectionAssembler (unified rendering) ──
+    if config.get("ai_generated") or config.get("sections"):
+        try:
+            from ai_assembler import SectionAssembler
+            from brand_registry import get_registry
+
+            registry = get_registry()
+            theme = site.get("theme", "inxotive")
+            brand = registry.get(theme)
+
+            sections_config = config.get("sections", [])
+            if sections_config:
+                spec = {
+                    "brand": theme,
+                    "title": site.get("name", "INXOTIVE Design"),
+                    "sections": sections_config,
+                    "colors": registry.get_colors(theme),
+                }
+                if brand:
+                    spec["fonts"] = brand.fonts
+
+                assembler = SectionAssembler()
+                html = assembler.assemble(spec, theme)
+                return HTMLResponse(html)
+        except ImportError:
+            pass
+        except Exception as e:
+            return HTMLResponse(f"<html><body><h2>Preview Error</h2><pre>{e}</pre></body></html>", status_code=500)
+
+    # ── HTML template: render via web_engine ──
     from builder import TEMPLATE_REGISTRY
     tpl = TEMPLATE_REGISTRY.get(template_id, {})
     if tpl.get("type") == "html":
-        # Render single page
         content_overrides = {}
-        config = site.get("config", {})
         if config:
             content_overrides = {"brand": config.get("brand", {}), "contact": config.get("contact", {})}
         try:
@@ -736,7 +763,7 @@ async def api_preview_site(sid: str, page: str = "home"):
         except Exception as e:
             return HTMLResponse(f"<html><body><h2>Preview Error</h2><pre>{e}</pre></body></html>", status_code=500)
 
-    # React template -- serve dist/index.html or trigger build
+    # ── React template ──
     site_dir = Path(site.get("directory", ""))
     if not site_dir.exists():
         return HTMLResponse("<html><body><h2>Site directory not found</h2></body></html>", status_code=404)
@@ -744,12 +771,10 @@ async def api_preview_site(sid: str, page: str = "home"):
     dist_index = site_dir / "dist" / "index.html"
     if dist_index.exists():
         html = dist_index.read_text()
-        # Rewrite asset paths to go through builder's static serving
         html = html.replace('src="/assets/', 'src="/site-assets/' + sid + '/assets/')
         html = html.replace('href="/assets/', 'href="/site-assets/' + sid + '/assets/')
         return HTMLResponse(html)
 
-    # Check for multi-page (on non-primary pages)
     if page != "home":
         dist_page = site_dir / "dist" / f"{page}.html"
         if dist_page.exists():
