@@ -194,7 +194,7 @@ async def api_design_models():
                 {"id": "9router-deepseek", "name": "DeepSeek V4", "provider": "9Router", "badge": "🐋 Deep"},
             ],
             "local": [
-                {"id": "local-qwen", "name": "Qwen2.5 3B", "provider": "Ollama Lokal", "badge": "💻 Local"},
+                {"id": "local-qwen", "name": "Qwen2.5 7B", "provider": "Ollama VPS (qwen2.5)", "badge": "💻 VPS"},
             ],
             "api": [
                 {"id": "api-gemini", "name": "Gemini 3 Flash", "provider": "Direct API", "badge": "☁️ API"},
@@ -333,35 +333,46 @@ def _keyword_config(prompt: str) -> dict:
 
 
 async def _call_ollama(prompt: str, template_id: str) -> dict | None:
-    """Call Ollama local model for prompt parsing."""
+    """Call Ollama VPS (qwen2.5:7b) for prompt parsing.
+    Tries VPS via Tailscale first, falls back to localhost.
+    """
     import aiohttp
-    try:
-        async with aiohttp.ClientSession() as session:
-            payload = {
-                "model": "qwen2.5:3b",
-                "prompt": f"""Extract website configuration from this client description.
+    import json as j
+
+    OLLAMA_ENDPOINTS = [
+        "http://100.78.79.60:11434",   # VPS via Tailscale
+        "http://localhost:11434",        # lokal / VPS langsung
+    ]
+    MODEL = "qwen2.5:7b"
+
+    payload = {
+        "model": MODEL,
+        "prompt": f"""Extract website configuration from this client description.
 Return ONLY valid JSON with these fields: name (string), tagline (string), industry (string).
 
 Description: {prompt}
 
 JSON:""",
-                "stream": False,
-                "options": {"temperature": 0.1}
-            }
-            async with session.post("http://localhost:11434/api/generate", json=payload, timeout=aiohttp.ClientTimeout(total=30)) as resp:
-                if resp.status == 200:
-                    data = await resp.json()
-                    text = data.get("response", "")
-                    import json as j
-                    # Try to extract JSON from response
-                    try:
-                        start = text.index('{')
-                        end = text.rindex('}') + 1
-                        return j.loads(text[start:end])
-                    except (ValueError, j.JSONDecodeError):
-                        return None
-    except Exception:
-        return None
+        "stream": False,
+        "options": {"temperature": 0.1}
+    }
+
+    for endpoint in OLLAMA_ENDPOINTS:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(f"{endpoint}/api/generate", json=payload, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        text = data.get("response", "")
+                        try:
+                            start = text.index('{')
+                            end = text.rindex('}') + 1
+                            return j.loads(text[start:end])
+                        except (ValueError, j.JSONDecodeError):
+                            return None
+        except Exception:
+            continue
+    return None
 
 
 async def _call_9router(prompt: str, template_id: str, model: str) -> dict | None:
