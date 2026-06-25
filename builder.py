@@ -892,7 +892,8 @@ def update_site_config(site_id: str, config_updates: dict) -> dict:
 
 
 def build_site(site_id: str) -> dict:
-    """Build site. React: npm build. HTML: render via web_engine."""
+    """Build site. React: npm build. HTML: render via web_engine.
+    AI-generated sites: render via SectionAssembler."""
     data = load_data()
     s = data["sites"].get(site_id)
     if not s:
@@ -901,6 +902,34 @@ def build_site(site_id: str) -> dict:
     site_dir = Path(s["directory"])
     if not site_dir.exists():
         return {"error": "Site directory not found"}
+
+    config = s.get("config", {}) or {}
+
+    # ── AI-generated site: render via SectionAssembler ──
+    if config.get("ai_generated") or config.get("sections"):
+        try:
+            from ai_assembler import SectionAssembler
+            from brand_registry import get_registry
+            registry = get_registry()
+            theme = s.get("theme", "inxotive")
+            sections_config = config.get("sections", [])
+            if sections_config:
+                spec = {"brand": theme, "title": s.get("name", "INXOTIVE Design"), "sections": sections_config, "colors": registry.get_colors(theme)}
+                brand = registry.get(theme)
+                if brand: spec["fonts"] = brand.fonts
+                assembler = SectionAssembler()
+                html = assembler.assemble(spec, theme)
+                dist_dir = site_dir / "dist"
+                dist_dir.mkdir(parents=True, exist_ok=True)
+                (dist_dir / "index.html").write_text(html)
+                s["status"] = "built"; s["updated"] = _now()
+                data["sites"][site_id] = s
+                save_data(data)
+                return {"success": True, "output": f"AI site built: {len(html)} chars"}
+        except ImportError:
+            pass
+        except Exception as e:
+            return {"error": f"AI build failed: {e}"}
 
     tpl = TEMPLATE_REGISTRY.get(s["template"], {})
 

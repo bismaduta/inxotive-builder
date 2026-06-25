@@ -170,10 +170,17 @@ class BrandRegistry:
             self._brands[slug] = brand
 
     def _try_load_getdesign(self):
-        """Try to load 62 getdesign brands if available."""
+        """Try to load 62 getdesign brands if available.
+        Graceful fallback if file doesn't exist (e.g. VPS without market-api)."""
         try:
             import sys
-            sys.path.insert(0, str(Path.home() / "inxotive-builder"))
+            for p in [
+                str(Path.home() / "inxotive-builder"),
+                str(Path("/opt/inxotive/builder")),
+                str(Path("/opt/market-api")),
+            ]:
+                if Path(p).exists():
+                    sys.path.insert(0, p)
             from getdesign_brands import GETDESIGN_BRANDS
             for slug, data in GETDESIGN_BRANDS.items():
                 if slug not in self._brands:
