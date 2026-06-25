@@ -1232,10 +1232,10 @@ async def api_site_sections(sid: str):
     archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
     arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
     section_order = arch["section_order"]
-    site_config = site.get("config", {})
+    site_config = site.get("config", {}) or {}
     hidden = site_config.get("section_adjustments", {})
 
-    section_types = site_config.get("section_types", {})
+    section_types = site_config.get("section_types", {}) if isinstance(site_config, dict) else {}
     SECTION_VARIANTS = {
         "hero": ["split", "centered", "full-bleed", "gradient", "video"],
         "features": ["grid-3", "grid-4", "zigzag", "showcase", "icon-grid"],
@@ -1310,57 +1310,6 @@ async def api_site_critique(sid: str):
         "entry": entry,
     }
 
-
-@app.get("/api/sites/{sid}/sections")
-async def api_site_sections(sid: str):
-    """List all sections for a site with their types and variants."""
-    site = get_site(sid)
-    if not site:
-        raise HTTPException(status_code=404, detail="Site not found")
-
-    from css_framework import get_archetype_for_brand, ARCHETYPES
-    archetype_key = get_archetype_for_brand(site.get("theme", "inxotive"))
-    arch = ARCHETYPES.get(archetype_key, ARCHETYPES["corporate"])
-    section_order = arch["section_order"]
-
-    all_variants = {
-        "hero": arch["hero_layout"],
-        "features": arch["feature_layout"],
-        "about": "standard",
-        "stats": "default",
-        "testimonials": "default",
-        "pricing": "default",
-        "faq": "default",
-        "cta": "compact" if arch["name"] in ("Bold / Tech", "Corporate / Trust") else "centered",
-        "contact": "default",
-        "team": "carousel" if arch["motion_level"] in ("high", "medium") else "grid",
-        "footer": "compact" if arch["name"] == "Bold / Tech" else "standard",
-    }
-
-    label_map = {
-        "hero": "Hero", "features": "Fitur", "stats": "Statistik", "about": "Tentang",
-        "testimonials": "Testimoni", "pricing": "Harga", "faq": "FAQ", "cta": "CTA",
-        "contact": "Kontak", "team": "Tim", "footer": "Footer",
-    }
-
-    config = site.get("config", {}) or {}
-    saved_variants = config.get("section_variants", {})
-    saved_adjustments = config.get("section_adjustments", {})
-
-    sections = []
-    for idx, stype in enumerate(section_order):
-        if stype == "footer":
-            continue  # Footer excluded from per-section editing
-        sections.append({
-            "idx": idx,
-            "type": stype,
-            "label": label_map.get(stype, stype.capitalize()),
-            "default_variant": all_variants.get(stype, "default"),
-            "current_variant": saved_variants.get(str(idx), all_variants.get(stype, "default")),
-            "adjustments": saved_adjustments.get(str(idx), {}),
-        })
-
-    return {"archetype": archetype_key, "archetype_name": arch["name"], "sections": sections}
 
 
 @app.get("/api/render/{template_id}")
